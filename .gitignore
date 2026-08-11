@@ -1,0 +1,14 @@
+# environment
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# experiment tracking (local file store; see doc/decision_log.md)
+mlruns/
+mlartifacts/
+
+# DVC adds its own data/raw/.gitignore entry for the tracked file after `dvc add`
+
+# jupyter
+.jupyter/

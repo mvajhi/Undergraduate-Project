@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mlflow": {
+      "command": ".venv/bin/mlflow-mcp",
+      "args": [],
+      "env": {
+        "MLFLOW_TRACKING_URI": "mlruns"
+      }
+    }
+  }
+}
