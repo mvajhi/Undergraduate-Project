@@ -1,0 +1,6 @@
+outs:
+- md5: daf2f6fd583b26398340081ee6b99795.dir
+  size: 277170626
+  nfiles: 14
+  hash: md5
+  path: per_person_raw_data
