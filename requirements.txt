@@ -6,3 +6,4 @@ jupyterlab
 mlflow-mcp
 jdatetime
 openpyxl
+holidays
