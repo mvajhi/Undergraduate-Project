@@ -10,5 +10,10 @@ mlartifacts/
 
 # DVC adds its own data/raw/.gitignore entry for the tracked file after `dvc add`
 
+# data/interim/ is regenerable scratch (WBS 0.2: "میانی") — never a locked snapshot,
+# not worth versioning; reproduce with `python -m src.data.make_dataset`
+data/interim/*
+!data/interim/.gitkeep
+
 # jupyter
 .jupyter/

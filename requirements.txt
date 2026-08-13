@@ -7,3 +7,4 @@ mlflow-mcp
 jdatetime
 openpyxl
 holidays
+rapidfuzz
