@@ -8,11 +8,13 @@
 import logging
 
 from src.config import DATA_PROCESSED
+from src.data.campus_geo import attach_city, drop_excluded_restaurants
 from src.data.clean_individual import (
     apply_food_mapping,
     apply_restaurant_dorm_mapping,
     build_person_dim,
     build_person_reservation_fact,
+    derive_dorm_residency,
     harmonize_schema,
     load_raw_individual,
     map_reserve_status,
@@ -24,8 +26,8 @@ from src.validate import check_t2_nonnegative, check_t7
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-PERSON_DIM_PATH = DATA_PROCESSED / "person_dim_v1.csv"
-PERSON_FACT_PATH = DATA_PROCESSED / "person_reservation_fact_v1.csv"
+PERSON_DIM_PATH = DATA_PROCESSED / "person_dim_v2.csv"
+PERSON_FACT_PATH = DATA_PROCESSED / "person_reservation_fact_v2.csv"
 
 
 def build_datasets():
@@ -45,6 +47,18 @@ def build_datasets():
 
     logger.info("Applying restaurant/dorm mapping ...")
     df = apply_restaurant_dorm_mapping(df)
+
+    logger.info("Deriving is_dorm_resident from GroupName (WBS 4 correction) ...")
+    df = derive_dorm_residency(df)
+    logger.info(f"-> dorm residents: {df['is_dorm_resident'].mean():.1%} of reservation rows")
+
+    # --- اصلاحیه‌ی فاز ۴ (ردیف‌های ۲۱ و ۲۲ decision_log) ---
+    logger.info("Dropping excluded restaurants (WBS 4 correction) ...")
+    df, n_excl = drop_excluded_restaurants(df, "restaurant_canonical")
+    logger.info(f"-> {n_excl} rows dropped -> {len(df)} rows")
+
+    logger.info("Attaching campus city/province (WBS 4 correction) ...")
+    df = attach_city(df, "restaurant_canonical")
 
     logger.info("Applying food mapping ...")
     df = apply_food_mapping(df)

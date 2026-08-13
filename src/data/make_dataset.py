@@ -10,6 +10,7 @@
 import logging
 
 from src.config import DATA_EXTERNAL, DATA_INTERIM, DATA_PROCESSED
+from src.data.campus_geo import attach_city, drop_excluded_restaurants
 from src.data.clean import aggregate_over_gender, build_full_grid, coverage_report, drop_exact_duplicates, parse_dates
 from src.data.inspect_raw import load_aggregate
 from src.data.text_normalize import normalize_columns
@@ -18,8 +19,8 @@ from src.validate import assert_suite_passes, run_aggregate_suite
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-OUTPUT_PATH = DATA_PROCESSED / "dataset_v1.csv"
-COVERAGE_GRID_PATH = DATA_INTERIM / "coverage_grid_v1.csv"
+OUTPUT_PATH = DATA_PROCESSED / "dataset_v2.csv"
+COVERAGE_GRID_PATH = DATA_INTERIM / "coverage_grid_v2.csv"
 
 
 def build_dataset() -> "pd.DataFrame":  # noqa: F821 - typing only
@@ -48,6 +49,14 @@ def build_dataset() -> "pd.DataFrame":  # noqa: F821 - typing only
     logger.info("Aggregating over gender (WBS 3.9) ...")
     df_gender = aggregate_over_gender(df)
     logger.info(f"-> {len(df_gender)} rows at (d,m,r,f) grain")
+
+    # --- اصلاحیه‌ی فاز ۴ (ردیف‌های ۲۱ و ۲۲ decision_log) ---
+    logger.info("Dropping excluded restaurants (WBS 4 correction) ...")
+    df_gender, n_excl = drop_excluded_restaurants(df_gender, "RestaurantName")
+    logger.info(f"-> {n_excl} rows dropped -> {len(df_gender)} rows")
+
+    logger.info("Attaching campus city/province (WBS 4 correction) ...")
+    df_gender = attach_city(df_gender, "RestaurantName")
 
     logger.info("Building full grid / is_served classification (WBS 3.10) ...")
     df_cal = pd.read_csv(DATA_EXTERNAL / "calendar_tehran.csv")

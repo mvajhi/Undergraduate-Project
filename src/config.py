@@ -48,3 +48,11 @@ def set_global_seed(seed: int = RANDOM_SEED) -> None:
             torch.cuda.manual_seed_all(seed)
     except ImportError:
         pass
+
+    try:
+        from src.viz_fa import setup as setup_viz_fa
+
+        setup_viz_fa()
+    except Exception:
+        pass
+

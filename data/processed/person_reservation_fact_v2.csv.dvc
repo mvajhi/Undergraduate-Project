@@ -1,0 +1,5 @@
+outs:
+- md5: 08de473e4e1f410d2f56d338769f4588
+  size: 749848636
+  hash: md5
+  path: person_reservation_fact_v2.csv

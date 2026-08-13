@@ -64,3 +64,29 @@ sha256sum data/raw/<file>   # باید با مقدار ثبت‌شده در جد
 ### فایل‌های سطح فردی (`per_person_raw_data/`)
 - کدگذاری/ساختار: `.xlsx` (openpyxl)، بدون جداکننده (باینری اکسل)؛ ستون‌های متنی چند مقدار حاوی نویز `_x000D_\n` (Windows carriage-return باقی‌مانده از خروجی اکسل) هستند — طبق بند ۳-۱۲ WBS پاکسازی آن به فاز ۳ موکول است، اینجا فقط وجودش تأیید می‌شود.
 - تعداد ردیف و بازه‌ی تاریخ هر فایل: در `doc/data_dictionary_individual.md` (بند ۲.۱.۴) ثبت شده — حجم کل ~۲.۵۶ میلیون ردیف در ۷ فایل ماهانه.
+
+---
+
+## snapshot نسخه‌ی ۲ (اصلاحیه‌ی شروع فاز ۴) — ۲۰۲۶-۰۸-۱۳
+
+نسخه‌ی ۱ (قفل‌شده در M1) با دو اصلاح دامنه‌ای باطل شد؛ نسخه‌ی ۲ جایگزین آن در تمام تحلیل‌های فاز ۴ به بعد است. نسخه‌ی ۱ حذف نمی‌شود (ردیابی‌پذیری)، ولی **نباید مبنای هیچ تحلیل جدیدی باشد**. جزئیات چرایی: ردیف‌های ۲۱، ۲۲ و ۲۳ `doc/decision_log.md`.
+
+| فایل | ردیف | تغییر نسبت به v1 |
+|---|---|---|
+| `data/processed/dataset_v2.csv` | ۷٬۵۷۹ | −۱۲ ردیف (حذف «دوره حوزه علوم انسانی»)؛ +۴ ستون `city`, `province`, `is_tehran`, `distance_km_to_tehran_campus` |
+| `data/processed/person_dim_v2.csv` | ۲۶٬۷۷۲ | +۱ ستون `is_dorm_resident` |
+| `data/processed/person_reservation_fact_v2.csv` | ۲٬۱۲۷٬۲۴۰ | −۲۰۹ ردیف (همان حذف)؛ +۲ ستون `city`, `is_tehran` |
+| `data/interim/coverage_grid_v2.csv` | — | بازتولید متناظر |
+| `data/external/campus_geo.csv` | ۳۰ | **جدید** — نگاشت سلف → شهر/استان/مختصات |
+| `data/external/excluded_restaurants.csv` | ۲ | **جدید** — فهرست صریح سلف‌های کنارگذاشته‌شده |
+| `data/external/weather_aqi_by_city.csv` | ۱٬۴۵۸ | **جدید** — هواشناسی/AQI روزانه‌ی ۶ شهر (جایگزین `weather_aqi_tehran.csv` برای الحاق) |
+
+**بازتولید:**
+```
+python -m src.data.campus_geo
+python -m src.data.weather --by-city
+python -m src.data.make_dataset
+python -m src.data.make_dataset_individual
+```
+
+**⚠️ قاعده‌ی الحاق هواشناسی:** از این پس کلید الحاق `(city, date_gregorian)` است، نه `date_gregorian` تنها.

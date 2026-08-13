@@ -92,6 +92,26 @@ def apply_restaurant_dorm_mapping(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def derive_dorm_residency(df: pd.DataFrame) -> pd.DataFrame:
+    """`is_dorm_resident` را از `dorm_canonical` استخراج می‌کند (اصلاحیه‌ی فاز ۴، ردیف ۲۳ decision_log).
+
+    `GroupName` در سامانه‌ی مبدأ «واحد سرو» فرد است، نه صرفاً خوابگاه: مقدارش برای
+    ساکنان خوابگاه نام خوابگاه («خوابگاه کوی دانشگاه»، «فارابی خوابگاه(دانش قم-برادران)»)
+    و برای دانشجوی غیرساکن نام دانشکده/پردیس («دانشکده حقوق»، «دانشکدگان مدیریت») است.
+    پس یک پرچم دوتایی «ساکن خوابگاه / غیرساکن» مستقیماً از همین ستون قابل‌استخراج است —
+    فیچری که تحلیل بند ۴.۱۳ به آن نیاز دارد و در داده‌ی تجمیعی وجود ندارد (آنجا فقط
+    `RestaurantType` هست که *نوع سلف* را می‌گوید نه *وضعیت سکونت فرد*).
+
+    قاعده: وجود واژه‌ی «خوابگاه» در نام واحد، یا پسوند «متاهلین ... (شام و صبحانه)» که
+    واحد مسکونی متأهلین پردیس کشاورزی است (سرو شام و صبحانه = اقامتی، در برابر
+    «(وعده ناهار)» که واحد روزانه است).
+    """
+    df = df.copy()
+    g = df["dorm_canonical"].astype(str)
+    df["is_dorm_resident"] = g.str.contains("خوابگاه", na=False) | g.str.contains("متاهلین", na=False)
+    return df
+
+
 def apply_food_mapping(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     food_map = pd.read_csv(FOOD_MAPPING_PATH).set_index("raw_food_name")
@@ -127,6 +147,7 @@ PERSON_DIM_COLS = [
     "DegreeCode",
     "DegreeName",
     "dorm_canonical",
+    "is_dorm_resident",
     "EducationSession",
     "PersonType",
 ]
@@ -139,6 +160,8 @@ FACT_COLS = [
     "date_gregorian",
     "Meal",
     "restaurant_canonical",
+    "city",
+    "is_tehran",
     "FoodName",
     "main_food",
     "food_canonical",

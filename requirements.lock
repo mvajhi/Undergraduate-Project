@@ -9,6 +9,7 @@ annotated-types==0.8.0
 antlr4-python3-runtime==4.9.3
 anyio==4.14.2
 appdirs==1.4.4
+arabic-reshaper==3.0.1
 argon2-cffi==25.1.0
 argon2-cffi-bindings==25.1.0
 arrow==1.4.0
@@ -146,11 +147,14 @@ opentelemetry-semantic-conventions==0.65b0
 orjson==3.11.9
 packaging==26.3
 pandas==2.3.3
+pandas-flavor==0.8.1
 pandocfilters==1.5.1
 parso==0.8.7
 pathspec==1.1.1
+patsy==1.0.2
 pexpect==4.9.0
 pillow==12.3.0
+pingouin==0.6.1
 platformdirs==4.11.2
 prettytable==3.18.0
 prometheus_client==0.26.0
@@ -173,6 +177,7 @@ Pygments==2.20.0
 pygtrie==2.5.0
 PyJWT==2.13.0
 pyparsing==3.3.2
+python-bidi==0.6.11
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
 python-json-logger==4.1.0
@@ -189,9 +194,12 @@ rfc3987-syntax==1.1.0
 rich==15.0.0
 rpds-py==2026.6.3
 ruamel.yaml==0.19.1
+ruptures==1.1.10
 scikit-learn==1.9.0
+scikit-posthocs==0.14.0
 scipy==1.18.0
 scmrepo==3.6.2
+seaborn==0.13.2
 semver==3.0.4
 Send2Trash==2.1.0
 setuptools==84.0.0
@@ -207,6 +215,7 @@ sqltrie==0.11.2
 sse-starlette==3.4.8
 stack-data==0.6.3
 starlette==1.6.0
+statsmodels==0.14.6
 tabulate==0.10.0
 terminado==0.18.1
 threadpoolctl==3.6.0
@@ -229,6 +238,7 @@ webcolors==25.10.0
 webencodings==0.5.1
 websocket-client==1.9.0
 Werkzeug==3.1.8
+xarray==2026.7.0
 yarl==1.24.5
 zc.lockfile==4.0
 zipp==4.1.0

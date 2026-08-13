@@ -1,0 +1,5 @@
+outs:
+- md5: 6c0ff10fc438c47827395e59bf1eb416
+  size: 5586735
+  hash: md5
+  path: person_dim_v2.csv

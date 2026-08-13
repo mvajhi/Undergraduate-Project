@@ -8,3 +8,13 @@ jdatetime
 openpyxl
 holidays
 rapidfuzz
+scipy
+scikit-learn
+matplotlib
+statsmodels
+ruptures
+seaborn
+pingouin
+scikit-posthocs
+arabic-reshaper
+python-bidi
