@@ -171,11 +171,39 @@ FACT_COLS = [
     "Count",
     "ReserveStatus",
     "dont_receive",
+    "is_main_meal",
     "Price",
     "Reception",
     "ReceptionType",
     "Comment",
 ]
+
+
+def drop_cross_file_duplicates(df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
+    """رزروهای تکراری بین دو فایل ماهانه را حذف می‌کند (کشف‌شده در دور ۲ فاز ۴).
+
+    **چرا دروازه‌ی فاز ۳ این را نگرفت؟** تست T7 یکتایی را روی کلید مرکب
+    `(Reserveid, source_file, FoodName)` بررسی می‌کرد — یعنی `source_file` *داخل* کلید
+    بود. این کلید عمداً انتخاب شده بود تا موردِ قانونیِ «یک Reserveid روی دو ردیف غذای
+    مجزا» (غذای اصلی + قلم همراه، ردیف ۱۹ decision_log) به‌اشتباه تکرار شمرده نشود. اما
+    همین انتخاب، تکرار **بین فایلی** را نامرئی می‌کرد: روز ۱۴۰۳-۰۲-۰۱ (۲۰۲۴-۰۴-۲۰) که
+    روز مرزی دو ماه است، به‌طور کامل هم در `ReserveFarvardin-1403.xlsx` و هم در
+    `ReserveOrdibehesht-1403.xlsx` آمده و ۱۶٬۸۴۳ رزرو را دقیقاً دو بار می‌شمرد.
+
+    کلید درست `(Reserveid, FoodName)` است — بدون `source_file`: موردِ قانونی چون
+    `FoodName` متفاوتی دارد حفظ می‌شود، ولی نسخه‌ی دوبار-واردشده‌ی یک ردیف حذف می‌شود.
+    ترتیب `source_file` پایدار نگه داشته می‌شود تا خروجی بازتولیدپذیر باشد.
+    """
+    df = df.sort_values(["Reserveid", "FoodName", "source_file"], kind="stable")
+    n_before = len(df)
+    df = df.drop_duplicates(subset=["Reserveid", "FoodName"], keep="first")
+    return df, n_before - len(df)
+
+
+# وعده‌هایی که واحد تحلیل پروژه را می‌سازند. فایل فردی علاوه بر این‌ها `breakfast` و
+# `sahar` (سحری رمضان) هم دارد که در فایل تجمیعی اصلاً وجود ندارند و بخشی از مسئله‌ی
+# «مقدار پخت ناهار/شام» نیستند — کشف‌شده در دور ۲ فاز ۴ (سؤال Q8).
+MAIN_MEALS = ("lunch", "dinner")
 
 
 def build_person_dim(df: pd.DataFrame) -> pd.DataFrame:

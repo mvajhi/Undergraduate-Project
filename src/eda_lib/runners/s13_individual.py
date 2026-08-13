@@ -32,7 +32,7 @@ from src.eda_lib.runners._common import (
 )
 
 FACT_COLS = ["PersonId", "date_gregorian", "Meal", "restaurant_canonical", "city",
-             "is_tehran", "Count", "dont_receive", "food_canonical"]
+             "is_tehran", "Count", "dont_receive", "food_canonical", "is_main_meal"]
 
 
 def load_fact() -> pd.DataFrame:
@@ -51,7 +51,12 @@ def load_fact() -> pd.DataFrame:
     if len(df) < n0:
         print(f"[info] {n0 - len(df)} ردیف بدون نگاشت سلف/شهر کنار گذاشته شد (از {n0:,})")
     df["is_tehran"] = df["is_tehran"].astype(bool)
-    return df
+    # فقط ناهار و شام: واحد تحلیل پروژه همین دو وعده است و فایل تجمیعی هم فقط همین‌ها
+    # را دارد. صبحانه و سحری (۲.۹٪ ردیف‌ها) کشف دور ۲ بودند و خارج از دامنه‌اند.
+    n1 = len(df)
+    df = df[df["is_main_meal"].astype(bool)]
+    print(f"[info] {n1 - len(df):,} ردیف صبحانه/سحری کنار گذاشته شد → {len(df):,} ردیف ناهار/شام")
+    return df.drop(columns=["is_main_meal"])
 
 
 def run_history(fact: pd.DataFrame, dim: pd.DataFrame) -> pd.DataFrame:

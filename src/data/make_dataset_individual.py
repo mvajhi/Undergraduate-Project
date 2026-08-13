@@ -10,11 +10,13 @@ import logging
 from src.config import DATA_PROCESSED
 from src.data.campus_geo import attach_city, drop_excluded_restaurants
 from src.data.clean_individual import (
+    MAIN_MEALS,
     apply_food_mapping,
     apply_restaurant_dorm_mapping,
     build_person_dim,
     build_person_reservation_fact,
     derive_dorm_residency,
+    drop_cross_file_duplicates,
     harmonize_schema,
     load_raw_individual,
     map_reserve_status,
@@ -26,8 +28,8 @@ from src.validate import check_t2_nonnegative, check_t7
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-PERSON_DIM_PATH = DATA_PROCESSED / "person_dim_v2.csv"
-PERSON_FACT_PATH = DATA_PROCESSED / "person_reservation_fact_v2.csv"
+PERSON_DIM_PATH = DATA_PROCESSED / "person_dim_v3.csv"
+PERSON_FACT_PATH = DATA_PROCESSED / "person_reservation_fact_v3.csv"
 
 
 def build_datasets():
@@ -79,6 +81,15 @@ def build_datasets():
         raise AssertionError(f"Validation failed: {t2}")
     if not t7.passed:
         raise AssertionError(f"Validation failed: {t7}: {t7.violations[['Reserveid', 'source_file']].head()}")
+
+    # --- اصلاحیه‌ی دور ۲ فاز ۴ (ردیف ۲۷ decision_log) ---
+    logger.info("Dropping cross-file duplicate reservations ...")
+    df, n_dup = drop_cross_file_duplicates(df)
+    logger.info(f"-> {n_dup} duplicate rows dropped -> {len(df)} rows")
+
+    logger.info(f"Meal composition before main-meal flag:\n{df['Meal'].value_counts().to_string()}")
+    df["is_main_meal"] = df["Meal"].isin(MAIN_MEALS)
+    logger.info(f"-> is_main_meal (lunch/dinner): {df['is_main_meal'].mean():.2%} of rows")
 
     logger.info("Splitting fact/dimension (WBS 3.12) ...")
     dim = build_person_dim(df)

@@ -10,8 +10,8 @@ import pandas as pd
 from src.config import DATA_EXTERNAL, DATA_PROCESSED, FIGURES_DIR, set_global_seed
 
 DATASET_PATH = DATA_PROCESSED / "dataset_v2.csv"
-PERSON_DIM_PATH = DATA_PROCESSED / "person_dim_v2.csv"
-PERSON_FACT_PATH = DATA_PROCESSED / "person_reservation_fact_v2.csv"
+PERSON_DIM_PATH = DATA_PROCESSED / "person_dim_v3.csv"
+PERSON_FACT_PATH = DATA_PROCESSED / "person_reservation_fact_v3.csv"
 WEATHER_BY_CITY_PATH = DATA_EXTERNAL / "weather_aqi_by_city.csv"
 CALENDAR_PATH = DATA_EXTERNAL / "calendar_tehran.csv"
 EVENTS_PATH = DATA_EXTERNAL / "events.csv"
