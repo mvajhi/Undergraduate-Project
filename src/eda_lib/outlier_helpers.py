@@ -20,6 +20,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from src.eda_lib.figio import save_fig  # noqa: F401 — پیاده‌سازی واحد، بازصادر می‌شود
+
 # ---------------------------------------------------------------------------
 # ۴.۵.۱ روش‌های تک‌متغیره
 # ---------------------------------------------------------------------------
@@ -222,10 +224,3 @@ def two_way_anova_interaction(df: pd.DataFrame, target: str, factor_a: str, fact
     }
 
 
-def save_fig(fig, name: str, figures_dir: Path | str, dpi: int = 150) -> Path:
-    """ذخیره‌ی شکل matplotlib با نام یکتا (پیشوند بند WBS) در reports/figures/."""
-    figures_dir = Path(figures_dir)
-    figures_dir.mkdir(parents=True, exist_ok=True)
-    out_path = figures_dir / name
-    fig.savefig(out_path, dpi=dpi, bbox_inches="tight")
-    return out_path

@@ -17,6 +17,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from src.eda_lib.figio import save_fig  # noqa: F401 — پیاده‌سازی واحد، بازصادر می‌شود
+
 
 def daily_university_series(df: pd.DataFrame) -> pd.DataFrame:
     """سری روزانه‌ی تجمیعی کل دانشگاه: rho_day = Sum(NoRecv) / Sum(Res) در آن روز.
@@ -133,10 +135,3 @@ def nearby_calendar_flags(date, calendar: pd.DataFrame, window_days: int = 3) ->
     return window[any_flag]
 
 
-def save_fig(fig, name: str, figures_dir: Path | str, dpi: int = 150) -> Path:
-    """ذخیره‌ی شکل matplotlib با نام یکتا (پیشوند بند WBS) در reports/figures/."""
-    figures_dir = Path(figures_dir)
-    figures_dir.mkdir(parents=True, exist_ok=True)
-    out_path = figures_dir / name
-    fig.savefig(out_path, dpi=dpi, bbox_inches="tight")
-    return out_path
