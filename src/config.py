@@ -1,5 +1,6 @@
 """Project-wide paths, constants, and the single source of truth for random seeding."""
 
+import os
 import random
 from pathlib import Path
 
@@ -18,6 +19,12 @@ FIGURES_DIR = REPORTS_DIR / "figures"
 DOCS_DIR = ROOT_DIR / "doc"
 
 MLFLOW_TRACKING_URI = str(ROOT_DIR / "mlruns")
+
+#: MLflow >=3.x از پیش‌فرض دیگر backend فایل‌سیستمی خام (``mlruns/``) را بدون این env var
+#: نمی‌پذیرد ("maintenance mode"). این پروژه عمداً روی backend فایل‌سیستمی می‌ماند — نه sqlite —
+#: چون گردش‌کار GPU (بند 7.8.3 سند فاز ۷) با کپی‌کردن مستقیم پوشه‌ی ``mlruns_gpu/`` داخل
+#: ``mlruns/`` ادغام می‌شود؛ دو فایل sqlite را نمی‌شود این‌طور ساده ادغام کرد.
+os.environ.setdefault("MLFLOW_ALLOW_FILE_STORE", "true")
 
 RANDOM_SEED = 42
 

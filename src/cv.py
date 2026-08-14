@@ -19,13 +19,22 @@
 `test_expanding_features_independent_of_fold` آزموده می‌شود.
 """
 
+import hashlib
+import json
 from dataclasses import dataclass
 from typing import Iterator
 
 import numpy as np
 import pandas as pd
 
+from src.config import DATA_PROCESSED
+
 DATE_COL = "date_gregorian"
+
+#: بند 7.7.3 WBS فاز ۷ — دروازه‌ی انصاف A1. `src/cv.py` این فایل را **یک‌بار** می‌سازد؛
+#: هر run آموزش مدل فاز ۷ باید فقط از `load_cv_folds()` بخواند، نه `WalkForwardSplitter`
+#: مستقیم، تا هش (`cv_folds_hash`) با آنچه در `doc/data_manifest.md` ثبت شده مطابق بماند.
+CV_FOLDS_PATH = DATA_PROCESSED / "cv_folds.json"
 
 #: سه روز پایانی تحت تأثیر سوگواری ملی (ردیف ۲۰ decision_log). حذف نمی‌شوند؛
 #: فقط در گزارش فاز ۸ به‌عنوان برش جداگانه می‌آیند.
@@ -107,6 +116,79 @@ def holdout_split(df: pd.DataFrame, test_days: int = 25,
              test_start=cut, test_end=uniq[-1])
     tr, te = f.masks(df[date_col])
     return tr, te, f
+
+
+# ---------------------------------------------------------------------------
+# بند 7.7.3 سند فاز ۷ — انجماد foldها در فایل + هش، دروازه‌ی انصاف A1
+# ---------------------------------------------------------------------------
+
+def _folds_to_records(folds: list[Fold]) -> list[dict]:
+    return [
+        {
+            "index": f.index,
+            "train_start": f.train_start.date().isoformat(),
+            "train_end": f.train_end.date().isoformat(),
+            "test_start": f.test_start.date().isoformat(),
+            "test_end": f.test_end.date().isoformat(),
+        }
+        for f in folds
+    ]
+
+
+def _records_to_folds(records: list[dict]) -> list[Fold]:
+    return [
+        Fold(
+            index=r["index"],
+            train_start=pd.Timestamp(r["train_start"]),
+            train_end=pd.Timestamp(r["train_end"]),
+            test_start=pd.Timestamp(r["test_start"]),
+            test_end=pd.Timestamp(r["test_end"]),
+        )
+        for r in records
+    ]
+
+
+def _folds_payload(df: pd.DataFrame, splitter: WalkForwardSplitter, source: str) -> dict:
+    """محتوای قطعی (deterministic) فایل — بدون timestamp، تا هش فقط تابع داده و تنظیمات splitter باشد."""
+    folds = splitter.split_dates(df[DATE_COL])
+    return {
+        "date_col": DATE_COL,
+        "source": source,
+        "splitter": {
+            "n_folds": splitter.n_folds,
+            "min_train_days": splitter.min_train_days,
+            "test_days": splitter.test_days,
+            "embargo_days": splitter.embargo_days,
+        },
+        "n_unique_dates": int(df[DATE_COL].nunique()),
+        "folds": _folds_to_records(folds),
+    }
+
+
+def sha256_file(path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def write_cv_folds(df: pd.DataFrame, splitter: WalkForwardSplitter, source: str,
+                   path=CV_FOLDS_PATH) -> str:
+    """می‌سازد و می‌نویسد. **فقط یک‌بار** اجرا شود (`python -m src.cv`) — نتیجه در git/DVC می‌ماند
+    و هرگز بی‌سروصدا بازنویسی نمی‌شود، وگرنه هش تغییر می‌کند و run‌های قبلی از دروازه‌ی A1 رد می‌شوند.
+
+    برمی‌گرداند: هش SHA-256 فایل نوشته‌شده، برای ثبت در `doc/data_manifest.md`.
+    """
+    payload = _folds_payload(df, splitter, source)
+    text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+    return sha256_file(path)
+
+
+def load_cv_folds(path=CV_FOLDS_PATH) -> tuple[list[Fold], str]:
+    """بارگذاری foldهای منجمدشده + هش فایل. هر اسکریپت/نوت‌بوک آموزش مدل فاز ۷ باید از این
+    تابع بخواند و `cv_folds_hash` بازگشتی را به‌عنوان param هر MLflow run ثبت کند (بند 7.7.2).
+    """
+    payload = json.loads(path.read_text())
+    return _records_to_folds(payload["folds"]), sha256_file(path)
 
 
 # ---------------------------------------------------------------------------
@@ -241,3 +323,35 @@ def run_protocol_tests(df: pd.DataFrame, splitter: WalkForwardSplitter) -> bool:
         print(f"  {'✅' if ok else '❌'} {name:<38s} {msg}")
         all_ok &= ok
     return all_ok
+
+
+def main() -> None:
+    """تولید یک‌بارِ `data/processed/cv_folds.json` (بند 7.7.3 سند فاز ۷).
+
+    اجرا: ``python -m src.cv``. اگر فایل از قبل وجود دارد، بازنویسی نمی‌کند — چون بازنویسی
+    یعنی هش عوض می‌شود و run‌های فاز ۷ که قبلاً با هش قدیمی ثبت شده‌اند نامعتبر می‌شوند.
+    """
+    from src.config import ROOT_DIR
+    from src.features.build import FEATURES_A_PATH
+
+    if CV_FOLDS_PATH.exists():
+        _, h = load_cv_folds()
+        print(f"⚠️  {CV_FOLDS_PATH} از قبل وجود دارد — بازنویسی نمی‌شود.")
+        print(f"    هش فعلی: {h}")
+        print("    برای بازتولید عمدی، ابتدا فایل را حذف کنید (و پیامدش روی run‌های قبلی را بسنجید).")
+        return
+
+    df = pd.read_parquet(FEATURES_A_PATH)
+    splitter = WalkForwardSplitter(n_folds=5, min_train_days=60)
+    h = write_cv_folds(df, splitter, source=str(FEATURES_A_PATH.relative_to(ROOT_DIR)))
+
+    folds, _ = load_cv_folds()
+    print(f"✅ {CV_FOLDS_PATH} ساخته شد — {len(folds)} fold از {df[DATE_COL].nunique()} تاریخ یکتا")
+    for f in folds:
+        print(f"    {f}")
+    print(f"\ncv_folds_hash = {h}")
+    print("\n⚠️ این هش را در doc/data_manifest.md ثبت کنید — دروازه‌ی انصاف A1 فاز ۷.")
+
+
+if __name__ == "__main__":
+    main()

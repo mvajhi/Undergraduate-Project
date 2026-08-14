@@ -1,0 +1,48 @@
+{
+  "date_col": "date_gregorian",
+  "folds": [
+    {
+      "index": 0,
+      "test_end": "2024-02-21",
+      "test_start": "2024-01-29",
+      "train_end": "2024-01-28",
+      "train_start": "2023-11-22"
+    },
+    {
+      "index": 1,
+      "test_end": "2024-03-11",
+      "test_start": "2024-02-22",
+      "train_end": "2024-02-21",
+      "train_start": "2023-11-22"
+    },
+    {
+      "index": 2,
+      "test_end": "2024-04-11",
+      "test_start": "2024-03-12",
+      "train_end": "2024-03-11",
+      "train_start": "2023-11-22"
+    },
+    {
+      "index": 3,
+      "test_end": "2024-04-30",
+      "test_start": "2024-04-13",
+      "train_end": "2024-04-11",
+      "train_start": "2023-11-22"
+    },
+    {
+      "index": 4,
+      "test_end": "2024-05-19",
+      "test_start": "2024-05-01",
+      "train_end": "2024-04-30",
+      "train_start": "2023-11-22"
+    }
+  ],
+  "n_unique_dates": 142,
+  "source": "data/processed/features_A_v1.parquet",
+  "splitter": {
+    "embargo_days": 0,
+    "min_train_days": 60,
+    "n_folds": 5,
+    "test_days": null
+  }
+}

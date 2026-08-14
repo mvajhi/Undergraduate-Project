@@ -1,6 +1,7 @@
 numpy
 pandas
 mlflow
+optuna
 dvc
 jupyterlab
 mlflow-mcp
@@ -18,3 +19,5 @@ pingouin
 scikit-posthocs
 arabic-reshaper
 python-bidi
+pygam
+group-lasso

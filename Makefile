@@ -12,4 +12,4 @@ data-pull:
 	.venv/bin/dvc pull
 
 mlflow-ui:
-	.venv/bin/mlflow ui --backend-store-uri mlruns
+	MLFLOW_ALLOW_FILE_STORE=true .venv/bin/mlflow ui --backend-store-uri mlruns

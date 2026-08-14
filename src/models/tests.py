@@ -1,0 +1,298 @@
+"""تست‌های واحد زیرساخت فاز ۷ (اسپرینت S-1) — الگوی `src/cv.py::run_protocol_tests`:
+هر ``test_*`` یک ``(bool, str)`` برمی‌گرداند، بدون وابستگی به pytest.
+
+اجرا: ``python -m src.models.tests``
+"""
+
+import re
+from pathlib import Path
+
+import optuna
+import pandas as pd
+
+from src.config import DOCS_DIR
+from src.cv import CV_FOLDS_PATH, WalkForwardSplitter, _folds_payload, load_cv_folds, sha256_file
+from src.models import cards
+from src.models.naming import parse_run_name, run_name, tau_code, tau_from_code
+from src.models.registry import FAMILIES, ModelSpec, register
+from src.models.spaces import register_space, sample, trial_budget
+
+# ---------------------------------------------------------------------------
+# src/cv.py — انجماد foldها (بند 7.7.3، دروازه‌ی A1)
+# ---------------------------------------------------------------------------
+
+def test_cv_folds_hash_reproducible() -> tuple[bool, str]:
+    """بازتولید payload از همان داده باید بایت‌به‌بایت با فایل منجمدشده یکی باشد —
+    وگرنه هش پایدار نیست و دروازه‌ی A1 بی‌معناست."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists() or not CV_FOLDS_PATH.exists():
+        return True, "رد شد (داده یا cv_folds.json هنوز موجود نیست) — نه شکست"
+
+    df = pd.read_parquet(FEATURES_A_PATH)
+    splitter = WalkForwardSplitter(n_folds=5, min_train_days=60)
+    fresh = _folds_payload(df, splitter, source="ignored-for-comparison")
+    frozen = __import__("json").loads(CV_FOLDS_PATH.read_text())
+
+    same_folds = fresh["folds"] == frozen["folds"]
+    same_n = fresh["n_unique_dates"] == frozen["n_unique_dates"]
+    ok = same_folds and same_n
+    return ok, f"{len(fresh['folds'])} fold بازتولید شد · یکسان با فایل منجمد: {ok}"
+
+
+def test_cv_folds_hash_matches_manifest() -> tuple[bool, str]:
+    """هش فایل زنده باید با هشی که در doc/data_manifest.md ثبت شده مطابق باشد — کشف
+    می‌کند که آیا کسی فایل را بی‌سروصدا بازتولید کرده بدون به‌روزرسانی سند."""
+    manifest_path = DOCS_DIR / "data_manifest.md"
+    if not CV_FOLDS_PATH.exists() or not manifest_path.exists():
+        return True, "رد شد (فایل یا سند مانیفست موجود نیست) — نه شکست"
+
+    text = manifest_path.read_text()
+    m = re.search(r"cv_folds\.json.*?`([0-9a-f]{64})`", text, re.DOTALL)
+    if not m:
+        return False, "هیچ هش SHA-256 مربوط به cv_folds.json در doc/data_manifest.md پیدا نشد"
+    registered_hash = m.group(1)
+    live_hash = sha256_file(CV_FOLDS_PATH)
+    ok = registered_hash == live_hash
+    return ok, f"ثبت‌شده={registered_hash[:12]}… · زنده={live_hash[:12]}… · مطابق: {ok}"
+
+
+def test_cv_folds_load_roundtrip() -> tuple[bool, str]:
+    if not CV_FOLDS_PATH.exists():
+        return True, "رد شد (cv_folds.json هنوز موجود نیست) — نه شکست"
+    folds, h = load_cv_folds()
+    ok = len(folds) == 5 and len(h) == 64
+    return ok, f"{len(folds)} fold بارگذاری شد · طول هش={len(h)}"
+
+
+# ---------------------------------------------------------------------------
+# src/models/registry.py — بند 7.0.2/7.26
+# ---------------------------------------------------------------------------
+
+def test_registry_family_sum() -> tuple[bool, str]:
+    total = sum(f.n_models for f in FAMILIES.values())
+    ok = total == 169 and len(FAMILIES) == 13
+    return ok, f"{len(FAMILIES)} خانواده · جمع مدل‌ها={total} (انتظار: ۱۳ و ۱۶۹)"
+
+
+def test_registry_duplicate_model_id_rejected() -> tuple[bool, str]:
+    spec = ModelSpec(model_id="__test_dummy__", family="F01", levels=("L1",), quantile_route="Q1")
+    try:
+        register(spec)
+        register(spec)
+        return False, "ثبت دوباره‌ی model_id تکراری باید ValueError می‌داد"
+    except ValueError:
+        return True, "ثبت دوباره درست رد شد"
+    finally:
+        from src.models.registry import MODELS
+        MODELS.pop("__test_dummy__", None)
+
+
+def test_registry_invalid_spec_rejected() -> tuple[bool, str]:
+    bad_family, bad_level, bad_route = False, False, False
+    try:
+        ModelSpec(model_id="x", family="F99", levels=("L1",), quantile_route="Q1")
+    except ValueError:
+        bad_family = True
+    try:
+        ModelSpec(model_id="x", family="F01", levels=("L9",), quantile_route="Q1")
+    except ValueError:
+        bad_level = True
+    try:
+        ModelSpec(model_id="x", family="F01", levels=("L1",), quantile_route="Q9")
+    except ValueError:
+        bad_route = True
+    ok = bad_family and bad_level and bad_route
+    return ok, f"خانواده‌ی نامعتبر رد شد={bad_family} · سطح={bad_level} · مسیر کوانتایل={bad_route}"
+
+
+# ---------------------------------------------------------------------------
+# src/models/naming.py — بند 7.7.1
+# ---------------------------------------------------------------------------
+
+def test_run_name_matches_wbs_example() -> tuple[bool, str]:
+    """مثال دقیق بند 7.7.1 سند فاز ۷ باید بایت‌به‌بایت بازتولید شود."""
+    import datetime as dt
+
+    name = run_name(family="F02", model="lightgbm", level="L1", target="rho",
+                    feature_set="FSlgbm", tau=0.10, stage="S2", seed=42,
+                    timestamp=dt.datetime(2026, 8, 15, 11, 30))
+    expected = "F02_lightgbm_L1_rho_FSlgbm_t010_S2_s42_20260815T1130"
+    return name == expected, f"{name!r} == {expected!r}"
+
+
+def test_run_name_roundtrip() -> tuple[bool, str]:
+    import datetime as dt
+
+    cases = [
+        dict(family="F05", model="egarch", level="L3", target="shock", feature_set="FSvar",
+             tau=0.10, stage="S2", seed=42),
+        dict(family="F07", model="tft", level="L4", target="rho", feature_set="FSseq",
+             tau=0.05, stage="S3", seed=0),
+    ]
+    for kw in cases:
+        name = run_name(timestamp=dt.datetime(2026, 8, 20, 9, 40), **kw)
+        parsed = parse_run_name(name)
+        for k, v in kw.items():
+            if parsed[k] != v:
+                return False, f"{name!r}: {k}={parsed[k]!r} != {v!r}"
+    return True, f"{len(cases)} مورد رفت‌وبرگشت کامل تأیید شد"
+
+
+def test_run_name_rejects_invalid_parts() -> tuple[bool, str]:
+    bad = [
+        dict(family="F99", model="x", level="L1", target="rho", feature_set="FS", tau=.1, stage="S2", seed=1),
+        dict(family="F01", model="Bad-Name", level="L1", target="rho", feature_set="FS", tau=.1, stage="S2", seed=1),
+        dict(family="F01", model="x", level="L9", target="rho", feature_set="FS", tau=.1, stage="S2", seed=1),
+        dict(family="F01", model="x", level="L1", target="rho", feature_set="FS", tau=.1, stage="S9", seed=1),
+        dict(family="F01", model="x", level="L1", target="rho", feature_set="FS", tau=1.5, stage="S2", seed=1),
+    ]
+    for kw in bad:
+        try:
+            run_name(**kw)
+            return False, f"باید رد می‌شد ولی نشد: {kw}"
+        except ValueError:
+            pass
+    return True, f"{len(bad)} ورودی نامعتبر همگی درست رد شدند"
+
+
+def test_tau_code_roundtrip() -> tuple[bool, str]:
+    for tau in (0.02, 0.05, 0.10, 0.15, 0.20, 1 / 3):
+        code = tau_code(tau)
+        back = tau_from_code(code)
+        if abs(back - round(tau, 2)) > 1e-9:
+            return False, f"tau={tau} → {code} → {back} — رفت‌وبرگشت نادرست"
+    return True, "شبکه‌ی τ (بند ۶.۵) رفت‌وبرگشت درست دارد"
+
+
+# ---------------------------------------------------------------------------
+# src/models/spaces.py — بند 7.6.2/7.6.3
+# ---------------------------------------------------------------------------
+
+def test_trial_budget_matches_wbs_table() -> tuple[bool, str]:
+    """جدول بند 7.6.2: (۱–۲→۲۵/۵۰) (۳–۵→۶۰/۱۲۰) (۶–۹→۱۲۰/۲۵۰) (۱۰+→۱۵۰/۳۰۰)."""
+    cases = [
+        (1, "S2", 25), (2, "S2", 25), (3, "S2", 60), (5, "S2", 60),
+        (6, "S2", 120), (9, "S2", 120), (10, "S2", 150), (20, "S2", 150),
+        (2, "S3", 50), (5, "S3", 120), (9, "S3", 250), (10, "S3", 300),
+    ]
+    for n, stage, expected in cases:
+        got = trial_budget(n, stage)
+        if got != expected:
+            return False, f"trial_budget({n}, {stage!r})={got} != {expected}"
+    return True, f"{len(cases)} نقطه از جدول 7.6.2 تأیید شد"
+
+
+def test_space_version_guard() -> tuple[bool, str]:
+    @register_space("__test_space__", version=1, n_hyperparams=1)
+    def _v1(trial: optuna.Trial) -> dict:
+        return {"a": trial.suggest_float("a", 0, 1)}
+
+    try:
+        @register_space("__test_space__", version=1, n_hyperparams=1)
+        def _v1_again(trial: optuna.Trial) -> dict:
+            return {}
+        return False, "ثبت با همان نسخه باید رد می‌شد"
+    except ValueError:
+        pass
+    finally:
+        from src.models.spaces import SPACES
+        SPACES.pop("__test_space__", None)
+    return True, "دکوراتور register_space نسخه‌ی تکراری را درست رد کرد"
+
+
+def test_space_sample_and_missing() -> tuple[bool, str]:
+    @register_space("__test_space2__", version=1, n_hyperparams=1)
+    def _space(trial: optuna.Trial) -> dict:
+        return {"x": trial.suggest_int("x", 1, 10)}
+
+    study = optuna.create_study(sampler=optuna.samplers.RandomSampler(seed=0))
+    trial = study.ask()
+    params = sample("__test_space2__", trial)
+    from src.models.spaces import SPACES
+    SPACES.pop("__test_space2__", None)
+
+    ok_sample = "x" in params and 1 <= params["x"] <= 10
+    try:
+        sample("__nonexistent_model__", trial)
+        ok_missing = False
+    except KeyError:
+        ok_missing = True
+    return ok_sample and ok_missing, f"نمونه‌گیری={ok_sample} · خطای مدل ثبت‌نشده={ok_missing}"
+
+
+# ---------------------------------------------------------------------------
+# src/models/cards.py — بند 7.4
+# ---------------------------------------------------------------------------
+
+def test_card_completeness_and_roundtrip(tmp_dir: Path | None = None) -> tuple[bool, str]:
+    import tempfile
+
+    tmp_dir = tmp_dir or Path(tempfile.mkdtemp())
+    card = cards.ModelCard("__test_model__")
+    if card.is_complete():
+        return False, "کارت خالی نباید کامل باشد"
+    if set(card.missing_mandatory()) != set(cards.MANDATORY_STEPS):
+        return False, f"missing_mandatory اشتباه: {card.missing_mandatory()}"
+
+    for i in range(1, len(cards.STEPS) + 1):
+        card.set_section(i, f"متن گام {i}")
+    if not card.is_complete():
+        return False, "کارت پرشده باید کامل باشد"
+
+    path = tmp_dir / "__test_model__.md"
+    card.save(path)
+    reloaded = cards.load("__test_model__", path)
+    ok = reloaded.sections == card.sections and reloaded.is_complete()
+    return ok, f"ذخیره/بازخوانی {len(cards.STEPS)} گام یکسان بازگشت: {ok}"
+
+
+def test_card_require_complete_raises() -> tuple[bool, str]:
+    card = cards.ModelCard("__test_incomplete__")
+    card.set_section(1, "فقط این یکی")
+    try:
+        card.require_complete()
+        return False, "require_complete باید برای کارت ناقص خطا می‌داد"
+    except ValueError:
+        return True, "require_complete درست خطا داد"
+
+
+# ---------------------------------------------------------------------------
+# اجراکننده
+# ---------------------------------------------------------------------------
+
+_ALL_TESTS = [
+    test_cv_folds_hash_reproducible,
+    test_cv_folds_hash_matches_manifest,
+    test_cv_folds_load_roundtrip,
+    test_registry_family_sum,
+    test_registry_duplicate_model_id_rejected,
+    test_registry_invalid_spec_rejected,
+    test_run_name_matches_wbs_example,
+    test_run_name_roundtrip,
+    test_run_name_rejects_invalid_parts,
+    test_tau_code_roundtrip,
+    test_trial_budget_matches_wbs_table,
+    test_space_version_guard,
+    test_space_sample_and_missing,
+    test_card_completeness_and_roundtrip,
+    test_card_require_complete_raises,
+]
+
+
+def run_all() -> bool:
+    all_ok = True
+    for fn in _ALL_TESTS:
+        ok, msg = fn()
+        print(f"  {'✅' if ok else '❌'} {fn.__name__:<40s} {msg}")
+        all_ok &= ok
+    return all_ok
+
+
+if __name__ == "__main__":
+    print("=" * 78)
+    print("تست‌های واحد زیرساخت فاز ۷ (اسپرینت S-1)")
+    print("=" * 78)
+    if not run_all():
+        raise AssertionError("یک یا چند تست زیرساخت شکست خورد")
+    print("\nهمه‌ی تست‌ها PASS")
