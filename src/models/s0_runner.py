@@ -83,7 +83,8 @@ def run_family_s0(family: str, level: str, models: dict[str, Callable], train: p
                         level=level, feature_set=feature_set, tau=tau, target=target,
                         **axis_overrides)
         with start_model_run(cfg, data_snapshot_hash=data_snapshot_hash, cv_folds_hash=cv_folds_hash,
-                             train=train, test=test, dataset_source=dataset_source) as run:
+                             train=train, test=test, dataset_source=dataset_source,
+                             source_fn=fn) as run:
             run_id = run.info.run_id
             try:
                 out = np.asarray(fn(train, test, tau), dtype=float)

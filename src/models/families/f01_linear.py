@@ -581,5 +581,51 @@ def main() -> None:
         raise AssertionError("یک یا چند مدل L1×F01 در S0 شکست خوردند")
 
 
+def run_s1(n_jobs: int | None = None) -> None:
+    """اجرای S1 (بند 7.3.1) — ۲۰ trial تصادفی × ۳ fold برای هر ۱۵ مدل تنظیم‌پذیر
+    (بدون glm_binomial، بند TUNING_EXCLUDED). اجرا: ``python -m
+    src.models.families.f01_linear --stage s1``."""
+    from src.config import set_global_seed
+    from src.cv import load_cv_folds, sha256_file
+    from src.features.build import FEATURES_A_PATH
+    from src.models.s1_runner import DEFAULT_N_JOBS, N_SCREENING_FOLDS, run_family_s1, save_results
+
+    set_global_seed()
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values("date_gregorian").reset_index(drop=True)
+    folds, cv_folds_hash = load_cv_folds()
+    data_snapshot_hash = sha256_file(FEATURES_A_PATH)
+
+    screening_folds = []
+    for f in folds[:N_SCREENING_FOLDS]:
+        tr_mask, te_mask = f.masks(df["date_gregorian"])
+        screening_folds.append((df.loc[tr_mask], df.loc[te_mask]))
+
+    model_ids = sorted(set(MODELS) - TUNING_EXCLUDED)
+    jobs = n_jobs or DEFAULT_N_JOBS
+    print(f"S1 — {FAMILY} ({LEVEL}) — {len(model_ids)} مدل، {N_SCREENING_FOLDS} fold "
+         f"نخست، {jobs} worker موازی")
+    print(f"مستثنا از تنظیم: {sorted(TUNING_EXCLUDED)} (بند 7.10.1: رد‌شده، فقط یک‌بار اجرا)\n")
+
+    results = run_family_s1(FAMILY, LEVEL, "src.models.families.f01_linear", model_ids, screening_folds,
+                            feature_set=FEATURE_SET_S0, data_snapshot_hash=data_snapshot_hash,
+                            cv_folds_hash=cv_folds_hash, dataset_source=str(FEATURES_A_PATH),
+                            n_jobs=jobs)
+    save_results(results, FAMILY, LEVEL)
+
+    n_fail = sum(1 for r in results if r.status == "fail")
+    print(f"\n{len(results)} trial تمام شد · {n_fail} شکست · "
+         f"ذخیره شد در reports/phase7/S1_screening_{FAMILY}.md")
+
+
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--stage", choices=["s0", "s1"], default="s0")
+    parser.add_argument("--jobs", type=int, default=None, help="تعداد worker موازی برای S1")
+    args = parser.parse_args()
+
+    if args.stage == "s0":
+        main()
+    else:
+        run_s1(n_jobs=args.jobs)

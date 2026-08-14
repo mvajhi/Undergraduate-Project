@@ -252,24 +252,39 @@ def test_tracking_logs_dataset_and_model_type() -> tuple[bool, str]:
         train = pd.DataFrame({"rho": [0.1, 0.2], "Res": [10, 20]})
         test = pd.DataFrame({"rho": [0.15], "Res": [15]})
         with tracking.start_model_run(cfg, data_snapshot_hash="abc123", cv_folds_hash="def456",
-                                      train=train, test=test, dataset_source="pytest-source") as run:
+                                      train=train, test=test, dataset_source="pytest-source",
+                                      source_fn=test_tracking_logs_dataset_and_model_type) as run:
             run_id = run.info.run_id
 
         client = mlflow.tracking.MlflowClient(tracking_uri=tmp_dir)
         r = client.get_run(run_id)
         model_type_ok = r.data.tags.get("model_type") == "pytest.DummyAlgo"
+        code_ref = r.data.tags.get("code_ref", "")
+        code_ref_ok = code_ref.startswith("src/models/tests.py:") and code_ref.endswith(
+            "#test_tracking_logs_dataset_and_model_type")
         inputs = r.inputs.dataset_inputs
         dataset_count_ok = len(inputs) == 2  # train + test
         names_ok = all("FS_test" in d.dataset.name for d in inputs)
         contexts = {t.value for d in inputs for t in d.tags if t.key == "mlflow.data.context"}
         contexts_ok = contexts == {"train", "test"}
-        ok = model_type_ok and dataset_count_ok and names_ok and contexts_ok
-        return ok, (f"model_type tag={model_type_ok} · تعداد dataset={len(inputs)} · "
-                    f"نام حاوی feature_set={names_ok} · context‌ها={contexts_ok}")
+        ok = model_type_ok and code_ref_ok and dataset_count_ok and names_ok and contexts_ok
+        return ok, (f"model_type tag={model_type_ok} · code_ref={code_ref!r} ({code_ref_ok}) · "
+                    f"تعداد dataset={len(inputs)} · نام حاوی feature_set={names_ok} · context‌ها={contexts_ok}")
     finally:
         tracking.MLFLOW_TRACKING_URI = original_uri
         if not already_registered:
             MODEL_REGISTRY.pop("test_track_dummy", None)
+
+
+def test_code_reference_derivation() -> tuple[bool, str]:
+    """``code_reference`` باید مسیر نسبی + خط + نام تابع بدهد، و ``None`` را با
+    ``'unknown'`` جواب بدهد (نه خطا) — چون همیشه هر مدل ``source_fn`` نمی‌دهد."""
+    from src.models.tracking import code_reference
+
+    ref = code_reference(test_code_reference_derivation)
+    ok_self = ref.startswith("src/models/tests.py:") and ref.endswith("#test_code_reference_derivation")
+    ok_none = code_reference(None) == "unknown"
+    return ok_self and ok_none, f"ref={ref!r} · none={code_reference(None)!r}"
 
 
 def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
@@ -339,6 +354,7 @@ _ALL_TESTS = [
     test_space_version_guard,
     test_space_sample_and_missing,
     test_tracking_logs_dataset_and_model_type,
+    test_code_reference_derivation,
     test_f01_all_specs_have_algorithm,
     test_card_completeness_and_roundtrip,
     test_card_require_complete_raises,

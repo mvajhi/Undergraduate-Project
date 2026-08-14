@@ -5,7 +5,7 @@
 اعلام‌کردن موضع اجرا روی **هر نُه محور آزمایش** بند 7.9.1 از نظر فنی اجباری است، نه
 یک توصیه‌ی نانوشته که فراموش شود.
 
-سه چیز همیشه در **جای اختصاصی خودشان** در MLflow ثبت می‌شوند، نه فقط به‌عنوان بخشی از
+چهار چیز همیشه در **جای اختصاصی خودشان** در MLflow ثبت می‌شوند، نه فقط به‌عنوان بخشی از
 نام run:
 
 1. **دیتاست** — با ``mlflow.log_input`` در تب Dataset هر run (نه فقط هش در param).
@@ -13,7 +13,11 @@
    بدون باز کردن param جداگانه معلوم باشد.
 2. **نوع مدل** — tag اختصاصی ``model_type`` (کلاس/کتابخانه‌ی واقعی، از
    ``registry.MODELS[model_id].algorithm``)، جدا از ``model_id`` که فقط اسلاگ داخلی است.
-3. **خودِ مدل fitشده** (اختیاری، برای مدل‌های سنگین) — با ``log_model_fn`` که یک تابع
+3. **مرجع کد** — tag اختصاصی ``code_ref`` (``مسیر/فایل.py:خط#نام_تابع``)، خودکار از
+   ``inspect`` روی خودِ تابع fit_predict استخراج می‌شود — نه نوشته‌شده‌ی دستی که ممکن است
+   با جابه‌جایی کد قدیمی بماند. کنار ``git_commit`` (که از قبل tag می‌شود)، یعنی هر run
+   دقیقاً می‌گوید «کدام کامیت، کدام فایل، کدام خط» — بازتولیدش فقط یک ``git checkout`` است.
+4. **خودِ مدل fitشده** (اختیاری، برای مدل‌های سنگین) — با ``log_model_fn`` که یک تابع
    ``(run) -> None`` است و مدل را با فلیور مناسب (``mlflow.sklearn``/``mlflow.pytorch``/…)
    در Model Registry ثبت می‌کند. برای مدل‌های سبک/برازش سریع (خ۱ خطی) لازم نیست — طبق
    بند 7.29.1 artifact کامل مدل برای قهرمانان S3 است، نه هر trial سبک S0/S1.
@@ -30,20 +34,23 @@
                     scope="per_cluster", weighting="res")   # ← محورها صریح‌اند
     with start_model_run(cfg, data_snapshot_hash=SNAPSHOT_HASH, cv_folds_hash=cv_hash,
                          train=train_df, test=test_df, dataset_source=str(FEATURES_A_PATH),
+                         source_fn=fit_predict_lightgbm,     # ← code_ref خودکار از این می‌آید
                          n_trials=120, sampler="TPE"):
         mlflow.log_params(hyperparams)
         mlflow.log_metric("pinball", value)
 """
 
+import inspect
 import subprocess
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Callable, Iterator
 
 import mlflow
 import mlflow.data
 import pandas as pd
 
-from src.config import MLFLOW_TRACKING_URI
+from src.config import MLFLOW_TRACKING_URI, ROOT_DIR
 from src.models.axes import LEVEL_DATASET_VARIANT, RunConfig
 from src.models.naming import run_name
 from src.models.registry import MODELS as MODEL_REGISTRY
@@ -59,6 +66,21 @@ def git_commit_short() -> str:
             ["git", "rev-parse", "--short", "HEAD"], text=True, stderr=subprocess.DEVNULL
         ).strip()
     except Exception:
+        return "unknown"
+
+
+def code_reference(fn: Callable | None) -> str:
+    """``مسیر/نسبی/فایل.py:خط#نام_تابع`` برای تابع fit_predict — بازتولید یعنی باز کردن
+    دقیقاً همین آدرس روی همان ``git_commit``. با ``inspect`` مشتق می‌شود تا هرگز دستی
+    نوشته و فراموش نشود (بند 7.7.2، `doc/phase7-execution-standard.md` بند ۱.۴)."""
+    if fn is None:
+        return "unknown"
+    try:
+        path = Path(inspect.getsourcefile(fn) or inspect.getfile(fn)).resolve()
+        rel = path.relative_to(ROOT_DIR)
+        _, lineno = inspect.getsourcelines(fn)
+        return f"{rel}:{lineno}#{fn.__name__}"
+    except (TypeError, OSError, ValueError):
         return "unknown"
 
 
@@ -81,7 +103,7 @@ def start_model_run(cfg: RunConfig, *, data_snapshot_hash: str, cv_folds_hash: s
                     compute: str = "local", n_trials: int | None = None,
                     sampler: str | None = None,
                     train: pd.DataFrame | None = None, test: pd.DataFrame | None = None,
-                    dataset_source: str | None = None,
+                    dataset_source: str | None = None, source_fn: Callable | None = None,
                     log_model_fn: Callable[[mlflow.ActiveRun], None] | None = None,
                     experiment: str = DEFAULT_EXPERIMENT) -> Iterator[mlflow.ActiveRun]:
     """باز کردن یک MLflow run با نام (بند 7.7.1) و tag/paramهای اجباری (بند 7.7.2).
@@ -89,7 +111,12 @@ def start_model_run(cfg: RunConfig, *, data_snapshot_hash: str, cv_folds_hash: s
     فراخوان مسئول ثبت ``hyperparams`` کامل و metricهای مدل خودش است (چون این‌ها
     مدل‌به‌مدل فرق می‌کنند)؛ این تابع فقط اسکلت مشترکی را که هرگز نباید فراموش شود تضمین
     می‌کند: نام درست، هر نُه محور آزمایش، ``cv_folds_hash``، ``data_snapshot_hash``، تب
-    Dataset (اگر ``train``/``test`` داده شود)، و tag اختصاصی ``model_type``.
+    Dataset (اگر ``train``/``test`` داده شود)، و tagهای اختصاصی ``model_type``/``code_ref``.
+
+    ``source_fn`` تابع fit_predict همان مدل است — اگر داده شود، ``code_ref`` خودکار از
+    روی آن ساخته می‌شود (بند ۱.۴ استاندارد اجرا). ندادنش خطا نیست ولی یعنی run
+    بازتولیدپذیریِ «کدام فایل، کدام خط» را ندارد — فقط برای کدهای آزمایشیِ خارج از
+    ``src/models/families/`` قابل‌قبول است.
 
     ``log_model_fn`` قلاب اختیاری برای مدل‌های سنگین است — بعد از پایان بدنه‌ی ``with``
     صدا زده می‌شود تا فراخوان مدل fitشده را با فلیور مناسب ثبت کند؛ برای خانواده‌های سبک
@@ -114,6 +141,7 @@ def start_model_run(cfg: RunConfig, *, data_snapshot_hash: str, cv_folds_hash: s
             "compute": compute,
             "family": cfg.family,
             "model_type": model_type,  # ⭐ جای اختصاصی نوع الگوریتم — جدا از model_id/نام run
+            "code_ref": code_reference(source_fn),  # ⭐ فایل:خط#تابع — بازتولید = git checkout + باز کردن همین آدرس
         })
         params = {
             **cfg.to_mlflow_params(),          # هر نُه محور، هرکدام یک param جدا
