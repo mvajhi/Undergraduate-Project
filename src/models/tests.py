@@ -76,7 +76,8 @@ def test_registry_family_sum() -> tuple[bool, str]:
 
 
 def test_registry_duplicate_model_id_rejected() -> tuple[bool, str]:
-    spec = ModelSpec(model_id="__test_dummy__", family="F01", levels=("L1",), quantile_route="Q1")
+    spec = ModelSpec(model_id="__test_dummy__", family="F01", levels=("L1",), quantile_route="Q1",
+                     algorithm="sklearn.Dummy")
     try:
         register(spec)
         register(spec)
@@ -91,15 +92,15 @@ def test_registry_duplicate_model_id_rejected() -> tuple[bool, str]:
 def test_registry_invalid_spec_rejected() -> tuple[bool, str]:
     bad_family, bad_level, bad_route = False, False, False
     try:
-        ModelSpec(model_id="x", family="F99", levels=("L1",), quantile_route="Q1")
+        ModelSpec(model_id="x", family="F99", levels=("L1",), quantile_route="Q1", algorithm="a")
     except ValueError:
         bad_family = True
     try:
-        ModelSpec(model_id="x", family="F01", levels=("L9",), quantile_route="Q1")
+        ModelSpec(model_id="x", family="F01", levels=("L9",), quantile_route="Q1", algorithm="a")
     except ValueError:
         bad_level = True
     try:
-        ModelSpec(model_id="x", family="F01", levels=("L1",), quantile_route="Q9")
+        ModelSpec(model_id="x", family="F01", levels=("L1",), quantile_route="Q9", algorithm="a")
     except ValueError:
         bad_route = True
     ok = bad_family and bad_level and bad_route
@@ -222,6 +223,68 @@ def test_space_sample_and_missing() -> tuple[bool, str]:
 
 
 # ---------------------------------------------------------------------------
+# src/models/tracking.py — دیتاست و model_type اختصاصی (نه فقط بخشی از نام run)
+# ---------------------------------------------------------------------------
+
+def test_tracking_logs_dataset_and_model_type() -> tuple[bool, str]:
+    """``start_model_run`` باید train/test را در تب Dataset اختصاصی MLflow ثبت کند
+    (نه فقط هش در param) و tag ``model_type`` را از رجیستری بخواند (نه از model_id)."""
+    import tempfile
+
+    import mlflow
+
+    from src.models import tracking
+    from src.models.axes import RunConfig
+    from src.models.registry import MODELS as MODEL_REGISTRY
+    from src.models.registry import ModelSpec, register
+
+    already_registered = "test_track_dummy" in MODEL_REGISTRY
+    if not already_registered:
+        register(ModelSpec(model_id="test_track_dummy", family="F01", levels=("L1",),
+                           quantile_route="Q1", algorithm="pytest.DummyAlgo"))
+
+    tmp_dir = tempfile.mkdtemp()
+    original_uri = tracking.MLFLOW_TRACKING_URI
+    tracking.MLFLOW_TRACKING_URI = tmp_dir
+    try:
+        cfg = RunConfig(family="F01", model_id="test_track_dummy", stage="S0", seed=1,
+                        level="L1", feature_set="FS_test", tau=0.20)
+        train = pd.DataFrame({"rho": [0.1, 0.2], "Res": [10, 20]})
+        test = pd.DataFrame({"rho": [0.15], "Res": [15]})
+        with tracking.start_model_run(cfg, data_snapshot_hash="abc123", cv_folds_hash="def456",
+                                      train=train, test=test, dataset_source="pytest-source") as run:
+            run_id = run.info.run_id
+
+        client = mlflow.tracking.MlflowClient(tracking_uri=tmp_dir)
+        r = client.get_run(run_id)
+        model_type_ok = r.data.tags.get("model_type") == "pytest.DummyAlgo"
+        inputs = r.inputs.dataset_inputs
+        dataset_count_ok = len(inputs) == 2  # train + test
+        names_ok = all("FS_test" in d.dataset.name for d in inputs)
+        contexts = {t.value for d in inputs for t in d.tags if t.key == "mlflow.data.context"}
+        contexts_ok = contexts == {"train", "test"}
+        ok = model_type_ok and dataset_count_ok and names_ok and contexts_ok
+        return ok, (f"model_type tag={model_type_ok} · تعداد dataset={len(inputs)} · "
+                    f"نام حاوی feature_set={names_ok} · context‌ها={contexts_ok}")
+    finally:
+        tracking.MLFLOW_TRACKING_URI = original_uri
+        if not already_registered:
+            MODEL_REGISTRY.pop("test_track_dummy", None)
+
+
+def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
+    """هر ۱۶ عضو ثبت‌شده‌ی F01 باید فیلد algorithm غیرخالی داشته باشد — چون این همان
+    مقداری است که به‌عنوان tag اختصاصی model_type در MLflow می‌رود، نه model_id."""
+    import src.models.families.f01_linear  # noqa: F401  — اثر جانبی: ثبت در MODELS
+    from src.models.registry import models_of_family
+
+    specs = models_of_family("F01")
+    empty = [s.model_id for s in specs if not s.algorithm]
+    ok = len(specs) >= 16 and not empty
+    return ok, f"{len(specs)} مدل F01 ثبت‌شده · بدون algorithm: {empty or 'هیچ‌کدام'}"
+
+
+# ---------------------------------------------------------------------------
 # src/models/cards.py — بند 7.4
 # ---------------------------------------------------------------------------
 
@@ -275,6 +338,8 @@ _ALL_TESTS = [
     test_trial_budget_matches_wbs_table,
     test_space_version_guard,
     test_space_sample_and_missing,
+    test_tracking_logs_dataset_and_model_type,
+    test_f01_all_specs_have_algorithm,
     test_card_completeness_and_roundtrip,
     test_card_require_complete_raises,
 ]

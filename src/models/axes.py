@@ -41,6 +41,14 @@ WEIGHTINGS = ("none", "res", "sqrt_res")
 #: سطح تجمیع خروجی (بند 7.24)
 OUTPUT_AGGREGATIONS = ("per_food", "aggregated", "reconciled")
 
+#: L1-L4 همگی از دیتاست **تجمیعی** مشتق می‌شوند (`dataset_v2.csv`)؛ L5 از دیتاست
+#: **فردی** (`person_reservation_fact_v3.csv`) — همان مرز «مدل A / مدل B» تاریخی
+#: (بند ۱.۶ WBS). برای نام‌گذاری خوانای MLflow Dataset استفاده می‌شود، تا از تب
+#: Datasets هر run بی‌درنگ معلوم شود روی کدام دیتاست و با کدام فیچرست train شده.
+LEVEL_DATASET_VARIANT: dict[str, str] = {
+    "L1": "تجمیعی", "L2": "تجمیعی", "L3": "تجمیعی", "L4": "تجمیعی", "L5": "فردی",
+}
+
 #: شبکه‌ی τ بند 7.9.1 — کل شبکه فقط در S3 پیموده می‌شود
 TAU_GRID = (0.02, 0.05, 0.10, 0.15, 0.20)
 

@@ -62,6 +62,9 @@ class ModelSpec:
     family: str                            # کد خانواده، باید در FAMILIES باشد
     levels: tuple[str, ...]                # سطوح داده‌ای که این مدل واقعاً روی آن اجرا می‌شود
     quantile_route: str                    # یکی از QUANTILE_ROUTES (بند 7.23)
+    algorithm: str                         # کلاس/کتابخانه‌ی واقعی پیاده‌سازی، مثل "statsmodels.GLM(Gamma)"
+                                            # — به tag اختصاصی `model_type` هر MLflow run می‌رود
+                                            # (جدا از model_id که فقط شناسه‌ی داخلی پروژه است)
     incompatible_levels: tuple[str, ...] = field(default_factory=tuple)  # با دلیل در بند 7.27
 
     def __post_init__(self) -> None:

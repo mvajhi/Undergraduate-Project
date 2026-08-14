@@ -14,12 +14,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "7ac6f9ff4a1741ed8b6ccfecdab24ed0",
+    "mlflow_run_id": "e09c441e50754da0a16f6e67811d8db1",
     "model_id": "adaptive_lasso",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.03837132453918457,
+    "seconds": 0.19142723083496094,
     "status": "pass"
   },
   "F01/L1/beta_regression": {
@@ -37,12 +37,12 @@
       "surplus_portions": 9568.0,
       "waste_reduction_pct": 0.4528819762122598
     },
-    "mlflow_run_id": "e7b87e196bce46929835e97fe9b60345",
+    "mlflow_run_id": "784b0ff298764a12804aaca0004b3670",
     "model_id": "beta_regression",
     "output_max": 0.16682289948118806,
     "output_mean": 0.043960135009134385,
     "output_min": 0.00046624446862862656,
-    "seconds": 0.6287901401519775,
+    "seconds": 0.9365427494049072,
     "status": "pass"
   },
   "F01/L1/composite_quantile_regression": {
@@ -60,12 +60,12 @@
       "surplus_portions": 7687.0,
       "waste_reduction_pct": 0.5604414455626716
     },
-    "mlflow_run_id": "dd98cf35c61f41a1af8389c7f42332b6",
+    "mlflow_run_id": "235c08b7329f430399f905c2006ba74f",
     "model_id": "composite_quantile_regression",
     "output_max": 0.14230548488953065,
     "output_mean": 0.05152829624595762,
     "output_min": 0.0,
-    "seconds": 34.88841104507446,
+    "seconds": 33.57541465759277,
     "status": "pass"
   },
   "F01/L1/elasticnet": {
@@ -83,12 +83,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "156d49b1b68c4dbe9e29a80bba61f32f",
+    "mlflow_run_id": "c0672585c107418e945cefcd088c26d8",
     "model_id": "elasticnet",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.03999590873718262,
+    "seconds": 0.19778871536254883,
     "status": "pass"
   },
   "F01/L1/expectile_regression": {
@@ -106,12 +106,12 @@
       "surplus_portions": 3911.0,
       "waste_reduction_pct": 0.7763609332113449
     },
-    "mlflow_run_id": "209e8f302e0b4e8f883505041ced4dbe",
+    "mlflow_run_id": "ac8d890d12554aafa6e0bd60b9ac20a3",
     "model_id": "expectile_regression",
     "output_max": 0.21074235767633592,
     "output_mean": 0.0858557896640661,
     "output_min": 0.0,
-    "seconds": 0.05075192451477051,
+    "seconds": 0.20087742805480957,
     "status": "pass"
   },
   "F01/L1/gam": {
@@ -129,12 +129,12 @@
       "surplus_portions": 2781.0,
       "waste_reduction_pct": 0.840976669716377
     },
-    "mlflow_run_id": "e4bf1ea9f5874e4a91ea0da0fd1f2eec",
+    "mlflow_run_id": "36214c33bc284a55a9e74f5f663652bc",
     "model_id": "gam",
     "output_max": 0.23198526839225805,
     "output_mean": 0.12040184978586566,
     "output_min": 0.0062661881386957274,
-    "seconds": 0.12691020965576172,
+    "seconds": 0.401090145111084,
     "status": "pass"
   },
   "F01/L1/glm_binomial": {
@@ -152,12 +152,12 @@
       "surplus_portions": 6915.0,
       "waste_reduction_pct": 0.6045860018298261
     },
-    "mlflow_run_id": "110a8e923ad74ee7b8e6f98f39e66cf5",
+    "mlflow_run_id": "682e62654e3b4286b8e3eed56f5e0005",
     "model_id": "glm_binomial",
     "output_max": 0.2325384320172953,
     "output_mean": 0.061691184292604395,
     "output_min": 0.0,
-    "seconds": 0.17666316032409668,
+    "seconds": 0.42548108100891113,
     "status": "pass"
   },
   "F01/L1/glm_gamma": {
@@ -175,12 +175,12 @@
       "surplus_portions": 8299.0,
       "waste_reduction_pct": 0.5254460201280878
     },
-    "mlflow_run_id": "191cb6154a70460e97810870a07ee5fb",
+    "mlflow_run_id": "82b59975739c48e2b10e6333e4edf543",
     "model_id": "glm_gamma",
     "output_max": 0.25654413268533377,
     "output_mean": 0.061670375586994564,
     "output_min": 0.013566779654242252,
-    "seconds": 0.345184326171875,
+    "seconds": 0.5704262256622314,
     "status": "pass"
   },
   "F01/L1/glm_tweedie": {
@@ -198,12 +198,12 @@
       "surplus_portions": 7610.0,
       "waste_reduction_pct": 0.5648444647758464
     },
-    "mlflow_run_id": "fb14a9bb6f0b4cf3a1868e3dc9f514de",
+    "mlflow_run_id": "3a7961d1f8c14cad98692a1c4265c81f",
     "model_id": "glm_tweedie",
     "output_max": 0.32306980426182963,
     "output_mean": 0.06932943592492465,
     "output_min": 0.00864300970147821,
-    "seconds": 0.5096304416656494,
+    "seconds": 0.7895970344543457,
     "status": "pass"
   },
   "F01/L1/group_lasso": {
@@ -221,12 +221,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "24d91564fbec4e7e9392dc20c76ac7ba",
+    "mlflow_run_id": "e5f64de59884491f84f4d82cb03f11a2",
     "model_id": "group_lasso",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.5315306186676025,
+    "seconds": 0.747352123260498,
     "status": "pass"
   },
   "F01/L1/hurdle": {
@@ -244,12 +244,12 @@
       "surplus_portions": 6582.0,
       "waste_reduction_pct": 0.6236276303751144
     },
-    "mlflow_run_id": "4132ba6fd1d44527abd0d1b3e96f26ba",
+    "mlflow_run_id": "b556d404b5d743e490e049d19bb3e724",
     "model_id": "hurdle",
     "output_max": 0.23331739872857943,
     "output_mean": 0.06438704065456606,
     "output_min": 0.0,
-    "seconds": 0.5414321422576904,
+    "seconds": 0.7700188159942627,
     "status": "pass"
   },
   "F01/L1/l1_quantile_regression": {
@@ -267,12 +267,12 @@
       "surplus_portions": 7681.0,
       "waste_reduction_pct": 0.5607845379688929
     },
-    "mlflow_run_id": "f0c9c82000b54557957ab46d6c2e57a5",
+    "mlflow_run_id": "f5e1ebe95e9a45b39e9fa720b538d227",
     "model_id": "l1_quantile_regression",
     "output_max": 0.12419221703006302,
     "output_mean": 0.05545266950054167,
     "output_min": 0.0,
-    "seconds": 1.176905870437622,
+    "seconds": 1.3060035705566406,
     "status": "pass"
   },
   "F01/L1/lasso": {
@@ -290,12 +290,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "6e30fc4fce5a45acbcea4580f51f0dc8",
+    "mlflow_run_id": "4ee67dada7dc4121a14c31d31b19b01f",
     "model_id": "lasso",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.045488595962524414,
+    "seconds": 0.21369075775146484,
     "status": "pass"
   },
   "F01/L1/ols": {
@@ -313,12 +313,12 @@
       "surplus_portions": 4630.0,
       "waste_reduction_pct": 0.7352470265324794
     },
-    "mlflow_run_id": "f8b47e00d8b64872a88058b26c34a5d5",
+    "mlflow_run_id": "1b6ff652ac094820b27b1b801ef7ff9d",
     "model_id": "ols",
     "output_max": 0.24007657883020592,
     "output_mean": 0.07742208296341885,
     "output_min": 0.0,
-    "seconds": 0.33927130699157715,
+    "seconds": 0.44754838943481445,
     "status": "pass"
   },
   "F01/L1/quantile_regression": {
@@ -336,12 +336,12 @@
       "surplus_portions": 6613.0,
       "waste_reduction_pct": 0.6218549862763038
     },
-    "mlflow_run_id": "e55700f1450f4ecaa1ba875db61db05c",
+    "mlflow_run_id": "0c214d3ab32a40dda909da56d8824781",
     "model_id": "quantile_regression",
     "output_max": 0.14793150991045342,
     "output_mean": 0.061824091930308786,
     "output_min": 0.0,
-    "seconds": 0.7120087146759033,
+    "seconds": 0.8658218383789062,
     "status": "pass"
   },
   "F01/L1/ridge": {
@@ -359,12 +359,12 @@
       "surplus_portions": 4704.0,
       "waste_reduction_pct": 0.7310155535224154
     },
-    "mlflow_run_id": "e61136c158cb4b35a1640b276a546650",
+    "mlflow_run_id": "5d55b0977b264f468e6fe50a319d0c1b",
     "model_id": "ridge",
     "output_max": 0.23919462662837962,
     "output_mean": 0.07694138508372783,
     "output_min": 0.0,
-    "seconds": 0.05379438400268555,
+    "seconds": 0.24873924255371094,
     "status": "pass"
   },
   "_baseline_B3": {

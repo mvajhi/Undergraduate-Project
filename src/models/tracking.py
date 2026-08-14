@@ -5,6 +5,19 @@
 اعلام‌کردن موضع اجرا روی **هر نُه محور آزمایش** بند 7.9.1 از نظر فنی اجباری است، نه
 یک توصیه‌ی نانوشته که فراموش شود.
 
+سه چیز همیشه در **جای اختصاصی خودشان** در MLflow ثبت می‌شوند، نه فقط به‌عنوان بخشی از
+نام run:
+
+1. **دیتاست** — با ``mlflow.log_input`` در تب Dataset هر run (نه فقط هش در param).
+   نام دیتاست خودش می‌گوید «تجمیعی یا فردی، با کدام فیچرست» تا از تب Datasets هر run
+   بدون باز کردن param جداگانه معلوم باشد.
+2. **نوع مدل** — tag اختصاصی ``model_type`` (کلاس/کتابخانه‌ی واقعی، از
+   ``registry.MODELS[model_id].algorithm``)، جدا از ``model_id`` که فقط اسلاگ داخلی است.
+3. **خودِ مدل fitشده** (اختیاری، برای مدل‌های سنگین) — با ``log_model_fn`` که یک تابع
+   ``(run) -> None`` است و مدل را با فلیور مناسب (``mlflow.sklearn``/``mlflow.pytorch``/…)
+   در Model Registry ثبت می‌کند. برای مدل‌های سبک/برازش سریع (خ۱ خطی) لازم نیست — طبق
+   بند 7.29.1 artifact کامل مدل برای قهرمانان S3 است، نه هر trial سبک S0/S1.
+
 مثال استفاده::
 
     from src.cv import load_cv_folds
@@ -16,6 +29,7 @@
                     level="L1", feature_set="FS_lgbm", tau=0.10,
                     scope="per_cluster", weighting="res")   # ← محورها صریح‌اند
     with start_model_run(cfg, data_snapshot_hash=SNAPSHOT_HASH, cv_folds_hash=cv_hash,
+                         train=train_df, test=test_df, dataset_source=str(FEATURES_A_PATH),
                          n_trials=120, sampler="TPE"):
         mlflow.log_params(hyperparams)
         mlflow.log_metric("pinball", value)
@@ -23,13 +37,16 @@
 
 import subprocess
 from contextlib import contextmanager
-from typing import Iterator
+from typing import Callable, Iterator
 
 import mlflow
+import mlflow.data
+import pandas as pd
 
 from src.config import MLFLOW_TRACKING_URI
-from src.models.axes import RunConfig
+from src.models.axes import LEVEL_DATASET_VARIANT, RunConfig
 from src.models.naming import run_name
+from src.models.registry import MODELS as MODEL_REGISTRY
 
 DEFAULT_EXPERIMENT = "phase7"
 
@@ -45,16 +62,38 @@ def git_commit_short() -> str:
         return "unknown"
 
 
+def _log_dataset_input(df: pd.DataFrame, cfg: RunConfig, context: str,
+                       source: str | None, snapshot_hash: str) -> None:
+    """ثبت یک زیرمجموعه (train/test) در تب Dataset اختصاصی MLflow — بند 7.7.2.
+
+    نام دیتاست خوانا و خودگویاست: ``{تجمیعی|فردی}-{feature_set}-{context}`` — تا از تب
+    Datasets هر run بی‌درنگ معلوم شود روی کدام دیتاست و با کدام فیچرست train شده، بدون
+    نیاز به باز کردن paramها.
+    """
+    variant = LEVEL_DATASET_VARIANT.get(cfg.level, cfg.level)
+    name = f"{variant}-{cfg.feature_set}-{context}"
+    ds = mlflow.data.from_pandas(df, source=source or "unknown", name=name, digest=snapshot_hash[:8])
+    mlflow.log_input(ds, context=context, tags={"level": cfg.level, "feature_set": cfg.feature_set})
+
+
 @contextmanager
 def start_model_run(cfg: RunConfig, *, data_snapshot_hash: str, cv_folds_hash: str,
                     compute: str = "local", n_trials: int | None = None,
                     sampler: str | None = None,
+                    train: pd.DataFrame | None = None, test: pd.DataFrame | None = None,
+                    dataset_source: str | None = None,
+                    log_model_fn: Callable[[mlflow.ActiveRun], None] | None = None,
                     experiment: str = DEFAULT_EXPERIMENT) -> Iterator[mlflow.ActiveRun]:
     """باز کردن یک MLflow run با نام (بند 7.7.1) و tag/paramهای اجباری (بند 7.7.2).
 
     فراخوان مسئول ثبت ``hyperparams`` کامل و metricهای مدل خودش است (چون این‌ها
     مدل‌به‌مدل فرق می‌کنند)؛ این تابع فقط اسکلت مشترکی را که هرگز نباید فراموش شود تضمین
-    می‌کند: نام درست، هر نُه محور آزمایش، ``cv_folds_hash``، و ``data_snapshot_hash``.
+    می‌کند: نام درست، هر نُه محور آزمایش، ``cv_folds_hash``، ``data_snapshot_hash``، تب
+    Dataset (اگر ``train``/``test`` داده شود)، و tag اختصاصی ``model_type``.
+
+    ``log_model_fn`` قلاب اختیاری برای مدل‌های سنگین است — بعد از پایان بدنه‌ی ``with``
+    صدا زده می‌شود تا فراخوان مدل fitشده را با فلیور مناسب ثبت کند؛ برای خانواده‌های سبک
+    (خ۱ خطی) لازم نیست.
     """
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment(experiment)
@@ -65,12 +104,16 @@ def start_model_run(cfg: RunConfig, *, data_snapshot_hash: str, cv_folds_hash: s
                     feature_set=cfg.feature_set.replace("_", ""), tau=cfg.tau,
                     stage=cfg.stage, seed=cfg.seed)
 
+    spec = MODEL_REGISTRY.get(cfg.model_id)
+    model_type = spec.algorithm if spec is not None else "unregistered"
+
     with mlflow.start_run(run_name=name) as run:
         mlflow.set_tags({
             "git_commit": git_commit_short(),
             "stage": cfg.stage,
             "compute": compute,
             "family": cfg.family,
+            "model_type": model_type,  # ⭐ جای اختصاصی نوع الگوریتم — جدا از model_id/نام run
         })
         params = {
             **cfg.to_mlflow_params(),          # هر نُه محور، هرکدام یک param جدا
@@ -82,4 +125,13 @@ def start_model_run(cfg: RunConfig, *, data_snapshot_hash: str, cv_folds_hash: s
         if sampler is not None:
             params["sampler"] = sampler
         mlflow.log_params(params)
+
+        if train is not None:
+            _log_dataset_input(train, cfg, "train", dataset_source, data_snapshot_hash)
+        if test is not None:
+            _log_dataset_input(test, cfg, "test", dataset_source, data_snapshot_hash)
+
         yield run
+
+        if log_model_fn is not None:
+            log_model_fn(run)

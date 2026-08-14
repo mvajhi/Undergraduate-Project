@@ -16,6 +16,7 @@ import json
 from functools import lru_cache
 
 import numpy as np
+import optuna
 import pandas as pd
 import statsmodels.api as sm
 from scipy import stats
@@ -26,6 +27,7 @@ from sklearn.preprocessing import StandardScaler
 
 from src.models.families import common
 from src.models.registry import ModelSpec, register
+from src.models.spaces import register_space
 
 FAMILY = "F01"
 FEATURE_SET_S0 = "FS_day"
@@ -402,8 +404,143 @@ _QUANTILE_ROUTES = {
     "glm_tweedie": "Q2", "beta_regression": "Q2", "glm_binomial": "Q2", "hurdle": "Q2", "gam": "Q3",
 }
 
+#: کلاس/کتابخانه‌ی واقعی هر مدل — به tag اختصاصی ``model_type`` هر MLflow run می‌رود
+#: (بند 7.7.2، تفصیل در `doc/phase7-execution-standard.md`)، جدا از model_id که فقط
+#: شناسه‌ی داخلی پروژه است.
+_ALGORITHMS = {
+    "ols": "sklearn.LinearRegression",
+    "ridge": "sklearn.Ridge",
+    "lasso": "sklearn.Lasso",
+    "elasticnet": "sklearn.ElasticNet",
+    "adaptive_lasso": "sklearn.Lasso (وزن‌دهی تطبیقی سفارشی)",
+    "group_lasso": "group_lasso.GroupLasso",
+    "quantile_regression": "statsmodels.QuantReg",
+    "l1_quantile_regression": "sklearn.QuantileRegressor",
+    "composite_quantile_regression": "scipy.optimize.linprog (LP سفارشی)",
+    "expectile_regression": "sklearn.Ridge (IRLS سفارشی)",
+    "glm_gamma": "statsmodels.GLM(Gamma)",
+    "glm_tweedie": "statsmodels.GLM(Tweedie)",
+    "beta_regression": "statsmodels.BetaModel",
+    "glm_binomial": "statsmodels.GLM(Binomial)",
+    "hurdle": "statsmodels.GLM(Binomial)+Ridge (دوبخشی سفارشی)",
+    "gam": "pygam.LinearGAM",
+}
+
 for _model_id, _route in _QUANTILE_ROUTES.items():
-    register(ModelSpec(model_id=_model_id, family=FAMILY, levels=(LEVEL,), quantile_route=_route))
+    register(ModelSpec(model_id=_model_id, family=FAMILY, levels=(LEVEL,), quantile_route=_route,
+                       algorithm=_ALGORITHMS[_model_id]))
+
+
+# ---------------------------------------------------------------------------
+# فضای هایپرپارامتر — بند 7.10.2. هر تابع یک optuna.Trial می‌گیرد و دیکشنری
+# هایپرپارامتر متناظر با امضای fit_predict همان مدل برمی‌گرداند.
+# ---------------------------------------------------------------------------
+
+#: عضو #۱۴ (GLM Binomial) طبق بند 7.10.1 «رد‌شده — ولی یک‌بار اجرا و گزارش می‌شود» است؛
+#: هیچ هایپرپارامتر آزاد ندارد و **وارد قیف S1/S2 نمی‌شود** — فقط اجرای پیش‌فرض S0 که
+#: قبلاً برای کمّی‌سازی کم‌برآورد عدم‌قطعیت گزارش شد کافی است.
+TUNING_EXCLUDED = frozenset({"glm_binomial"})
+
+
+@register_space("ols", version=1, n_hyperparams=0)
+def _space_ols(trial: optuna.Trial) -> dict:
+    return {}  # بدون هایپرپارامتر — فقط به‌عنوان مرجع مطلق در جدول می‌ماند (بند 7.10.1 عضو ۱)
+
+
+@register_space("ridge", version=1, n_hyperparams=1)
+def _space_ridge(trial: optuna.Trial) -> dict:
+    return {"alpha": trial.suggest_float("alpha", 1e-4, 1e2, log=True)}
+
+
+@register_space("lasso", version=1, n_hyperparams=1)
+def _space_lasso(trial: optuna.Trial) -> dict:
+    return {"alpha": trial.suggest_float("alpha", 1e-4, 1e2, log=True)}
+
+
+@register_space("elasticnet", version=1, n_hyperparams=2)
+def _space_elasticnet(trial: optuna.Trial) -> dict:
+    return {
+        "alpha": trial.suggest_float("alpha", 1e-4, 1e2, log=True),
+        "l1_ratio": trial.suggest_float("l1_ratio", 0.05, 0.95),
+    }
+
+
+@register_space("adaptive_lasso", version=1, n_hyperparams=2)
+def _space_adaptive_lasso(trial: optuna.Trial) -> dict:
+    """سند ردیف مجزایی برای Adaptive Lasso ندارد؛ فضای Ridge/Lasso/EN + توان وزن تطبیقی
+    ($\\gamma$، بند 7.10.1 عضو ۵) تعمیم داده شده."""
+    return {
+        "alpha": trial.suggest_float("alpha", 1e-4, 1e2, log=True),
+        "gamma": trial.suggest_float("gamma", 0.5, 2.0),
+    }
+
+
+@register_space("group_lasso", version=1, n_hyperparams=2)
+def _space_group_lasso(trial: optuna.Trial) -> dict:
+    return {
+        "alpha": trial.suggest_float("alpha", 1e-4, 1e1, log=True),
+        "group_reg": trial.suggest_float("group_reg", 1e-4, 1e1, log=True),
+    }
+
+
+@register_space("quantile_regression", version=1, n_hyperparams=0)
+def _space_quantile_regression(trial: optuna.Trial) -> dict:
+    """`q`=τ در سطح run ثابت می‌شود، نه هایپرپارامتر Optuna. statsmodels.QuantReg بدون
+    منظم‌سازی هیچ هایپرپارامتر آزاد دیگری ندارد (سطر «QuantReg» جدول 7.10.2 عملاً برای
+    نسخه‌ی L1-منظم‌شده‌ی زیر است)."""
+    return {}
+
+
+@register_space("l1_quantile_regression", version=1, n_hyperparams=1)
+def _space_l1_quantile_regression(trial: optuna.Trial) -> dict:
+    return {"alpha": trial.suggest_float("alpha", 1e-5, 1e0, log=True)}
+
+
+@register_space("composite_quantile_regression", version=1, n_hyperparams=1)
+def _space_composite_quantile_regression(trial: optuna.Trial) -> dict:
+    """محور تنظیم این مدل مجموعه‌ی τهای هم‌زمان‌برازش‌شده است، نه یک عدد پیوسته
+    (بند 7.10.1 عضو ۹) — یک هایپرپارامتر دسته‌ای طبق جدول 7.10.2."""
+    grids = {"narrow": (0.05, 0.10, 0.15, 0.20), "wide": (0.02, 0.05, 0.10, 0.15, 0.20, 0.25)}
+    return {"taus": grids[trial.suggest_categorical("taus_grid", list(grids))]}
+
+
+@register_space("expectile_regression", version=1, n_hyperparams=1)
+def _space_expectile_regression(trial: optuna.Trial) -> dict:
+    """سند ردیف مجزا ندارد؛ تنها هایپرپارامتر آزاد پیاده‌سازی IRLS، ضریب منظم‌سازی Ridge
+    داخلی است (پایداری عددی، نه انتخاب مدل)."""
+    return {"alpha": trial.suggest_float("alpha", 1e-6, 1e1, log=True)}
+
+
+@register_space("glm_gamma", version=1, n_hyperparams=1)
+def _space_glm_gamma(trial: optuna.Trial) -> dict:
+    return {"link": trial.suggest_categorical("link", ["log", "inverse", "identity"])}
+
+
+@register_space("glm_tweedie", version=1, n_hyperparams=1)
+def _space_glm_tweedie(trial: optuna.Trial) -> dict:
+    return {"power": trial.suggest_float("power", 1.01, 1.99)}
+
+
+@register_space("beta_regression", version=1, n_hyperparams=1)
+def _space_beta_regression(trial: optuna.Trial) -> dict:
+    return {"link_mu": trial.suggest_categorical("link_mu", ["logit", "probit", "cloglog"])}
+
+
+@register_space("hurdle", version=1, n_hyperparams=2)
+def _space_hurdle(trial: optuna.Trial) -> dict:
+    return {
+        "part1_link": trial.suggest_categorical("part1_link", ["logit", "probit"]),
+        "part2_dist": trial.suggest_categorical("part2_dist", ["gamma", "beta", "lognormal"]),
+    }
+
+
+@register_space("gam", version=1, n_hyperparams=3)
+def _space_gam(trial: optuna.Trial) -> dict:
+    return {
+        "n_splines": trial.suggest_int("n_splines", 5, 25),
+        "lam": trial.suggest_float("lam", 1e-3, 1e3, log=True),
+        "spline_order": trial.suggest_categorical("spline_order", [2, 3]),
+    }
 
 
 def main() -> None:
@@ -433,7 +570,8 @@ def main() -> None:
     print(f"S0 — {FAMILY} ({LEVEL}) — {f} (train={len(train):,}, test={len(test):,})")
     print("⚠️ پارامتر پیش‌فرض، یک fold — نشانه‌ی اولیه است، نه رتبه‌بندی (بند 7.3.2)\n")
     results = run_family_s0(FAMILY, LEVEL, MODELS, train, test, feature_set=FEATURE_SET_S0,
-                            data_snapshot_hash=data_snapshot_hash, cv_folds_hash=cv_folds_hash)
+                            data_snapshot_hash=data_snapshot_hash, cv_folds_hash=cv_folds_hash,
+                            dataset_source=str(FEATURES_A_PATH))
     baseline = baseline_reference(train, test)
     ok = print_summary(results, baseline)
     save_results(results, baseline)

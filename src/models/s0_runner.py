@@ -62,7 +62,7 @@ class S0Result:
 
 def run_family_s0(family: str, level: str, models: dict[str, Callable], train: pd.DataFrame,
                   test: pd.DataFrame, feature_set: str, data_snapshot_hash: str, cv_folds_hash: str,
-                  tau: float = S0_TAU, target: str = "rho", seed: int = 42,
+                  dataset_source: str, tau: float = S0_TAU, target: str = "rho", seed: int = 42,
                   **axis_overrides) -> list[S0Result]:
     """هر مدل را دقیقاً یک‌بار، با پارامتر پیش‌فرض، برازش و زمان‌سنجی می‌کند — و همزمان یک
     MLflow run با tag/param اجباری بند 7.7.2 باز می‌کند (``stage="S0"``)، تا حتی نتیجه‌ی
@@ -82,8 +82,8 @@ def run_family_s0(family: str, level: str, models: dict[str, Callable], train: p
         cfg = RunConfig(family=family, model_id=model_id, stage="S0", seed=seed,
                         level=level, feature_set=feature_set, tau=tau, target=target,
                         **axis_overrides)
-        with start_model_run(cfg, data_snapshot_hash=data_snapshot_hash,
-                             cv_folds_hash=cv_folds_hash) as run:
+        with start_model_run(cfg, data_snapshot_hash=data_snapshot_hash, cv_folds_hash=cv_folds_hash,
+                             train=train, test=test, dataset_source=dataset_source) as run:
             run_id = run.info.run_id
             try:
                 out = np.asarray(fn(train, test, tau), dtype=float)
