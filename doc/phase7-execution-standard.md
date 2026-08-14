@@ -20,6 +20,7 @@ WBS نُه محور آزمایش و یک منشور انصاف هفت‌قاعد
 | τ تنظیم ۰.۱۰ بود در حالی که تصمیم پروژه ۰.۲۰ است | عدد در سند و کد پراکنده بود، از `decision_log` جدا افتاد | ثابت واحد `axes.TUNING_TAU` + بند «⚠️ چرا τ برابر ۰.۲۰ است» در 7.3.1 |
 | هشت محور از نُه محور بی‌صدا روی پیش‌فرض ماندند | هیچ‌کجا لازم نبود موضع اجرا اعلام شود | `RunConfig` اجباری + `coverage.py` |
 | S0 هیچ معیار کیفیتی حساب نمی‌کرد، دو باگ پنهان ماند | «امکان‌سنجی» را به‌معنای «فقط زمان اجرا» گرفتیم | قاعده‌ی «هر اجرا معیار عملیاتی + مرجع خط پایه» |
+| `python -m src.models.families.f01_linear` با S1 موازی روی `BrokenProcessPool`/«model_id تکراری» کرش کرد | فایل خانواده هم زیر نام `"__main__"` (از `-m`) هم — توسط `_init_worker` هر spawn — زیر نام دات‌دار واقعی‌اش import شد؛ دو import مستقل یعنی حلقه‌ی `register()` دوبار اجرا شد | `src/models/run_family.py`: نقطه‌ورود مشترک که ماژول خانواده را **فقط** با نام دات‌دار import می‌کند — بند ۱.۵ |
 
 ---
 
@@ -52,6 +53,7 @@ def fit_predict_<model>(train: pd.DataFrame, test: pd.DataFrame, tau: float,
 | `src/models/cards.py` | کارت مدل ۱۴ گامی |
 | `src/models/coverage.py` | گزارش «کدام نقاط زده نشده‌اند» |
 | `src/models/s0_runner.py` · `s1_runner.py` · … | هارنس هر مرحله — **عمومی، نه مخصوص یک خانواده** |
+| `src/models/run_family.py` | نقطه‌ورود مشترک CLI — تنها راه مجاز اجرای `main()`/`run_s1()` هر خانواده (بند ۱.۵) |
 | `src/models/families/common.py` | پیش‌پردازش و مسیرهای کوانتایل مشترک |
 | `src/models/families/f0X_*.py` | یک ماژول به‌ازای هر خانواده: توابع مدل + فضاها + `main()` |
 
@@ -92,6 +94,25 @@ UI دیده شود که این run روی **کدام دیتاست** (تجمیع�
   (`mlflow.pytorch`/`mlflow.pyfunc`/…) در Model Registry ثبت شود. برای مدل‌های سبکِ
   خانواده‌های خطی/درختی که هر trial را در چند صدم ثانیه دوباره fit می‌کنند لازم نیست —
   طبق بند 7.29.1 artifact کامل مدل برای **قهرمانان S3** رزرو شده، نه هر trial.
+
+### ۱.۵ ⚠️ هرگز ماژول خانواده را مستقیم `-m` اجرا نکنید
+
+فایل خانواده (`f0X_*.py`) هیچ بلوک `if __name__ == "__main__":` ندارد — عمداً. دلیلش
+یک باگ واقعی است که در همین اسپرینت رخ داد: `python -m src.models.families.f01_linear`
+فایل را زیر نام `"__main__"` import می‌کند (کدهای سطح ماژول، از جمله حلقه‌ی `register()`
+هر مدل، همان‌جا اجرا می‌شوند). با `multiprocessing` روی `spawn` (لازم برای S1/S2 —
+بند ۱.۴)، هر worker تازه هنگام bootstrap **دوباره** همان اسکریپت را زیر نام `"__main__"`
+بارگذاری می‌کند؛ اگر کد داخلی هم صریحاً همان فایل را زیر نام دات‌دار واقعی‌اش import کند
+(لازم برای `_init_worker`)، آن فایل **دوبار** در یک process اجرا می‌شود ⇒ هر `register()`
+دوبار ⇒ `ValueError: model_id تکراری` / `BrokenProcessPool`.
+
+**همیشه از طریق نقطه‌ورود مشترک اجرا کنید** — این ماژول خانواده را فقط با نام دات‌دار
+import می‌کند، هرگز `__main__` نمی‌شود:
+
+```bash
+python -m src.models.run_family src.models.families.f01_linear --stage s0
+python -m src.models.run_family src.models.families.f01_linear --stage s1 --jobs 8
+```
 
 ---
 

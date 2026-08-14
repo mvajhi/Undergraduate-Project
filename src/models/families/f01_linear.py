@@ -617,15 +617,7 @@ def run_s1(n_jobs: int | None = None) -> None:
          f"ذخیره شد در reports/phase7/S1_screening_{FAMILY}.md")
 
 
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--stage", choices=["s0", "s1"], default="s0")
-    parser.add_argument("--jobs", type=int, default=None, help="تعداد worker موازی برای S1")
-    args = parser.parse_args()
-
-    if args.stage == "s0":
-        main()
-    else:
-        run_s1(n_jobs=args.jobs)
+# ⚠️ عمداً بدون بلوک ``if __name__ == "__main__":`` — اجرای مستقیم این فایل با ``-m``
+# باعث بارگذاری‌اش زیر نام "__main__" می‌شود که با ``multiprocessing`` روی ``spawn``
+# (تابع run_s1) به ثبت دوگانه‌ی مدل‌ها منجر می‌شود. همیشه از طریق
+# ``python -m src.models.run_family src.models.families.f01_linear --stage {s0,s1}`` اجرا شود.
