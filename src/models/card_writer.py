@@ -2,10 +2,11 @@
 
 بخش‌های **داده‌محور** (۵، ۷، ۸، ۹، ۱۰، ۱۲) مستقیماً از نتیجه‌ی S2 (`s2_runner`) و مطالعه‌ی
 Optuna پایدارشده (`optuna_studies/{model_id}.db`) ساخته می‌شوند — دستی نوشته نمی‌شوند تا با
-تغییر کد از هم جدا نیفتند. بخش‌های ۱، ۲، ۳، ۶ هم به‌اندازه‌ی کافی مکانیکی‌اند (۱: docstring
-خودِ `fit_predict_*`؛ ۲: سطح L1 ثابت؛ ۳: نگاشت هدف از `quantile_route`؛ ۶: پیش‌پردازش از
-`common.design_matrix`) و کامل پر می‌شوند. بخش‌های **روایی باقی‌مانده** (۴، ۱۴) که به قضاوت
-دامنه‌ای نیاز دارند، با ``draft_card`` فقط راهنما می‌گیرند و باید دستی تکمیل شوند.
+تغییر کد از هم جدا نیفتند. بخش‌های ۱، ۲، ۳، ۴، ۶ هم به‌اندازه‌ی کافی مکانیکی‌اند (۱: docstring
+خودِ `fit_predict_*`؛ ۲: سطح L1 ثابت؛ ۳: نگاشت هدف از `quantile_route`؛ ۴: نگاشت مدل→آزمون
+پیش‌پرواز *قبلاً*-اجراشده‌ی بند 7.9.2؛ ۶: پیش‌پردازش از `common.design_matrix`) و کامل پر
+می‌شوند. بخش **روایی باقی‌مانده** (۱۴) که به قضاوت دامنه‌ای نیاز دارد و به گام‌های ۱۱/۱۳
+همین کارت وابسته است، جدا سنتز می‌شود (پایین‌تر).
 
 گام‌های ۱۱ (تشخیص برازش) و ۱۳ (کالیبراسیون) با ``render_step11_fit_diagnosis``/
 ``render_step13_calibration`` جدا محاسبه می‌شوند — چون برخلاف بخش‌های بالا نیازمند
@@ -33,6 +34,59 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 #: خانواده → مسیر دات‌دار ماژول — برای بارگذاری ``MODELS``/``QUANTREG_MODEL_IDS`` در
 #: ``render_step13_calibration`` بدون وابستگی مستقیم به یک خانواده‌ی خاص.
 _FAMILY_MODULES = {"F01": "src.models.families.f01_linear"}
+
+#: بند 7.9.2 WBS — آزمون‌های پیش‌پرواز خ۱ که در فاز ۴/۶ **قبلاً** اجرا و در دفتر حقایق
+#: ثبت شده‌اند (نه اینجا دوباره محاسبه می‌شوند — فقط ارجاع/نگاشط به مدل مربوطه‌اند).
+_PREFLIGHT_TESTS = {
+    "vif": ("VIF رگرسورها", "✅ انجام‌شده در فاز ۴", "F44: `temp_mean`=۱۸۲.۹ ⇒ نیازمند مهار هم‌خطی/منظم‌سازی"),
+    "heteroscedasticity": ("ناهمسانی واریانس (Breusch-Pagan/White)", "✅ انجام‌شده در فاز ۴",
+                          "F06: BP p=۶.۴e−۴۰، White p=۱.۴e−۵۳ ⇒ فرض همسانی واریانس OLS رد می‌شود"),
+    "skew_kurtosis": ("چولگی/کشیدگی هدف", "✅ انجام‌شده در فاز ۴",
+                     "F02: چولگی ۴.۰۶، کشیدگی ۳۱.۹ ⇒ OLS نامناسب، فقط مرجع مطلق"),
+    "zero_inflation": ("تورم صفر و مُدبودن", "✅ انجام‌شده در فاز ۴",
+                      "F03: ۴.۹۰٪ رکورد دقیقاً صفر ولی تک‌مُدی (Sarle=۰.۴۶۱) ⇒ دوبخشی کافی است، ZI کامل لازم نیست"),
+    "distributional_fit": ("برازش توزیعی (Gamma در برابر Beta)", "✅ انجام‌شده در فاز ۴",
+                          "F04: Gamma (KS=۰.۰۴۲۹) بهتر از Beta (۰.۰۶۱۵) برازش می‌دهد"),
+    "overdispersion": ("بیش‌پراکندگی ($\\chi^2/df$)", "✅ انجام‌شده در فاز ۴",
+                      "F07: نسبت بیش‌پراکندگی صعودی ۳.۷×→۱۵.۶× ⇒ GLM دوجمله‌ای رد می‌شود (بند 7.10.1 عضو ۱۴)"),
+}
+
+#: model_id → کدام آزمون‌های بالا برایش مرتبط‌اند (بند 7.9.2، ردیف «خ۱»)
+_F01_PREFLIGHT_RELEVANCE = {
+    "ols": ("vif", "heteroscedasticity", "skew_kurtosis"),
+    "ridge": ("vif", "heteroscedasticity"),
+    "lasso": ("vif", "heteroscedasticity"),
+    "elasticnet": ("vif", "heteroscedasticity"),
+    "adaptive_lasso": ("vif", "heteroscedasticity"),
+    "group_lasso": ("vif", "heteroscedasticity"),
+    "quantile_regression": ("vif", "heteroscedasticity"),
+    "l1_quantile_regression": ("vif", "heteroscedasticity"),
+    "composite_quantile_regression": ("vif", "heteroscedasticity"),
+    "expectile_regression": ("vif", "heteroscedasticity"),
+    "glm_gamma": ("vif", "distributional_fit"),
+    "glm_tweedie": ("vif", "zero_inflation"),
+    "beta_regression": ("vif", "distributional_fit"),
+    "glm_binomial": ("overdispersion",),
+    "hurdle": ("vif", "zero_inflation"),
+    "gam": ("vif",),
+}
+
+
+def render_step4_preflight_tests(model_id: str, family: str) -> str:
+    """آزمون‌های پیش‌پرواز مرتبط با این مدل — طبق بند 7.9.2، برای خ۱ همه در فاز ۴/۶
+    قبلاً اجرا شده‌اند (اینجا دوباره محاسبه نمی‌شوند، فقط با کد یافته ارجاع داده می‌شوند)."""
+    if family != "F01":
+        return "_نگاشت آزمون پیش‌پرواز برای این خانواده هنوز تعریف نشده._"
+    keys = _F01_PREFLIGHT_RELEVANCE.get(model_id)
+    if not keys:
+        return "_مدل در نگاشت آزمون‌های پیش‌پرواز خ۱ ثبت نشده._"
+    lines = ["| آزمون | وضعیت | شاهد |", "|---|---|---|"]
+    for k in keys:
+        name, status, evidence = _PREFLIGHT_TESTS[k]
+        lines.append(f"| {name} | {status} | {evidence} |")
+    lines.append("\nمنبع: بند 7.9.2 `doc/WBS-phase7-modeling.md` (ردیف «خ۱»)، کدهای یافته از دفتر حقایق فاز ۴.")
+    return "\n".join(lines)
+
 
 _QUANTILE_ROUTE_DESC = {
     "Q1": "بومی — مدل مستقیماً Pinball@τ را کمینه می‌کند (رگرسیون کوانتایل).",
@@ -331,7 +385,7 @@ def render_step14_summary(model_id: str, family: str, card: cards.ModelCard) -> 
 
 def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | None = None,
                quantreg: bool = False, include_refit_diagnostics: bool = False) -> cards.ModelCard:
-    """کارت را با بخش‌های داده‌محور/مکانیکی (۱،۲،۳،۵،۶،۷،۸،۹،۱۰،۱۲) پر می‌کند؛ بقیه راهنما می‌مانند.
+    """کارت را با بخش‌های داده‌محور/مکانیکی (۱،۲،۳،۴،۵،۶،۷،۸،۹،۱۰،۱۲) پر می‌کند؛ بقیه راهنما می‌مانند.
 
     ``feature_cols`` باید از ``f01_linear._feature_cols_s2()``/``_feature_cols_s2_quantreg()``
     بیاید — اینجا وابستگی مستقیم به آن ماژول ندارد تا برای خانواده‌های دیگر هم قابل‌استفاده بماند.
@@ -347,6 +401,7 @@ def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | Non
     card.set_section(1, render_step1_theoretical_position(model_id, family))
     card.set_section(2, render_step2_data_levels(model_id))
     card.set_section(3, render_step3_target_mapping(model_id))
+    card.set_section(4, render_step4_preflight_tests(model_id, family))
     if feature_cols is not None:
         card.set_section(5, render_step5_feature_set(model_id, feature_cols, quantreg))
     card.set_section(6, render_step6_preprocessing())
@@ -359,7 +414,7 @@ def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | Non
         card.set_section(11, render_step11_fit_diagnosis(model_id, family))
         card.set_section(13, render_step13_calibration(model_id, family))
 
-    # بقیه (۴،۱۴ — و ۱۱/۱۳ اگر include_refit_diagnostics=False) عمداً دست‌نخورده می‌مانند —
+    # بقیه (۱۴ — و ۱۱/۱۳ اگر include_refit_diagnostics=False) عمداً دست‌نخورده می‌مانند —
     # ModelCard.to_markdown() خودش جای‌گزین «_ثبت نشده._» می‌گذارد، پس نیازی به یادداشت TODO
     # دستی اینجا نیست؛ card.missing_mandatory() برای پرس‌وجوی برنامه‌ای «چه چیزی هنوز مانده» کافی است.
     return card

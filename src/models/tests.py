@@ -509,6 +509,28 @@ def test_fit_diagnosis_train_test_gap_arithmetic() -> tuple[bool, str]:
            f"pinball_train≈۰={ok_train_zero} · pinball_test>۰={ok_test_positive} · markdown سالم={ok_md}")
 
 
+def test_card_writer_step4_preflight_mapping() -> tuple[bool, str]:
+    """گام ۴ (پیش‌پرواز) باید هر مدل F01 را به آزمون‌های بند 7.9.2 مرتبط نگاشت کند —
+    بدون فراخوانی هیچ کد آماری تازه، فقط ارجاع به یافته‌های فاز ۴ که قبلاً مستندند."""
+    from src.models import card_writer
+
+    ols_md = card_writer.render_step4_preflight_tests("ols", "F01")
+    ok_ols = all(k in ols_md for k in ["VIF", "ناهمسانی", "چولگی"])
+
+    binom_md = card_writer.render_step4_preflight_tests("glm_binomial", "F01")
+    ok_binom = "بیش‌پراکندگی" in binom_md and "VIF" not in binom_md  # فقط آزمون مرتبط، نه همه
+
+    every_model_covered = all(
+        mid in card_writer._F01_PREFLIGHT_RELEVANCE for mid in card_writer._FAMILY_MODULES
+    ) or all(  # بررسی مستقیم‌تر: همه‌ی ۱۶ عضو رجیستری‌شده‌ی F01 باید نگاشت داشته باشند
+        mid in card_writer._F01_PREFLIGHT_RELEVANCE
+        for mid in __import__("src.models.families.f01_linear", fromlist=["MODELS"]).MODELS
+    )
+    return (ok_ols and ok_binom and every_model_covered,
+           f"ols سه‌آزمون={ok_ols} · glm_binomial فقط بیش‌پراکندگی={ok_binom} · "
+           f"هر ۱۶ مدل نگاشت‌شده={every_model_covered}")
+
+
 def test_card_writer_step1_and_step14_on_real_data() -> tuple[bool, str]:
     """گام ۱ (از docstring `fit_predict_ridge`) و گام ۱۴ (سنتز از S2 + B3 + خودِ گام‌های
     ۱۱/۱۳ کارت) روی «ridge» چک می‌شوند — گام ۱۴ نباید بازبرازش کند، فقط بخواند."""
@@ -653,6 +675,7 @@ _ALL_TESTS = [
     test_calibration_coverage_arithmetic,
     test_fit_diagnosis_train_test_gap_arithmetic,
     test_card_writer_step11_fit_diagnosis_on_real_data,
+    test_card_writer_step4_preflight_mapping,
     test_card_writer_step1_and_step14_on_real_data,
     test_card_writer_step13_calibration_on_real_data,
 ]
