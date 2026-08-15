@@ -431,6 +431,71 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_operational_metrics_has_mandated_keys() -> tuple[bool, str]:
+    """بند 7.7.2 معیارهای اجباری را فهرست کرده — این تست تضمین می‌کند
+    `operational_metrics` هیچ‌کدام را جا نینداخته، و مقادیرشان درست‌اند."""
+    import numpy as np
+    from src.baselines import operational_metrics
+
+    # داده‌ی مصنوعی با پاسخ دقیقاً معلوم: نیمی پوشیده، نیمی نه
+    n = 100
+    df = pd.DataFrame({
+        "Res": np.full(n, 100.0),
+        "rho": np.array([0.1, 0.5] * (n // 2)),
+        "Recv": np.full(n, 80.0),
+    })
+    m = operational_metrics(df, np.full(n, 0.3), tau=0.20)
+
+    mandated = {"pinball", "pinball_portions", "RMSE_rho", "MAE_rho", "R2_rho",
+                "shortage_rate", "waste_reduction_pct", "coverage", "coverage_gap",
+                "MAE_portions", "RMSE_portions"}
+    missing = mandated - set(m)
+    # نصف ردیف‌ها rho=0.1 ≤ 0.3 (پوشیده) و نصف rho=0.5 > 0.3 ⇒ پوشش دقیقاً ۰.۵
+    ok_cov = abs(m["coverage"] - 0.5) < 1e-9 and abs(m["coverage_gap"] - 0.3) < 1e-9
+    # pinball در فضای پرس باید دقیقاً Res برابر فضای نرخ باشد (Res ثابت=۱۰۰)
+    ok_portions = abs(m["pinball_portions"] - m["pinball"] * 100) < 1e-6
+    return (not missing and ok_cov and ok_portions,
+           f"معیار غایب: {sorted(missing) or 'هیچ‌کدام'} · پوشش={ok_cov} · فضای پرس={ok_portions}")
+
+
+def test_all_operational_metrics_reach_mlflow() -> tuple[bool, str]:
+    """⚠️ **تست ضدبازگشت.** ریشه‌ی باگ اصلی: هر runner دستی چند معیار منتخب ثبت می‌کرد
+    و بقیه دور ریخته می‌شد (S2 فقط `pinball`). این تست می‌آزماید که `log_metrics_dict`
+    **هر** کلید `operational_metrics` را به MLflow می‌رساند — پس افزودن معیار جدید
+    به آن تابع، خودکار در هر سه مرحله ثبت می‌شود."""
+    import tempfile
+
+    import mlflow
+    import numpy as np
+
+    from src.baselines import operational_metrics
+    from src.models.tracking import aggregate_fold_metrics, log_metrics_dict
+
+    df = pd.DataFrame({"Res": np.full(50, 100.0), "rho": np.linspace(0.0, 0.4, 50),
+                      "Recv": np.full(50, 80.0)})
+    m = operational_metrics(df, np.full(50, 0.2), tau=0.20)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        prev = mlflow.get_tracking_uri()
+        mlflow.set_tracking_uri(f"file://{tmp}")
+        try:
+            # فروشگاه موقت experiment پیش‌فرض ندارد — باید صریح ساخته شود
+            mlflow.set_experiment("metric_contract_test")
+            with mlflow.start_run() as run:
+                log_metrics_dict(m, step=0)
+                log_metrics_dict(aggregate_fold_metrics([m, m]), prefix="mean_")
+            logged = set(mlflow.get_run(run.info.run_id).data.metrics)
+        finally:
+            mlflow.set_tracking_uri(prev)
+
+    expected = {k for k, v in m.items() if k != "n" and np.isfinite(v)}
+    missing = expected - logged
+    ok_mean = {f"mean_{k}" for k in expected}.issubset(logged)
+    return (not missing and ok_mean,
+           f"{len(expected)} معیار انتظار · ثبت‌نشده: {sorted(missing) or 'هیچ‌کدام'} · "
+           f"نسخه‌ی mean_ کامل={ok_mean}")
+
+
 def test_calibration_coverage_arithmetic() -> tuple[bool, str]:
     """``oof_predictions``/``render_step13`` روی داده‌ی مصنوعی با پوشش دقیقاً شناخته‌شده —
     نصف رکوردها زیر پیش‌بینی (پوشیده)، نصف بالا؛ پوشش باید دقیقاً ۰.۵ محاسبه شود."""
@@ -678,6 +743,8 @@ _ALL_TESTS = [
     test_card_writer_step4_preflight_mapping,
     test_card_writer_step1_and_step14_on_real_data,
     test_card_writer_step13_calibration_on_real_data,
+    test_operational_metrics_has_mandated_keys,
+    test_all_operational_metrics_reach_mlflow,
 ]
 
 

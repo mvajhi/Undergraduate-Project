@@ -163,3 +163,58 @@ def start_model_run(cfg: RunConfig, *, data_snapshot_hash: str, cv_folds_hash: s
 
         if log_model_fn is not None:
             log_model_fn(run)
+
+
+# ---------------------------------------------------------------------------
+# ثبت معیارها — بند 7.7.2 «metric»
+# ---------------------------------------------------------------------------
+
+#: کلیدهای خروجی `operational_metrics` که metric نیستند (فراداده‌ی اندازه‌ی نمونه).
+_NON_METRIC_KEYS = frozenset({"n"})
+
+
+def log_metrics_dict(metrics: dict, *, step: int | None = None, prefix: str = "") -> None:
+    """**هر** معیار خروجی ``src.baselines.operational_metrics`` را ثبت می‌کند.
+
+    ⚠️ **چرا این تابع وجود دارد.** پیش از این، هر runner دستی چند معیار منتخب را
+    ثبت می‌کرد (S2 فقط ``pinball``) و بقیه‌ی خروجی ``operational_metrics`` دور ریخته
+    می‌شد — یعنی KPIهای عملیاتی (کاهش هدررفت، نرخ کمبود) و $R^2$ که بند 7.7.2
+    اجباری کرده، در MLflow نبودند. با عبور همه‌ی runnerها از این تابع، افزودن یک
+    کلید به ``operational_metrics`` خودکار یعنی ثبتش در هر سه مرحله.
+
+    ``step`` برای معیارهای per-fold استفاده می‌شود تا نمودار سری‌زمانی MLflow
+    مقدار هر fold را جدا نشان دهد. مقدارهای غیرمتناهی (NaN از تقسیم بر صفر در
+    ``waste_reduction_pct``) رد می‌شوند چون MLflow آن‌ها را رد می‌کند.
+    """
+    import math
+
+    payload = {}
+    for k, v in metrics.items():
+        if k in _NON_METRIC_KEYS:
+            continue
+        if isinstance(v, (int, float)) and math.isfinite(v):
+            payload[f"{prefix}{k}"] = float(v)
+    if payload:
+        mlflow.log_metrics(payload, step=step)
+
+
+def aggregate_fold_metrics(fold_metrics: list[dict]) -> dict:
+    """میانگین هر معیار روی foldها.
+
+    معیارهای «جمعی» (تعداد پرس کمبود/مازاد) **جمع** می‌شوند نه میانگین، چون واحدشان
+    تعداد است نه نرخ — میانگین‌گرفتن از آن‌ها عدد بی‌معنایی می‌دهد که به تعداد fold
+    وابسته است.
+    """
+    import math
+
+    if not fold_metrics:
+        return {}
+    summed = {"shortage_portions", "surplus_portions"}
+    keys = [k for k in fold_metrics[0] if k not in _NON_METRIC_KEYS]
+    out = {}
+    for k in keys:
+        vals = [m[k] for m in fold_metrics
+                if isinstance(m.get(k), (int, float)) and math.isfinite(m[k])]
+        if vals:
+            out[k] = float(sum(vals)) if k in summed else float(sum(vals) / len(vals))
+    return out

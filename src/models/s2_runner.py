@@ -36,7 +36,7 @@ from src.baselines import b3_empirical_quantile, operational_metrics
 from src.config import REPORTS_DIR, ROOT_DIR
 from src.models.axes import TUNING_TAU, RunConfig
 from src.models.spaces import SPACES, sample, trial_budget
-from src.models.tracking import start_model_run
+from src.models.tracking import aggregate_fold_metrics, log_metrics_dict, start_model_run
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
@@ -122,6 +122,7 @@ def _run_model_s2(model_id: str, fn: Callable, design_fn: Callable, folds: list,
                                  n_trials=n_trials, sampler="TPE") as run:
                 mlflow.log_params({f"hp_{k}": v for k, v in hp.items()})
                 mlflow.log_param("trial_idx", trial_idx)
+                fold_metrics = []
                 for fold_idx, (tr, te) in enumerate(folds):
                     Xtr, Xte = designed_folds[fold_idx]
                     out = np.asarray(fn(tr, te, S2_TAU, **hp), dtype=float)
@@ -129,8 +130,12 @@ def _run_model_s2(model_id: str, fn: Callable, design_fn: Callable, folds: list,
                         raise ValueError(f"شکل/مقدار نامعتبر در fold{fold_idx}")
                     m = operational_metrics(te, out, S2_TAU)
                     pinballs.append(m["pinball"])
-                    mlflow.log_metric("pinball", m["pinball"], step=fold_idx)
+                    fold_metrics.append(m)
+                    log_metrics_dict(m, step=fold_idx)  # هر ۱۳ معیار، نه فقط pinball
                 mean_pb = float(np.mean(pinballs))
+                # میانگین هر معیار روی ۵ fold با پیشوند `mean_` — این اعدادِ قابل‌مقایسه
+                # بین runها هستند (معیارهای step-دار برای نمودار per-fold می‌مانند)
+                log_metrics_dict(aggregate_fold_metrics(fold_metrics), prefix="mean_")
                 mlflow.log_metrics({"pinball_mean": mean_pb, "fit_seconds": time.time() - t0})
                 mlflow.set_tag("outcome", "pass")
             study.tell(trial, mean_pb)

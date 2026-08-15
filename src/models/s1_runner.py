@@ -34,7 +34,7 @@ from src.baselines import b3_empirical_quantile, operational_metrics
 from src.config import REPORTS_DIR
 from src.models.axes import TUNING_TAU, RunConfig
 from src.models.spaces import SPACES, sample
-from src.models.tracking import start_model_run
+from src.models.tracking import aggregate_fold_metrics, log_metrics_dict, start_model_run
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
@@ -128,16 +128,18 @@ def _run_one_trial(job: TrialJob, fn: Callable, folds: list) -> TrialResult:
         mlflow.log_param("trial_idx", job.trial_idx)
         pinballs: list[float] = []
         try:
+            fold_metrics = []
             for fold_idx, (tr, te) in enumerate(folds):
                 out = np.asarray(fn(tr, te, S1_TAU, **job.hyperparams), dtype=float)
                 if out.shape != (len(te),) or not np.all(np.isfinite(out)):
                     raise ValueError(f"شکل/مقدار نامعتبر در fold{fold_idx}: shape={out.shape}")
                 m = operational_metrics(te, out, S1_TAU)
                 pinballs.append(m["pinball"])
-                mlflow.log_metric("pinball", m["pinball"], step=fold_idx)
-                mlflow.log_metric("shortage_rate", m["shortage_rate"], step=fold_idx)
+                fold_metrics.append(m)
+                log_metrics_dict(m, step=fold_idx)  # هر ۱۳ معیار، نه فقط pinball/shortage
             mean_pb = float(np.mean(pinballs))
             dt = time.time() - t0
+            log_metrics_dict(aggregate_fold_metrics(fold_metrics), prefix="mean_")
             mlflow.log_metrics({"pinball_mean": mean_pb, "fit_seconds": dt})
             mlflow.set_tag("outcome", "pass")
             return TrialResult(job.family, job.level, job.model_id, job.trial_idx, job.hyperparams,

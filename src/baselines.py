@@ -44,19 +44,45 @@ def cook_qty(res: np.ndarray, rho_hat: np.ndarray) -> np.ndarray:
 
 
 def operational_metrics(df: pd.DataFrame, rho_hat: np.ndarray, tau: float) -> dict:
-    """معیارها در **هر دو** فضای نرخ و تعداد پرس (قاعده‌ی حیاتی بند ۶.۴)."""
+    """معیارها در **هر دو** فضای نرخ و تعداد پرس (قاعده‌ی حیاتی بند ۶.۴).
+
+    خروجی این تابع **قرارداد ثبت MLflow** است: `src/models/tracking.py::log_metrics_dict`
+    هر کلید غیر از `n` را به‌عنوان metric ثبت می‌کند. پس افزودن کلید جدید اینجا
+    خودکار یعنی ثبتش در هر سه مرحله‌ی S0/S1/S2 — و تست
+    `test_all_operational_metrics_reach_mlflow` تضمین می‌کند هیچ کلیدی دور ریخته نشود.
+    """
     res, recv, rho = df["Res"].to_numpy(float), df["Recv"].to_numpy(float), df["rho"].to_numpy(float)
+    rho_hat = np.asarray(rho_hat, dtype=float)
     qty = cook_qty(res, rho_hat)
 
     shortage = qty < recv
     surplus = np.maximum(qty - recv, 0.0)
     surplus_b0 = np.maximum(res - recv, 0.0)  # B0: پخت = کل رزرو
+    demand = recv  # تقاضای واقعی = تعداد دریافت‌کننده
+
+    # پوشش تجربی: کسری از سلول‌ها که کوانتایل پیش‌بینی‌شده واقعیت را پوشانده است.
+    # اگر $\hat\rho_\tau$ واقعاً کوانتایل τ باشد، این عدد باید ≈ τ شود (بند ۶.۱۰).
+    coverage = float((rho <= rho_hat).mean())
+
+    # $R^2$ در فضای نرخ. ⚠️ برای یک پیش‌بینی‌کننده‌ی **کوانتایل** (نه میانگین) این عدد
+    # ذاتاً پایین است و **معیار انتخاب مدل نیست** — نقشش در بند 7.9.2 «سیم‌چین نشتی»
+    # است: سقف واقع‌بینانه ۰.۴–۰.۵ (بند ۵.۱۳)، و هر مقدار >۰.۹ یعنی توقف و ممیزی نشت.
+    ss_res = float(((rho - rho_hat) ** 2).sum())
+    ss_tot = float(((rho - rho.mean()) ** 2).sum())
+    r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else np.nan
 
     return {
         "pinball": float(pinball_loss(rho, rho_hat, tau).mean()),
+        # همان زیان در فضای پرس — بند ۶.۴ صریحاً هر دو فضا را می‌خواهد، چون
+        # ۰.۰۰۱ نرخ در سلولی با Res=۱۵ و سلولی با Res=۸۰۰ دو چیز کاملاً متفاوت است.
+        "pinball_portions": float((pinball_loss(rho, rho_hat, tau) * res).mean()),
         "MAE_rho": float(np.abs(rho - rho_hat).mean()),
         "RMSE_rho": float(np.sqrt(((rho - rho_hat) ** 2).mean())),
+        "R2_rho": float(r2),
         "MAE_portions": float(np.abs(qty - recv).mean()),
+        "RMSE_portions": float(np.sqrt(((qty - demand) ** 2).mean())),
+        "coverage": coverage,
+        "coverage_gap": coverage - tau,
         "shortage_rate": float(shortage.mean()),
         "shortage_portions": float(np.maximum(recv - qty, 0.0).sum()),
         "surplus_portions": float(surplus.sum()),

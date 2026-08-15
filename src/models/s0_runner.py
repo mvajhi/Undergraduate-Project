@@ -28,7 +28,7 @@ import pandas as pd
 from src.baselines import b3_empirical_quantile, operational_metrics
 from src.config import REPORTS_DIR
 from src.models.axes import TUNING_TAU, RunConfig
-from src.models.tracking import start_model_run
+from src.models.tracking import log_metrics_dict, start_model_run
 
 PHASE7_DIR = REPORTS_DIR / "phase7"
 RESULTS_JSON = PHASE7_DIR / "S0_feasibility.json"
@@ -105,8 +105,8 @@ def run_family_s0(family: str, level: str, models: dict[str, Callable], train: p
                     "output_mean": float(out.mean()),
                     "output_min": float(out.min()),
                     "output_max": float(out.max()),
-                    **{k: v for k, v in metrics.items() if np.isfinite(v)},
                 })
+                log_metrics_dict(metrics)  # همان قرارداد مشترک S1/S2
                 results.append(S0Result(family, level, model_id, status, dt,
                                         output_mean=float(out.mean()), output_min=float(out.min()),
                                         output_max=float(out.max()), mlflow_run_id=run_id,
