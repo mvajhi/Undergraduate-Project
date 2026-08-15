@@ -486,6 +486,13 @@ _QUANTILE_ROUTES = {
     "glm_tweedie": "Q2", "beta_regression": "Q2", "glm_binomial": "Q2", "hurdle": "Q2", "gam": "Q3",
 }
 
+#: اعضای مسیر Q1 (بومی کوانتایل) — طبق بند 7.5.3 ردیف «رگرسیون کوانتایل خطی»، فیچرست
+#: S2 اضافی‌شان (حذف فیچر تقریباً ثابت) با بقیه فرق دارد. `src/models/s2_runner.py`
+#: از همین مجموعه می‌فهمد کدام مدل باید ``_design_s2(..., quantreg=True)`` بگیرد.
+QUANTREG_MODEL_IDS = frozenset(
+    mid for mid, route in _QUANTILE_ROUTES.items() if route == "Q1"
+)
+
 #: کلاس/کتابخانه‌ی واقعی هر مدل — به tag اختصاصی ``model_type`` هر MLflow run می‌رود
 #: (بند 7.7.2، تفصیل در `doc/phase7-execution-standard.md`)، جدا از model_id که فقط
 #: شناسه‌ی داخلی پروژه است.
@@ -711,6 +718,56 @@ def run_s1(n_jobs: int | None = None) -> None:
     n_fail = sum(1 for r in results if r.status == "fail")
     print(f"\n{len(results)} trial تمام شد · {n_fail} شکست · "
          f"ذخیره شد در reports/phase7/S1_screening_{FAMILY}.md")
+
+
+def run_s2(n_jobs: int | None = None) -> None:
+    """اجرای S2 (بند 7.3.1/7.6) — بهینه‌سازی کامل با Optuna TPE، هر ۵ fold، بودجه‌ی
+    trial طبق جدول 7.6.2. موازی‌سازی **بین مدل‌ها**ست (TPE ترتیبی است، بند بالای
+    `s2_runner.py`) — رگرسیون کوانتایل ترکیبی می‌تواند ساعت‌ها طول بکشد، ولی یک worker
+    را اشغال می‌کند نه همه را؛ نتیجه‌ی هر مدل به‌محض اتمام ذخیره می‌شود، نه در پایان کل
+    خانواده. اجرا: ``python -m src.models.run_family src.models.families.f01_linear --stage s2``."""
+    from src.config import set_global_seed
+    from src.cv import load_cv_folds, sha256_file
+    from src.features.build import FEATURES_A_PATH
+    from src.models.s2_runner import (
+        N_S2_FOLDS,
+        baseline_reference_5fold,
+        run_family_s2,
+        save_one_result,
+    )
+
+    set_global_seed()
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values("date_gregorian").reset_index(drop=True)
+    folds, cv_folds_hash = load_cv_folds()
+    data_snapshot_hash = sha256_file(FEATURES_A_PATH)
+
+    if len(folds) != N_S2_FOLDS:
+        raise AssertionError(f"cv_folds.json باید {N_S2_FOLDS} fold داشته باشد، نه {len(folds)}")
+
+    tuning_folds = []
+    for f in folds:
+        tr_mask, te_mask = f.masks(df["date_gregorian"])
+        tuning_folds.append((df.loc[tr_mask], df.loc[te_mask]))
+
+    model_ids = sorted(set(MODELS) - TUNING_EXCLUDED)
+    jobs = n_jobs or 6
+    print(f"S2 — {FAMILY} ({LEVEL}) — {len(model_ids)} مدل، هر {N_S2_FOLDS} fold، {jobs} worker موازی")
+    print(f"مستثنا از تنظیم: {sorted(TUNING_EXCLUDED)} (بند 7.10.1: رد‌شده، فقط یک‌بار اجرا)\n")
+
+    def _on_result(model_id: str, result) -> None:
+        save_one_result(model_id, result, FAMILY, LEVEL)
+
+    results = run_family_s2(FAMILY, LEVEL, "src.models.families.f01_linear", model_ids, tuning_folds,
+                            data_snapshot_hash=data_snapshot_hash, cv_folds_hash=cv_folds_hash,
+                            dataset_source=str(FEATURES_A_PATH), n_jobs=jobs, on_result=_on_result)
+
+    baseline = baseline_reference_5fold(tuning_folds)
+    from src.models.s2_runner import save_results
+    save_results(results, FAMILY, LEVEL, baseline_pinball=baseline)
+
+    n_fail = sum(r.n_fail for r in results.values())
+    print(f"\n{len(results)} مدل تنظیم شد · {n_fail} trial شکست‌خورده · "
+         f"ذخیره شد در reports/phase7/S2_tuning_{FAMILY}.md")
 
 
 # ⚠️ عمداً بدون بلوک ``if __name__ == "__main__":`` — اجرای مستقیم این فایل با ``-m``

@@ -17,24 +17,27 @@ bootstrap دوباره همان اسکریپت را زیر نام ``"__main__"``
 
     python -m src.models.run_family src.models.families.f01_linear --stage s0
     python -m src.models.run_family src.models.families.f01_linear --stage s1 --jobs 8
+    python -m src.models.run_family src.models.families.f01_linear --stage s2 --jobs 6
 """
 
 import argparse
 import importlib
 
+_STAGE_FUNCS = {"s0": "main", "s1": "run_s1", "s2": "run_s2"}
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("module", help="مسیر دات‌دار ماژول خانواده، مثل src.models.families.f01_linear")
-    parser.add_argument("--stage", choices=["s0", "s1"], default="s0")
-    parser.add_argument("--jobs", type=int, default=None, help="تعداد worker موازی برای S1")
+    parser.add_argument("--stage", choices=list(_STAGE_FUNCS), default="s0")
+    parser.add_argument("--jobs", type=int, default=None, help="تعداد worker موازی برای S1/S2")
     args = parser.parse_args()
 
     mod = importlib.import_module(args.module)
     if args.stage == "s0":
         mod.main()
     else:
-        mod.run_s1(n_jobs=args.jobs)
+        getattr(mod, _STAGE_FUNCS[args.stage])(n_jobs=args.jobs)
 
 
 if __name__ == "__main__":

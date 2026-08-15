@@ -355,6 +355,82 @@ def test_f01_s2_feature_set_resolves_dow_collinearity() -> tuple[bool, str]:
                 f"بدون NaN={ok_no_nan} · VIF فوریه متناهی={ok_finite_vif} (max={max(vifs):.1f})")
 
 
+def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
+    """بند 7.6.3: study هر مدل باید روی SQLite ماندگار شود و اجرای دوباره باید trialهای
+    قبلی را از سر نگیرد (پیش‌نیاز fANOVA گام ۱۰ کارت مدل + ادامه‌پذیری بعد از قطعی)."""
+    import shutil
+    import tempfile
+    import time
+
+    from src.models import s2_runner
+
+    tmp_dir = Path(tempfile.mkdtemp())
+    original_dir = s2_runner.OPTUNA_STUDIES_DIR
+    original_phase7 = s2_runner.PHASE7_DIR
+    s2_runner.OPTUNA_STUDIES_DIR = tmp_dir / "optuna_studies"
+    s2_runner.PHASE7_DIR = tmp_dir / "phase7"
+    try:
+        import numpy as np
+        import pandas as pd
+
+        n = 40
+        rng = np.random.default_rng(0)
+        res = rng.integers(5, 50, n)
+        rho = rng.uniform(0, 0.3, n)
+        df = pd.DataFrame({
+            "rho": rho, "Res": res, "Recv": np.round(res * (1 - rho)),
+            "date_gregorian": pd.date_range("2024-01-01", periods=n // 4).repeat(4)[:n],
+        })
+        train, test = df.iloc[: n // 2], df.iloc[n // 2:]
+        folds = [(train, test)] * 5
+
+        def fake_fit_predict(tr, te, tau, alpha=1.0, **hp):
+            return np.full(len(te), float(tr["rho"].mean()) * min(alpha, 1.0))
+
+        from src.models.registry import MODELS as MODEL_REGISTRY
+        from src.models.registry import ModelSpec, register
+        from src.models.spaces import SPACES, register_space
+
+        if "test_s2_dummy" not in MODEL_REGISTRY:
+            register(ModelSpec(model_id="test_s2_dummy", family="F01", levels=("L1",),
+                               quantile_route="Q1", algorithm="pytest.Dummy"))
+        if "test_s2_dummy" not in SPACES:
+            @register_space("test_s2_dummy", version=1, n_hyperparams=1)
+            def _space(trial):
+                return {"alpha": trial.suggest_float("alpha", 0.1, 1.0)}
+
+        design_fn = lambda tr, te: (tr, te)  # noqa: E731
+
+        r1 = s2_runner._run_model_s2("test_s2_dummy", fake_fit_predict, design_fn, folds,
+                                     "F01", "L1", "snap", "cvhash", "src", seed=1)
+        t0 = time.time()
+        r2 = s2_runner._run_model_s2("test_s2_dummy", fake_fit_predict, design_fn, folds,
+                                     "F01", "L1", "snap", "cvhash", "src", seed=1)
+        dt_resume = time.time() - t0
+
+        ok_same_n = r1.n_trials == r2.n_trials
+        ok_same_best = abs(r1.best_pinball - r2.best_pinball) < 1e-9
+        ok_fast_resume = dt_resume < 2.0  # اگر واقعاً از نو اجرا شده بود، بسیار کندتر می‌بود
+
+        import optuna
+        study = optuna.load_study(study_name="F01_test_s2_dummy_S2",
+                                  storage=s2_runner.study_storage_url("test_s2_dummy"))
+        ok_trial_count = len(study.trials) == r1.n_trials  # نه دوبرابر
+        # ⚠️ fANOVA اینجا آزموده نمی‌شود — با این fixture مصنوعیِ کم‌تنوع گاهی
+        # IndexError داخلی optuna می‌دهد (مسئله‌ی تبهگنی داده‌ی آزمایشی، نه کد تولید؛
+        # روی مطالعه‌ی واقعی Ridge دستی تأیید شد که get_param_importances کار می‌کند).
+
+        ok = ok_same_n and ok_same_best and ok_fast_resume and ok_trial_count
+        return ok, (f"n یکسان={ok_same_n} · best یکسان={ok_same_best} · resume سریع "
+                    f"({dt_resume:.2f}s)={ok_fast_resume} · بدون تکرار trial={ok_trial_count}")
+    finally:
+        s2_runner.OPTUNA_STUDIES_DIR = original_dir
+        s2_runner.PHASE7_DIR = original_phase7
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        MODEL_REGISTRY.pop("test_s2_dummy", None)
+        SPACES.pop("test_s2_dummy", None)
+
+
 def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۱۶ عضو ثبت‌شده‌ی F01 باید فیلد algorithm غیرخالی داشته باشد — چون این همان
     مقداری است که به‌عنوان tag اختصاصی model_type در MLflow می‌رود، نه model_id."""
@@ -425,6 +501,7 @@ _ALL_TESTS = [
     test_code_reference_derivation,
     test_s1_report_includes_baseline_and_marks_winners,
     test_f01_s2_feature_set_resolves_dow_collinearity,
+    test_s2_study_persists_and_resumes,
     test_f01_all_specs_have_algorithm,
     test_card_completeness_and_roundtrip,
     test_card_require_complete_raises,
