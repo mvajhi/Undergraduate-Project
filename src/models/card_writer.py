@@ -7,21 +7,29 @@ Optuna پایدارشده (`optuna_studies/{model_id}.db`) ساخته می‌ش�
 جز ۲، ۳، ۶ که برای خ۱ به‌اندازه‌ی کافی مکانیکی‌اند (سطح L1 ثابت، نگاشت هدف از
 ``quantile_route``، پیش‌پردازش از ``common.design_matrix``) و کامل پر می‌شوند.
 
-⚠️ گام ۱۳ (کالیبراسیون) اجباری است ولی اینجا محاسبه نمی‌شود — نیازمند بازبرازش بهترین
-پیکربندی روی هر fold و سنجش پوشش به تفکیک برش‌هاست؛ در ``draft_card`` فقط راهنما می‌ماند
-تا با داده‌ی واقعی (نه شبیه‌سازی) در گام تکمیل کارت پر شود.
+گام ۱۳ (کالیبراسیون) با ``render_step13_calibration`` جدا محاسبه می‌شود — چون برخلاف
+بخش‌های بالا نیازمند **بازبرازش واقعی** مدل روی هر ۵ fold با بهترین هایپرپارامتر S2 است
+(``src/models/calibration.py``)، نه فقط خواندن نتیجه‌ی ذخیره‌شده؛ برای مدل‌های کند
+(مثل رگرسیون کوانتایل ترکیبی) این هزینه‌ی قابل‌توجهی دارد، پس در ``draft_card`` با
+پرچم ``include_calibration=False`` پیش‌فرض خاموش است.
 """
 
+import importlib
 import json
 
 import numpy as np
 import optuna
+import pandas as pd
 
 from src.models import cards
 from src.models.registry import MODELS as MODEL_REGISTRY
 from src.models.s2_runner import PHASE7_DIR, study_storage_url
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+#: خانواده → مسیر دات‌دار ماژول — برای بارگذاری ``MODELS``/``QUANTREG_MODEL_IDS`` در
+#: ``render_step13_calibration`` بدون وابستگی مستقیم به یک خانواده‌ی خاص.
+_FAMILY_MODULES = {"F01": "src.models.families.f01_linear"}
 
 _QUANTILE_ROUTE_DESC = {
     "Q1": "بومی — مدل مستقیماً Pinball@τ را کمینه می‌کند (رگرسیون کوانتایل).",
@@ -57,6 +65,30 @@ def render_step5_feature_set(model_id: str, feature_cols: list[str], quantreg: b
         "حذف نشد — طبق بند 7.5.4، انتخاب فیچر این خانواده «مسیر L1» است: خودِ منظم‌سازی "
         "مدل باید این افزونگی را حل کند، نه هرس دستی پیشینی (که در آزمایش، فیچر قوی "
         "`log_res` را هم حذف می‌کرد)."
+    )
+
+
+def render_step2_data_levels(model_id: str) -> str:
+    spec = MODEL_REGISTRY.get(model_id)
+    if spec is None:
+        return "_مدل در رجیستری ثبت نشده._"
+    lines = [f"سطح اجراشده: **{', '.join(spec.levels)}** (بند 7.1.1)."]
+    if spec.incompatible_levels:
+        lines.append(f"ناسازگار با: `{', '.join(spec.incompatible_levels)}` (دلیل در بند 7.27).")
+    return " ".join(lines)
+
+
+def render_step3_target_mapping(model_id: str, tau: float | None = None) -> str:
+    from src.models.axes import TUNING_TAU
+
+    spec = MODEL_REGISTRY.get(model_id)
+    if spec is None:
+        return "_مدل در رجیستری ثبت نشده._"
+    t = tau if tau is not None else TUNING_TAU
+    return (
+        f"هدف خام: `rho` (نرخ عدم‌دریافت، بند ۴ سند تعریف مسئله). سطح کوانتایل: "
+        f"**τ={t}** (بند 7.3، ثابت پروژه). مسیر برآورد کوانتایل: **{spec.quantile_route}** "
+        f"— {_QUANTILE_ROUTE_DESC.get(spec.quantile_route, '')}"
     )
 
 
@@ -152,16 +184,51 @@ def render_step12_quantile_extraction(model_id: str) -> str:
     return f"مسیر **{route}** (بند 7.23) — {_QUANTILE_ROUTE_DESC.get(route, '')}"
 
 
+def render_step13_calibration(model_id: str, family: str, tau: float | None = None) -> str:
+    """بازبرازش واقعی مدل با بهترین هایپرپارامتر S2 روی هر ۵ fold رسمی + سنجش پوشش
+    تجربی (``src/models/calibration.py``) — گام ۱۳ اجباری کارت مدل، بند 7.4."""
+    from src.config import set_global_seed
+    from src.cv import DATE_COL, load_cv_folds
+    from src.features.build import FEATURES_A_PATH
+    from src.models import calibration
+    from src.models.axes import TUNING_TAU
+
+    result = load_s2_result(model_id, family)
+    if not result.get("best_hyperparams") and result.get("n_hyperparams", 0) > 0:
+        return "_هنوز trial موفقی برای بهترین هایپرپارامتر موجود نیست._"
+
+    mod = importlib.import_module(_FAMILY_MODULES[family])
+    fit_fn = mod.MODELS[model_id]
+
+    set_global_seed()
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    fold_meta, _ = load_cv_folds()
+    folds = []
+    for f in fold_meta:
+        tr_mask, te_mask = f.masks(df[DATE_COL])
+        folds.append((df.loc[tr_mask], df.loc[te_mask]))
+
+    t = tau if tau is not None else TUNING_TAU
+    oof = calibration.oof_predictions(fit_fn, folds, t, result["best_hyperparams"])
+    return calibration.render_step13(oof, t)
+
+
 def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | None = None,
-               quantreg: bool = False) -> cards.ModelCard:
-    """کارت را با بخش‌های داده‌محور (۵،۶،۷،۸،۹،۱۰،۱۲) پر می‌کند؛ بقیه راهنما می‌مانند.
+               quantreg: bool = False, include_calibration: bool = False) -> cards.ModelCard:
+    """کارت را با بخش‌های داده‌محور/مکانیکی (۲،۳،۵،۶،۷،۸،۹،۱۰،۱۲) پر می‌کند؛ بقیه راهنما می‌مانند.
 
     ``feature_cols`` باید از ``f01_linear._feature_cols_s2()``/``_feature_cols_s2_quantreg()``
     بیاید — اینجا وابستگی مستقیم به آن ماژول ندارد تا برای خانواده‌های دیگر هم قابل‌استفاده بماند.
+
+    ``include_calibration=True`` گام ۱۳ (اجباری) را هم با بازبرازش واقعی پر می‌کند —
+    پیش‌فرض خاموش چون هزینه‌اش برای مدل‌های کند (رگرسیون کوانتایل ترکیبی) قابل‌توجه است؛
+    برای آن‌ها ``render_step13_calibration`` جداگانه و آگاهانه صدا زده شود.
     """
     result = load_s2_result(model_id, family)
     card = cards.ModelCard(model_id)
 
+    card.set_section(2, render_step2_data_levels(model_id))
+    card.set_section(3, render_step3_target_mapping(model_id))
     if feature_cols is not None:
         card.set_section(5, render_step5_feature_set(model_id, feature_cols, quantreg))
     card.set_section(6, render_step6_preprocessing())
@@ -170,8 +237,10 @@ def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | Non
     card.set_section(9, render_step9_convergence(result))
     card.set_section(10, render_step10_importance(model_id, family))
     card.set_section(12, render_step12_quantile_extraction(model_id))
+    if include_calibration:
+        card.set_section(13, render_step13_calibration(model_id, family))
 
-    # بقیه (۱،۲،۳،۴،۱۱،۱۳،۱۴) عمداً دست‌نخورده می‌مانند — ModelCard.to_markdown() خودش
+    # بقیه (۱،۴،۱۱،۱۴ — و ۱۳ اگر include_calibration=False) عمداً دست‌نخورده می‌مانند — ModelCard.to_markdown() خودش
     # جای‌گزین «_ثبت نشده._» می‌گذارد، پس نیازی به یادداشت TODO دستی اینجا نیست؛
     # card.missing_mandatory() برای پرس‌وجوی برنامه‌ای «چه چیزی هنوز مانده» کافی است.
     return card

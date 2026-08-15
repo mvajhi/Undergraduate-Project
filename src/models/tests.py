@@ -431,8 +431,36 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_calibration_coverage_arithmetic() -> tuple[bool, str]:
+    """``oof_predictions``/``render_step13`` روی داده‌ی مصنوعی با پوشش دقیقاً شناخته‌شده —
+    نصف رکوردها زیر پیش‌بینی (پوشیده)، نصف بالا؛ پوشش باید دقیقاً ۰.۵ محاسبه شود."""
+    from src.models import calibration
+
+    n = 200
+    te = pd.DataFrame({
+        "rho": [0.1 if i % 2 == 0 else 0.9 for i in range(n)],
+        "RestaurantName": ["A"] * (n // 2) + ["B"] * (n // 2),
+        "Meal": ["lunch"] * n,
+        "Res": list(range(n)),
+        "is_tehran": [True] * n,
+    })
+
+    def fake_fit(train, test, tau, **hp):
+        return __import__("numpy").full(len(test), 0.5)
+
+    df = calibration.oof_predictions(fake_fit, [(te, te)], tau=0.20, hyperparams={})
+    overall = calibration._coverage_row("کلی", df, 0.20)
+    ok_cov = abs(overall["coverage"] - 0.5) < 1e-9
+    ok_gap = abs(overall["gap"] - 0.3) < 1e-9
+
+    md = calibration.render_step13(df, 0.20)
+    ok_md = "پوشش کلی: 0.5000" in md and "چارک Res" in md and "بدترین برش" in md
+    return (ok_cov and ok_gap and ok_md,
+           f"پوشش=۰.۵ محاسبه‌شد={ok_cov} · شکاف=۰.۳={ok_gap} · markdown سالم={ok_md}")
+
+
 def test_card_writer_renders_data_driven_sections() -> tuple[bool, str]:
-    """بخش‌های ۵،۶،۷،۸،۹،۱۰،۱۲ ``card_writer.draft_card`` باید از روی نتیجه‌ی S2 واقعی
+    """بخش‌های ۲،۳،۵،۶،۷،۸،۹،۱۰،۱۲ ``card_writer.draft_card`` باید از روی نتیجه‌ی S2 واقعی
     (نه شبیه‌سازی) محتوای غیرخالی و سازگار با آن نتیجه بسازند."""
     from src.models import card_writer
 
@@ -448,13 +476,34 @@ def test_card_writer_renders_data_driven_sections() -> tuple[bool, str]:
     model_id = candidates[0]
 
     card = card_writer.draft_card(model_id, "F01", feature_cols=["log_res", "log_res_sq"], quantreg=False)
-    filled = {5, 6, 7, 8, 9, 10, 12}
+    filled = {2, 3, 5, 6, 7, 8, 9, 10, 12}
     ok_filled = filled.issubset(card.sections.keys())
     ok_nonempty = all(len(card.sections.get(i, "")) > 20 for i in filled)
     ok_step8_has_trials = str(payload[model_id]["n_trials"]) in card.sections[8]
     return (ok_filled and ok_nonempty and ok_step8_has_trials,
            f"مدل={model_id} · بخش‌های پرشده={ok_filled} · غیرخالی={ok_nonempty} · "
            f"تعداد trial در گام ۸={ok_step8_has_trials}")
+
+
+def test_card_writer_step13_calibration_on_real_data() -> tuple[bool, str]:
+    """گام ۱۳ اجباری با بازبرازش واقعی روی fold‌های رسمی — روی «ridge» (سریع، معمولاً
+    از اولین‌های S2 که کامل می‌شوند) چک می‌کند پوشش کلی و برش‌های اجباری تولید می‌شوند."""
+    from src.models import card_writer
+
+    json_path = card_writer.PHASE7_DIR / "S2_tuning_F01.json"
+    if not json_path.exists():
+        return True, "رد شد (S2_tuning_F01.json هنوز موجود نیست) — نه شکست"
+    import json
+    payload = json.loads(json_path.read_text())
+    if "ridge" not in payload or payload["ridge"].get("n_trials", 0) == 0:
+        return True, "رد شد (ridge هنوز نتیجه‌ی S2 ندارد) — نه شکست"
+
+    md = card_writer.render_step13_calibration("ridge", "F01")
+    ok_overall = "پوشش کلی:" in md
+    ok_cuts = all(c in md for c in ["وعده", "سلف", "چارک Res", "تهران؟"])
+    ok_worst = "بدترین برش" in md
+    return (ok_overall and ok_cuts and ok_worst,
+           f"پوشش کلی={ok_overall} · هر ۴ برش اجباری حاضرند={ok_cuts} · بدترین‌برش={ok_worst}")
 
 
 def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
@@ -532,6 +581,8 @@ _ALL_TESTS = [
     test_card_completeness_and_roundtrip,
     test_card_require_complete_raises,
     test_card_writer_renders_data_driven_sections,
+    test_calibration_coverage_arithmetic,
+    test_card_writer_step13_calibration_on_real_data,
 ]
 
 
