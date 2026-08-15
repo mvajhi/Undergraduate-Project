@@ -1,7 +1,10 @@
-"""بند 7.3.1 سند فاز ۷ — هارنس غربالگری S1: ۲۰ trial تصادفی × ۳ fold، بدون حذف هیچ مدلی.
+"""بند 7.3.1 سند فاز ۷ — هارنس غربالگری R1 (=S1): ``N_TRIALS`` trial تصادفی × ۳ fold.
 
-⚠️ **S1 مدلی را حذف نمی‌کند؛ فقط ترتیب می‌دهد** (بند 7.3.2) — رتبه‌بندی این مرحله برای
-کالیبره‌کردن بودجه‌ی S2 استفاده می‌شود، نه برای بازنده اعلام‌کردن.
+🔄 **بازنویسی ۲۰۲۶-۰۸-۱۶ (ردیف ۳۷ decision_log).** نسخه‌ی قبلی می‌گفت «S1 مدلی را حذف
+نمی‌کند، فقط ترتیب می‌دهد» — درست برای خ۱ (F01) که همه‌جا اجرا شد، ولی برای خانواده‌های
+بعدی R1 اکنون **گام اول نصف‌سازی متوالی** است (بند 7.3.2 بازنویسی‌شده): حذف با آزمون
+زوجی DM در برابر رهبر انجام می‌شود، نه رتبه‌ی خام. ``N_TRIALS`` هم از ۲۰ به ۱۰ کاهش
+یافت (سقف زمانی سخت هر trial هم اضافه شد: ``TRIAL_TIME_CAP_SECONDS``).
 
 اجرا با استخر پردازش موازی (`ProcessPoolExecutor`): این خانواده به‌تنهایی ۱۵ مدل × ۲۰
 trial × ۳ fold = ۹۰۰ برازش دارد و بیشترشان زیر یک ثانیه‌اند، ولی بعضی (مثل رگرسیون
@@ -40,8 +43,10 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 PHASE7_DIR = REPORTS_DIR / "phase7"
 
-#: بند 7.3.1
-N_TRIALS = 20
+#: بند 7.3.2 بازنویسی‌شده (R1، ردیف ۳۷ decision_log): ۱۰ trial تصادفی (قبلاً ۲۰ در
+#: نسخه‌ی قبل از تجدیدنظر — خ۱/F01 قبلاً با همان ۲۰ اجرا و بسته شده، این عدد فقط
+#: خانواده‌های بعدی را می‌پوشاند).
+N_TRIALS = 10
 N_SCREENING_FOLDS = 3
 
 #: بند 7.3.3 بازنویسی‌شده (R1، ردیف ۳۷ decision_log) — سقف زمانی سخت هر trial. عبور از
@@ -86,7 +91,7 @@ class TrialResult:
 def build_jobs(family: str, level: str, model_ids: list[str], feature_set: str,
               data_snapshot_hash: str, cv_folds_hash: str, dataset_source: str,
               target: str = "rho", seed: int = 42, n_trials: int = N_TRIALS) -> list[TrialJob]:
-    """نمونه‌گیری قطعی ۲۰ trial به‌ازای هر مدل (پیش از ارسال به استخر موازی) — یک
+    """نمونه‌گیری قطعی N_TRIALS trial به‌ازای هر مدل (پیش از ارسال به استخر موازی) — یک
     ``optuna.Study`` تصادفی مستقل با seed مشتق‌شده از model_id، تا نتیجه بازتولیدپذیر
     باشد ولی مدل‌ها همان یک جریان تصادفی را کورکورانه به اشتراک نگذارند.
     """
@@ -178,7 +183,7 @@ def run_family_s1(family: str, level: str, family_module_path: str, model_ids: l
                   folds: list, feature_set: str, data_snapshot_hash: str, cv_folds_hash: str,
                   dataset_source: str, seed: int = 42, n_trials: int = N_TRIALS,
                   n_jobs: int = DEFAULT_N_JOBS, progress_every: int = 20) -> list[TrialResult]:
-    """۲۰ trial تصادفی × ۳ fold برای هر مدل در ``model_ids``، موازی روی ``n_jobs`` پردازش.
+    """N_TRIALS trial تصادفی × ۳ fold برای هر مدل در ``model_ids``، موازی روی ``n_jobs`` پردازش.
 
     ``folds`` باید دقیقاً ``N_SCREENING_FOLDS`` عضو ``(train, test)`` باشد (فراخوان انتخاب
     می‌کند کدام fold‌ها — معمولاً سه‌تای اول، چون کوچک‌ترند و غربالگری را ارزان نگه می‌دارند).
@@ -266,9 +271,9 @@ def _render_markdown(store: dict, path, family: str, level: str) -> None:
     lines = [
         f"# غربالگری S1 — {family} ({level})",
         "",
-        "> بند 7.3.1 سند `doc/WBS-phase7-modeling.md`. ۲۰ trial تصادفی × ۳ fold، τ="
-        f"{S1_TAU}. **⚠️ هیچ مدلی حذف نشده** (بند 7.3.2) — این فقط رتبه‌بندی مقدماتی برای "
-        "کالیبره‌کردن بودجه‌ی S2 است.",
+        f"> بند 7.3.1/7.3.2 سند `doc/WBS-phase7-modeling.md`. {N_TRIALS} trial تصادفی × "
+        f"۳ fold (R1)، τ={S1_TAU}. حذف با آزمون زوجی بند ۶.۶ در برابر رهبر انجام می‌شود "
+        "(بند 7.3.2 بازنویسی‌شده) — این جدول فقط رتبه‌بندی مقدماتی است.",
         "",
     ]
     if baseline is not None:

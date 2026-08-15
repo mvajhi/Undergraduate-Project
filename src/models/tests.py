@@ -431,6 +431,48 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_f02_all_specs_have_algorithm() -> tuple[bool, str]:
+    """هر ۳ عضو کوتاه‌فهرست‌شده‌ی F02 (اسپرینت C) باید algorithm غیرخالی و فضای
+    هایپرپارامتر ثبت‌شده داشته باشند."""
+    import src.models.families.f02_tree as f02  # noqa: F401
+    from src.models.registry import models_of_family
+    from src.models.spaces import SPACES
+
+    specs = models_of_family("F02")
+    empty = [s.model_id for s in specs if not s.algorithm]
+    no_space = [s.model_id for s in specs if s.model_id not in SPACES]
+    ok = len(specs) == 3 and not empty and not no_space
+    return ok, f"{len(specs)} مدل F02 ثبت‌شده · بدون algorithm: {empty or 'هیچ‌کدام'} · بدون فضا: {no_space or 'هیچ‌کدام'}"
+
+
+def test_f02_models_fit_predict_on_real_data() -> tuple[bool, str]:
+    """هر سه مدل F02 (LightGBM/CatBoost/QRF) باید روی یک fold واقعی خروجی معتبر
+    (شکل درست، بدون NaN/inf، داخل [0,1]) بدهند — دقیقاً همان آزمونی که R0 هر مدل را
+    از آن عبور می‌دهد، اینجا به‌عنوان تست واحد رگرسیون تکرار شده."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import numpy as np
+    import pandas as pd
+
+    import src.models.families.f02_tree as f02
+    from src.cv import DATE_COL, load_cv_folds
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    folds, _ = load_cv_folds()
+    tr_mask, te_mask = folds[0].masks(df[DATE_COL])
+    train, test = df.loc[tr_mask], df.loc[te_mask]
+
+    results = {}
+    for model_id, fn in f02.MODELS.items():
+        out = np.asarray(fn(train, test, 0.20))
+        ok = out.shape == (len(test),) and np.all(np.isfinite(out)) and out.min() >= 0.0 and out.max() <= 1.0
+        results[model_id] = ok
+    return all(results.values()), " · ".join(f"{k}={v}" for k, v in results.items())
+
+
 def test_axis_screening_weighting_axis_end_to_end() -> tuple[bool, str]:
     """اسپرینت A، بند 7.9.1 بازنویسی‌شده: پیمایش محور «وزن‌دهی» با هر دو کاوشگر باید
     روی داده‌ی واقعی L1 کامل اجرا شود و خروجی سازگار با قرارداد δ بدهد — سبک‌ترین محور
@@ -909,6 +951,8 @@ _ALL_TESTS = [
     test_significance_dm_test_runs_on_real_f01_results,
     test_axis_screening_target_transforms_are_invertible,
     test_axis_screening_weighting_axis_end_to_end,
+    test_f02_all_specs_have_algorithm,
+    test_f02_models_fit_predict_on_real_data,
 ]
 
 

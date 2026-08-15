@@ -24,6 +24,7 @@ billiard==4.2.4
 bleach==6.4.0
 blinker==1.9.0
 cachetools==7.1.7
+catboost==1.2.10
 celery==5.6.3
 certifi==2026.7.22
 cffi==2.1.1
@@ -78,6 +79,7 @@ grandalf==0.8
 graphene==3.4.3
 graphql-core==3.2.11
 graphql-relay==3.2.0
+graphviz==0.21
 greenlet==3.5.5
 group-lasso==1.5.0
 gto==1.10.1
@@ -160,6 +162,7 @@ pexpect==4.9.0
 pillow==12.3.0
 pingouin==0.6.1
 platformdirs==4.11.2
+plotly==6.9.0
 prettytable==3.18.0
 progressbar2==4.6.0
 prometheus_client==0.26.0
@@ -192,6 +195,7 @@ python-utils==4.0.0
 pytz==2026.3.post1
 PyYAML==6.0.3
 pyzmq==27.1.0
+quantile-forest==1.4.2
 RapidFuzz==3.14.5
 referencing==0.37.0
 requests==2.34.2

@@ -22,3 +22,5 @@ python-bidi
 pygam
 group-lasso
 lightgbm
+catboost
+quantile-forest

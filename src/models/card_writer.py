@@ -33,7 +33,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 #: خانواده → مسیر دات‌دار ماژول — برای بارگذاری ``MODELS``/``QUANTREG_MODEL_IDS`` در
 #: ``render_step13_calibration`` بدون وابستگی مستقیم به یک خانواده‌ی خاص.
-_FAMILY_MODULES = {"F01": "src.models.families.f01_linear"}
+_FAMILY_MODULES = {"F01": "src.models.families.f01_linear", "F02": "src.models.families.f02_tree"}
 
 #: بند 7.9.2 WBS — آزمون‌های پیش‌پرواز خ۱ که در فاز ۴/۶ **قبلاً** اجرا و در دفتر حقایق
 #: ثبت شده‌اند (نه اینجا دوباره محاسبه می‌شوند — فقط ارجاع/نگاشط به مدل مربوطه‌اند).
@@ -75,6 +75,14 @@ _F01_PREFLIGHT_RELEVANCE = {
 def render_step4_preflight_tests(model_id: str, family: str) -> str:
     """آزمون‌های پیش‌پرواز مرتبط با این مدل — طبق بند 7.9.2، برای خ۱ همه در فاز ۴/۶
     قبلاً اجرا شده‌اند (اینجا دوباره محاسبه نمی‌شوند، فقط با کد یافته ارجاع داده می‌شوند)."""
+    if family == "F02":
+        return (
+            "بند 7.9.2 هیچ آزمون پیش‌پروازی برای خانواده‌ی درختی/بوستینگ اجباری نکرده "
+            "(جدول آن بند فقط ADF/KPSS/Ljung-Box برای سری‌زمانی، ARCH-LM برای GARCH، و "
+            "VIF/Breusch-Pagan برای خطی/توزیعی را می‌خواهد). درخت/بوستینگ نه فرض خطی‌بودن "
+            "دارد و نه فرض همسانی واریانس — **نبود آزمون اینجا خودش یک یافته‌ی مثبت است**، "
+            "نه غفلت."
+        )
     if family != "F01":
         return "_نگاشت آزمون پیش‌پرواز برای این خانواده هنوز تعریف نشده._"
     keys = _F01_PREFLIGHT_RELEVANCE.get(model_id)
@@ -126,7 +134,18 @@ def _load_study(model_id: str, family: str) -> optuna.Study:
     return optuna.load_study(study_name=f"{family}_{model_id}_S2", storage=study_storage_url(model_id))
 
 
-def render_step5_feature_set(model_id: str, feature_cols: list[str], quantreg: bool) -> str:
+def render_step5_feature_set(model_id: str, feature_cols: list[str], quantreg: bool,
+                             family: str = "F01") -> str:
+    if family == "F02":
+        return (
+            "بند 7.5.3، ردیف «درختی/بوستینگ». پایه: `FS_full_A` کامل، **بدون حذف زودهنگام** "
+            "— درخت برهم‌کنش و غیرخطی را خودش کشف می‌کند؛ هرس فقط با SHAP-RFE گام ۳ که در "
+            "فهرست کوتاه اسپرینت C نبود.\n\n"
+            f"**{len(feature_cols)} ستون نهایی**: `{', '.join(feature_cols)}`.\n\n"
+            "دسته‌ای‌ها (`RestaurantName` ۳۰ سطح، `FoodType`, `Meal`, `RestaurantType`, "
+            "`city`, `precip_type`) **خام** به LightGBM/CatBoost داده می‌شوند (نه یک‌هات) — "
+            "رمزگذاری بومی این کتابخانه‌ها معمولاً بهتر از یک‌هات عمل می‌کند."
+        )
     bucket = "رگرسیون کوانتایل خطی" if quantreg else "خطی/منظم‌شده"
     extra = "؛ علاوه‌بر آن `pre_holiday_x_block_len` (فیچر تقریباً ثابت، <۱٪ تغییرپذیری) حذف شده" if quantreg else ""
     return (
@@ -403,7 +422,7 @@ def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | Non
     card.set_section(3, render_step3_target_mapping(model_id))
     card.set_section(4, render_step4_preflight_tests(model_id, family))
     if feature_cols is not None:
-        card.set_section(5, render_step5_feature_set(model_id, feature_cols, quantreg))
+        card.set_section(5, render_step5_feature_set(model_id, feature_cols, quantreg, family))
     card.set_section(6, render_step6_preprocessing())
     card.set_section(7, render_step7_hyperparam_space(model_id, family))
     card.set_section(8, render_step8_search_strategy(result))
