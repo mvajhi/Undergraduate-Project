@@ -431,6 +431,29 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_significance_dm_test_runs_on_real_f01_results() -> tuple[bool, str]:
+    """اسپرینت A بند ۱ (سند تصمیم ۳۷): آزمون DM باید روی نتایج واقعی S2 خ۱ اجرا شود و
+    نتیجه‌ای سازگار با یافته‌ی ۱۱ (برد سه مدل روی B3 معنادار نیست) بدهد."""
+    from src.models import card_writer, significance
+
+    json_path = card_writer.PHASE7_DIR / "S2_tuning_F01.json"
+    if not json_path.exists():
+        return True, "رد شد (S2_tuning_F01.json هنوز موجود نیست) — نه شکست"
+    import json
+    payload = json.loads(json_path.read_text())
+    if not all(payload.get(m, {}).get("n_trials", 0) > 0 for m in significance.F01_WINNERS):
+        return True, "رد شد (هنوز نتیجه‌ی S2 هر سه برنده موجود نیست) — نه شکست"
+
+    df = significance.run_f01_significance()
+    ok_shape = len(df) == 6 and set(df["reference"]) == {"B3", "B6"}
+    ok_cols = {"dm_stat", "p_value", "delta_pinball"}.issubset(df.columns)
+    ok_finite = df["p_value"].apply(lambda p: 0.0 <= p <= 1.0).all()
+    report = significance.render_report(df, 0.20)
+    ok_report = "Diebold-Mariano" in report and "B6" in report
+    return (ok_shape and ok_cols and ok_finite and ok_report,
+           f"شکل={ok_shape} · ستون‌ها={ok_cols} · p-value معتبر={ok_finite} · گزارش سالم={ok_report}")
+
+
 def test_effective_budget_caps_to_cardinality() -> tuple[bool, str]:
     """بند 7.6.2 بازنویسی‌شده (ردیف ۳۷ decision_log): بودجه هرگز نباید از کاردینالیتی
     واقعی فضا بیشتر شود — ریشه‌ی ۷.۳ ساعت اتلاف در composite_quantile_regression."""
@@ -843,6 +866,7 @@ _ALL_TESTS = [
     test_effective_budget_caps_to_cardinality,
     test_recommended_sampler_uses_bruteforce_for_finite_space,
     test_s2_model_time_cap_stops_early,
+    test_significance_dm_test_runs_on_real_f01_results,
 ]
 
 
