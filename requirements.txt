@@ -21,3 +21,4 @@ arabic-reshaper
 python-bidi
 pygam
 group-lasso
+lightgbm

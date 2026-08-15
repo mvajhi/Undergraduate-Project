@@ -431,6 +431,46 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_axis_screening_weighting_axis_end_to_end() -> tuple[bool, str]:
+    """اسپرینت A، بند 7.9.1 بازنویسی‌شده: پیمایش محور «وزن‌دهی» با هر دو کاوشگر باید
+    روی داده‌ی واقعی L1 کامل اجرا شود و خروجی سازگار با قرارداد δ بدهد — سبک‌ترین محور
+    برای تست است (بدون تبدیل هدف/گروه‌بندی، فقط sample_weight)."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    from src.models import axis_screening
+
+    df = axis_screening.screen_axis("weighting")
+    ok_shape = len(df) == 4  # ۲ کاوشگر × ۲ مقدار (res, sqrt_res)
+    ok_cols = {"delta", "p_value", "beats_anchor_significantly", "within_equivalence_margin"}.issubset(df.columns)
+    ok_margin_logic = all(
+        (abs(r["delta"]) < axis_screening.EQUIVALENCE_MARGIN_DELTA) == r["within_equivalence_margin"]
+        or r["p_value"] >= 0.05
+        for _, r in df.iterrows()
+    )
+    report = axis_screening.render_report(df, 0.20)
+    ok_report = "weighting" in report and "قفل" in report
+    return (ok_shape and ok_cols and ok_margin_logic and ok_report,
+           f"شکل={ok_shape} · ستون‌ها={ok_cols} · منطق δ={ok_margin_logic} · گزارش سالم={ok_report}")
+
+
+def test_axis_screening_target_transforms_are_invertible() -> tuple[bool, str]:
+    """logit/arcsine-sqrt باید دقیقاً یکنوا و قابل‌وارون باشند تا کوانتایل جابه‌جا نشود —
+    اگر این نقض شود، کل محور «نگاشت هدف» بی‌اعتبار می‌شود."""
+    import numpy as np
+
+    from src.models import axis_screening
+
+    p = np.linspace(0.001, 0.999, 200)
+    ok = {}
+    for name, (fwd, inv) in axis_screening.TARGET_TRANSFORMS.items():
+        back = inv(fwd(p))
+        ok[name] = bool(np.allclose(back, p, atol=1e-6))
+    return all(ok.values()), " · ".join(f"{k}={v}" for k, v in ok.items())
+
+
 def test_significance_dm_test_runs_on_real_f01_results() -> tuple[bool, str]:
     """اسپرینت A بند ۱ (سند تصمیم ۳۷): آزمون DM باید روی نتایج واقعی S2 خ۱ اجرا شود و
     نتیجه‌ای سازگار با یافته‌ی ۱۱ (برد سه مدل روی B3 معنادار نیست) بدهد."""
@@ -867,6 +907,8 @@ _ALL_TESTS = [
     test_recommended_sampler_uses_bruteforce_for_finite_space,
     test_s2_model_time_cap_stops_early,
     test_significance_dm_test_runs_on_real_f01_results,
+    test_axis_screening_target_transforms_are_invertible,
+    test_axis_screening_weighting_axis_end_to_end,
 ]
 
 
