@@ -2,20 +2,23 @@
 
 بخش‌های **داده‌محور** (۵، ۷، ۸، ۹، ۱۰، ۱۲) مستقیماً از نتیجه‌ی S2 (`s2_runner`) و مطالعه‌ی
 Optuna پایدارشده (`optuna_studies/{model_id}.db`) ساخته می‌شوند — دستی نوشته نمی‌شوند تا با
-تغییر کد از هم جدا نیفتند. بخش‌های **روایی** (۱، ۲، ۳، ۴، ۶، ۱۱، ۱۳، ۱۴) که به قضاوت
-دامنه‌ای نیاز دارند، با ``draft_card`` فقط یک چارچوب/راهنما می‌گیرند و باید تکمیل شوند —
-جز ۲، ۳، ۶ که برای خ۱ به‌اندازه‌ی کافی مکانیکی‌اند (سطح L1 ثابت، نگاشت هدف از
-``quantile_route``، پیش‌پردازش از ``common.design_matrix``) و کامل پر می‌شوند.
+تغییر کد از هم جدا نیفتند. بخش‌های ۱، ۲، ۳، ۶ هم به‌اندازه‌ی کافی مکانیکی‌اند (۱: docstring
+خودِ `fit_predict_*`؛ ۲: سطح L1 ثابت؛ ۳: نگاشت هدف از `quantile_route`؛ ۶: پیش‌پردازش از
+`common.design_matrix`) و کامل پر می‌شوند. بخش‌های **روایی باقی‌مانده** (۴، ۱۴) که به قضاوت
+دامنه‌ای نیاز دارند، با ``draft_card`` فقط راهنما می‌گیرند و باید دستی تکمیل شوند.
 
-گام ۱۳ (کالیبراسیون) با ``render_step13_calibration`` جدا محاسبه می‌شود — چون برخلاف
-بخش‌های بالا نیازمند **بازبرازش واقعی** مدل روی هر ۵ fold با بهترین هایپرپارامتر S2 است
-(``src/models/calibration.py``)، نه فقط خواندن نتیجه‌ی ذخیره‌شده؛ برای مدل‌های کند
-(مثل رگرسیون کوانتایل ترکیبی) این هزینه‌ی قابل‌توجهی دارد، پس در ``draft_card`` با
-پرچم ``include_calibration=False`` پیش‌فرض خاموش است.
+گام‌های ۱۱ (تشخیص برازش) و ۱۳ (کالیبراسیون) با ``render_step11_fit_diagnosis``/
+``render_step13_calibration`` جدا محاسبه می‌شوند — چون برخلاف بخش‌های بالا نیازمند
+**بازبرازش واقعی** مدل روی هر ۵ fold با بهترین هایپرپارامتر S2 هستند
+(``src/models/fit_diagnosis.py``, ``src/models/calibration.py``)، نه فقط خواندن نتیجه‌ی
+ذخیره‌شده؛ برای مدل‌های کند (مثل رگرسیون کوانتایل ترکیبی) این هزینه‌ی قابل‌توجهی دارد،
+پس در ``draft_card`` با پرچم ``include_refit_diagnostics=False`` پیش‌فرض خاموش است.
 """
 
+import functools
 import importlib
 import json
+import re
 
 import numpy as np
 import optuna
@@ -36,6 +39,23 @@ _QUANTILE_ROUTE_DESC = {
     "Q2": "از توزیع پارامتری برازش‌شده — کوانتایل با معکوس CDF توزیع فرضی محاسبه می‌شود.",
     "Q3": "از توزیع تجربی باقیمانده — پیش‌بینی میانگین + آفست کوانتایل باقیمانده به تفکیک چارک Res.",
 }
+
+
+def render_step1_theoretical_position(model_id: str, family: str) -> str:
+    """docstring خودِ ``fit_predict_*`` معمولاً همان توجیه «چرا این مدل» بند 7.10.1 است
+    (نوشته‌شده هنگام پیاده‌سازی)؛ برای مدل‌های بدون docstring (مثل ols بی‌نظم‌سازها)،
+    به توضیح عمومی از رجیستری برمی‌گردد."""
+    import inspect
+
+    spec = MODEL_REGISTRY.get(model_id)
+    mod = importlib.import_module(_FAMILY_MODULES[family])
+    fn = mod.MODELS.get(model_id)
+    doc = inspect.getdoc(fn) if fn else None
+    if doc:
+        return doc
+    if spec is None:
+        return "_مدل در رجیستری ثبت نشده._"
+    return f"عضو خانواده‌ی {family} (بند 7.10.1) — پیاده‌سازی: `{spec.algorithm}`."
 
 
 def load_s2_result(model_id: str, family: str) -> dict:
@@ -184,18 +204,20 @@ def render_step12_quantile_extraction(model_id: str) -> str:
     return f"مسیر **{route}** (بند 7.23) — {_QUANTILE_ROUTE_DESC.get(route, '')}"
 
 
-def render_step13_calibration(model_id: str, family: str, tau: float | None = None) -> str:
-    """بازبرازش واقعی مدل با بهترین هایپرپارامتر S2 روی هر ۵ fold رسمی + سنجش پوشش
-    تجربی (``src/models/calibration.py``) — گام ۱۳ اجباری کارت مدل، بند 7.4."""
+def _load_refit_context(model_id: str, family: str):
+    """بارگذاری مشترک برای گام‌های ۱۱/۱۳ که نیازمند بازبرازش واقعی‌اند — یک‌بار داده و
+    fold و بهترین هایپرپارامتر را می‌خواند، دو بار کد تکرار نمی‌شود.
+
+    برمی‌گرداند: ``(fit_fn, folds, best_hyperparams)`` یا ``None`` اگر هنوز trial
+    موفقی موجود نباشد.
+    """
     from src.config import set_global_seed
     from src.cv import DATE_COL, load_cv_folds
     from src.features.build import FEATURES_A_PATH
-    from src.models import calibration
-    from src.models.axes import TUNING_TAU
 
     result = load_s2_result(model_id, family)
     if not result.get("best_hyperparams") and result.get("n_hyperparams", 0) > 0:
-        return "_هنوز trial موفقی برای بهترین هایپرپارامتر موجود نیست._"
+        return None
 
     mod = importlib.import_module(_FAMILY_MODULES[family])
     fit_fn = mod.MODELS[model_id]
@@ -207,26 +229,122 @@ def render_step13_calibration(model_id: str, family: str, tau: float | None = No
     for f in fold_meta:
         tr_mask, te_mask = f.masks(df[DATE_COL])
         folds.append((df.loc[tr_mask], df.loc[te_mask]))
+    return fit_fn, folds, result["best_hyperparams"]
 
+
+def render_step11_fit_diagnosis(model_id: str, family: str, tau: float | None = None) -> str:
+    """بازبرازش واقعی + شکاف pinball train/test روی هر ۵ fold رسمی
+    (``src/models/fit_diagnosis.py``) — گام ۱۱ اجباری کارت مدل، بند 7.4."""
+    from src.models import fit_diagnosis
+    from src.models.axes import TUNING_TAU
+
+    ctx = _load_refit_context(model_id, family)
+    if ctx is None:
+        return "_هنوز trial موفقی برای بهترین هایپرپارامتر موجود نیست._"
+    fit_fn, folds, hp = ctx
     t = tau if tau is not None else TUNING_TAU
-    oof = calibration.oof_predictions(fit_fn, folds, t, result["best_hyperparams"])
+    rows = fit_diagnosis.train_test_gap(fit_fn, folds, t, hp)
+    return fit_diagnosis.render_step11(rows)
+
+
+def render_step13_calibration(model_id: str, family: str, tau: float | None = None) -> str:
+    """بازبرازش واقعی مدل با بهترین هایپرپارامتر S2 روی هر ۵ fold رسمی + سنجش پوشش
+    تجربی (``src/models/calibration.py``) — گام ۱۳ اجباری کارت مدل، بند 7.4."""
+    from src.models import calibration
+    from src.models.axes import TUNING_TAU
+
+    ctx = _load_refit_context(model_id, family)
+    if ctx is None:
+        return "_هنوز trial موفقی برای بهترین هایپرپارامتر موجود نیست._"
+    fit_fn, folds, hp = ctx
+    t = tau if tau is not None else TUNING_TAU
+    oof = calibration.oof_predictions(fit_fn, folds, t, hp)
     return calibration.render_step13(oof, t)
 
 
+@functools.lru_cache(maxsize=4)
+def _b3_baseline_5fold(family: str, level: str) -> float:
+    """مرجع B3 روی هر ۵ fold رسمی — مستقل از اتمام کل S2 محاسبه می‌شود (بند 7.6.3
+    نتیجه‌ی نهایی همان مقدار را در ``_baseline_B3`` می‌نویسد، ولی آن فقط بعد از اتمام
+    **کل** خانواده نوشته می‌شود؛ گام ۱۴ نباید منتظرش بماند — این تابع سبک است چون فقط
+    کوانتایل تجربی خط پایه را می‌سنجد، نه هیچ برازش مدلی)."""
+    from src.cv import DATE_COL, load_cv_folds
+    from src.features.build import FEATURES_A_PATH
+    from src.models.s2_runner import baseline_reference_5fold
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    fold_meta, _ = load_cv_folds()
+    folds = []
+    for f in fold_meta:
+        tr_mask, te_mask = f.masks(df[DATE_COL])
+        folds.append((df.loc[tr_mask], df.loc[te_mask]))
+    return baseline_reference_5fold(folds)
+
+
+_COVERAGE_RE = re.compile(r"پوشش کلی: ([\d.]+)\*\* \(اسمی τ=[\d.]+, شکاف=([+-][\d.]+)")
+_RATIO_RE = re.compile(r"نسبت pinball\(test\)/pinball\(train\) روی ۵ fold: ([\d.]+)\*\*")
+
+
+def render_step14_summary(model_id: str, family: str, card: cards.ModelCard) -> str:
+    """سنتز نهایی — از نتیجه‌ی S2 (بند ۸/۹) + مرجع B3 + آنچه گام‌های ۱۱/۱۳ **همین کارت**
+    (اگر پیش‌تر پر شده باشند) قبلاً محاسبه کرده‌اند می‌سازد؛ دوباره بازبرازش نمی‌کند."""
+    result = load_s2_result(model_id, family)
+    if not np.isfinite(result.get("best_pinball", float("nan"))):
+        return "_هنوز نتیجه‌ی S2 معتبری موجود نیست._"
+
+    b3 = _b3_baseline_5fold(family, "L1")
+    beat_b3 = result["best_pinball"] < b3
+    lines = [
+        f"**pinball نهایی (بهترین trial، ۵ fold): {result['best_pinball']:.5f}** در برابر "
+        f"مرجع B3={b3:.5f} — {'🎯 بهتر از B3' if beat_b3 else '❌ هنوز B3 را نبرده'}.",
+        f"همگرایی (A6): {'✅' if result['converged'] else '⚠️'} · پایداری (بند 7.6.3): "
+        f"{result['stable_top10pct_folds']}/5 fold · {result['n_trials']} trial، "
+        f"{result['n_fail']} شکست.",
+    ]
+
+    cov_m = _COVERAGE_RE.search(card.sections.get(13, ""))
+    if cov_m:
+        cov, gap = float(cov_m.group(1)), float(cov_m.group(2))
+        cal_verdict = "قابل‌قبول" if abs(gap) < 0.05 else "نیازمند کالیبراسیون متعامد (خ۱۳) پیش از استفاده‌ی عملیاتی"
+        lines.append(f"کالیبراسیون (گام ۱۳): پوشش کلی={cov:.4f} (شکاف={gap:+.4f}) — {cal_verdict}.")
+
+    ratio_m = _RATIO_RE.search(card.sections.get(11, ""))
+    if ratio_m:
+        ratio = float(ratio_m.group(1))
+        fit_verdict = "بدون نشانه‌ی بیش‌برازش قابل‌توجه" if ratio <= 1.20 else "نشانه‌ی بیش‌برازش"
+        lines.append(f"تشخیص برازش (گام ۱۱): نسبت pinball test/train={ratio:.3f} — {fit_verdict}.")
+
+    stable = result["stable_top10pct_folds"] >= 3  # آستانه‌ی بند 7.6.3
+    cal_ok = not cov_m or abs(float(cov_m.group(2))) < 0.10
+    if beat_b3 and result["converged"] and cal_ok and stable:
+        verdict, why = "✅ کاندید ورود به S3 (حساسیت τ + ترکیب)", "برنده‌ی B3 با همگرایی، پایداری و کالیبراسیون قابل‌قبول"
+    elif beat_b3 and result["converged"] and cal_ok and not stable:
+        verdict, why = ("⚠️ برد حاشیه‌ای — نیازمند تأیید آماری پیش از S3",
+                        f"بهتر از B3 است ولی پایداری پایین (بند 7.6.3: فقط {result['stable_top10pct_folds']}/5 fold "
+                        "در ۱۰٪ برتر) — احتمال شانسی‌بودن برد را نمی‌شود رد کرد؛ آزمون Diebold-Mariano لازم است "
+                        "(یافته‌ی ۷ doc/progress: S1 هم مشابه همین را برای adaptive_lasso نشان داد که در S2 تکرار نشد)")
+    else:
+        verdict, why = "⚠️ نیازمند بررسی بیشتر پیش از S3", "حداقل یکی از معیارهای برد/همگرایی/کالیبراسیون هنوز برآورده نشده"
+    lines.append(f"\n**توصیه:** {verdict} — {why}.")
+    return "\n".join(lines)
+
+
 def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | None = None,
-               quantreg: bool = False, include_calibration: bool = False) -> cards.ModelCard:
-    """کارت را با بخش‌های داده‌محور/مکانیکی (۲،۳،۵،۶،۷،۸،۹،۱۰،۱۲) پر می‌کند؛ بقیه راهنما می‌مانند.
+               quantreg: bool = False, include_refit_diagnostics: bool = False) -> cards.ModelCard:
+    """کارت را با بخش‌های داده‌محور/مکانیکی (۱،۲،۳،۵،۶،۷،۸،۹،۱۰،۱۲) پر می‌کند؛ بقیه راهنما می‌مانند.
 
     ``feature_cols`` باید از ``f01_linear._feature_cols_s2()``/``_feature_cols_s2_quantreg()``
     بیاید — اینجا وابستگی مستقیم به آن ماژول ندارد تا برای خانواده‌های دیگر هم قابل‌استفاده بماند.
 
-    ``include_calibration=True`` گام ۱۳ (اجباری) را هم با بازبرازش واقعی پر می‌کند —
-    پیش‌فرض خاموش چون هزینه‌اش برای مدل‌های کند (رگرسیون کوانتایل ترکیبی) قابل‌توجه است؛
-    برای آن‌ها ``render_step13_calibration`` جداگانه و آگاهانه صدا زده شود.
+    ``include_refit_diagnostics=True`` گام‌های ۱۱ و ۱۳ (هر دو اجباری) را هم با یک
+    بازبرازش واقعی مشترک (``_load_refit_context``) پر می‌کند — پیش‌فرض خاموش چون هزینه‌اش
+    برای مدل‌های کند (رگرسیون کوانتایل ترکیبی) قابل‌توجه است؛ برای آن‌ها
+    ``render_step11_fit_diagnosis``/``render_step13_calibration`` جداگانه و آگاهانه صدا زده شود.
     """
     result = load_s2_result(model_id, family)
     card = cards.ModelCard(model_id)
 
+    card.set_section(1, render_step1_theoretical_position(model_id, family))
     card.set_section(2, render_step2_data_levels(model_id))
     card.set_section(3, render_step3_target_mapping(model_id))
     if feature_cols is not None:
@@ -237,10 +355,11 @@ def draft_card(model_id: str, family: str = "F01", feature_cols: list[str] | Non
     card.set_section(9, render_step9_convergence(result))
     card.set_section(10, render_step10_importance(model_id, family))
     card.set_section(12, render_step12_quantile_extraction(model_id))
-    if include_calibration:
+    if include_refit_diagnostics:
+        card.set_section(11, render_step11_fit_diagnosis(model_id, family))
         card.set_section(13, render_step13_calibration(model_id, family))
 
-    # بقیه (۱،۴،۱۱،۱۴ — و ۱۳ اگر include_calibration=False) عمداً دست‌نخورده می‌مانند — ModelCard.to_markdown() خودش
-    # جای‌گزین «_ثبت نشده._» می‌گذارد، پس نیازی به یادداشت TODO دستی اینجا نیست؛
-    # card.missing_mandatory() برای پرس‌وجوی برنامه‌ای «چه چیزی هنوز مانده» کافی است.
+    # بقیه (۴،۱۴ — و ۱۱/۱۳ اگر include_refit_diagnostics=False) عمداً دست‌نخورده می‌مانند —
+    # ModelCard.to_markdown() خودش جای‌گزین «_ثبت نشده._» می‌گذارد، پس نیازی به یادداشت TODO
+    # دستی اینجا نیست؛ card.missing_mandatory() برای پرس‌وجوی برنامه‌ای «چه چیزی هنوز مانده» کافی است.
     return card

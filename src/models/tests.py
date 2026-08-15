@@ -460,7 +460,7 @@ def test_calibration_coverage_arithmetic() -> tuple[bool, str]:
 
 
 def test_card_writer_renders_data_driven_sections() -> tuple[bool, str]:
-    """بخش‌های ۲،۳،۵،۶،۷،۸،۹،۱۰،۱۲ ``card_writer.draft_card`` باید از روی نتیجه‌ی S2 واقعی
+    """بخش‌های ۱،۲،۳،۵،۶،۷،۸،۹،۱۰،۱۲ ``card_writer.draft_card`` باید از روی نتیجه‌ی S2 واقعی
     (نه شبیه‌سازی) محتوای غیرخالی و سازگار با آن نتیجه بسازند."""
     from src.models import card_writer
 
@@ -476,13 +476,62 @@ def test_card_writer_renders_data_driven_sections() -> tuple[bool, str]:
     model_id = candidates[0]
 
     card = card_writer.draft_card(model_id, "F01", feature_cols=["log_res", "log_res_sq"], quantreg=False)
-    filled = {2, 3, 5, 6, 7, 8, 9, 10, 12}
+    filled = {1, 2, 3, 5, 6, 7, 8, 9, 10, 12}
     ok_filled = filled.issubset(card.sections.keys())
     ok_nonempty = all(len(card.sections.get(i, "")) > 20 for i in filled)
     ok_step8_has_trials = str(payload[model_id]["n_trials"]) in card.sections[8]
     return (ok_filled and ok_nonempty and ok_step8_has_trials,
            f"مدل={model_id} · بخش‌های پرشده={ok_filled} · غیرخالی={ok_nonempty} · "
            f"تعداد trial در گام ۸={ok_step8_has_trials}")
+
+
+def test_fit_diagnosis_train_test_gap_arithmetic() -> tuple[bool, str]:
+    """``train_test_gap`` روی داده‌ی مصنوعی با نسبت pinball دقیقاً شناخته‌شده — مدل ثابتی
+    که همیشه ۰.۵ برمی‌گرداند، روی actual ثابت ۰.۵ باید pinball=۰ (نسبت=inf چون صورت=۰) بدهد
+    و روی actual دیگر نسبت مثبت معنادار."""
+    from src.models import fit_diagnosis
+
+    n = 50
+    train = pd.DataFrame({"rho": [0.5] * n, "Recv": [0.0] * n, "Res": [1.0] * n})
+    test = pd.DataFrame({"rho": [0.2] * n, "Recv": [0.0] * n, "Res": [1.0] * n})
+
+    def fake_fit(tr, te, tau, **hp):
+        import numpy as np
+        return np.full(len(te), 0.5)
+
+    rows = fit_diagnosis.train_test_gap(fake_fit, [(train, test)], tau=0.20, hyperparams={})
+    ok_train_zero = abs(rows[0]["pinball_train"]) < 1e-9  # train خودش را کامل می‌پوشاند
+    ok_test_positive = rows[0]["pinball_test"] > 0  # پیش‌بینی ۰.۵ روی actual=۰.۲ خطای مثبت دارد
+
+    md = fit_diagnosis.render_step11(rows, n_cols=42)
+    ok_md = "نسبت pinball" in md and "42" in md
+    return (ok_train_zero and ok_test_positive and ok_md,
+           f"pinball_train≈۰={ok_train_zero} · pinball_test>۰={ok_test_positive} · markdown سالم={ok_md}")
+
+
+def test_card_writer_step1_and_step14_on_real_data() -> tuple[bool, str]:
+    """گام ۱ (از docstring `fit_predict_ridge`) و گام ۱۴ (سنتز از S2 + B3 + خودِ گام‌های
+    ۱۱/۱۳ کارت) روی «ridge» چک می‌شوند — گام ۱۴ نباید بازبرازش کند، فقط بخواند."""
+    from src.models import card_writer, cards
+
+    json_path = card_writer.PHASE7_DIR / "S2_tuning_F01.json"
+    if not json_path.exists():
+        return True, "رد شد (S2_tuning_F01.json هنوز موجود نیست) — نه شکست"
+    import json
+    payload = json.loads(json_path.read_text())
+    if "ridge" not in payload or payload["ridge"].get("n_trials", 0) == 0:
+        return True, "رد شد (ridge هنوز نتیجه‌ی S2 ندارد) — نه شکست"
+
+    step1 = card_writer.render_step1_theoretical_position("ridge", "F01")
+    ok_step1 = "F44" in step1  # docstring واقعی fit_predict_ridge به F44 اشاره می‌کند
+
+    card = cards.ModelCard("ridge")
+    card.set_section(13, card_writer.render_step13_calibration("ridge", "F01"))
+    card.set_section(11, card_writer.render_step11_fit_diagnosis("ridge", "F01"))
+    step14 = card_writer.render_step14_summary("ridge", "F01", card)
+    ok_step14 = "B3=" in step14 and "توصیه" in step14 and "کالیبراسیون" in step14
+
+    return (ok_step1 and ok_step14, f"گام۱ حاوی F44={ok_step1} · گام۱۴ سالم={ok_step14}")
 
 
 def test_card_writer_step13_calibration_on_real_data() -> tuple[bool, str]:
@@ -504,6 +553,26 @@ def test_card_writer_step13_calibration_on_real_data() -> tuple[bool, str]:
     ok_worst = "بدترین برش" in md
     return (ok_overall and ok_cuts and ok_worst,
            f"پوشش کلی={ok_overall} · هر ۴ برش اجباری حاضرند={ok_cuts} · بدترین‌برش={ok_worst}")
+
+
+def test_card_writer_step11_fit_diagnosis_on_real_data() -> tuple[bool, str]:
+    """گام ۱۱ اجباری با بازبرازش واقعی — روی «ridge» چک می‌کند شکاف train/test هر ۵ fold
+    و نسبت میانگین محاسبه و گزارش می‌شوند."""
+    from src.models import card_writer
+
+    json_path = card_writer.PHASE7_DIR / "S2_tuning_F01.json"
+    if not json_path.exists():
+        return True, "رد شد (S2_tuning_F01.json هنوز موجود نیست) — نه شکست"
+    import json
+    payload = json.loads(json_path.read_text())
+    if "ridge" not in payload or payload["ridge"].get("n_trials", 0) == 0:
+        return True, "رد شد (ridge هنوز نتیجه‌ی S2 ندارد) — نه شکست"
+
+    md = card_writer.render_step11_fit_diagnosis("ridge", "F01")
+    ok_ratio = "نسبت pinball" in md
+    ok_rows = md.count("| 0 |") + md.count("| 1 |") + md.count("| 2 |") + md.count("| 3 |") + md.count("| 4 |") >= 5
+    return (ok_ratio and ok_rows,
+           f"نسبت میانگین گزارش‌شده={ok_ratio} · هر ۵ fold حاضرند={ok_rows}")
 
 
 def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
@@ -582,6 +651,9 @@ _ALL_TESTS = [
     test_card_require_complete_raises,
     test_card_writer_renders_data_driven_sections,
     test_calibration_coverage_arithmetic,
+    test_fit_diagnosis_train_test_gap_arithmetic,
+    test_card_writer_step11_fit_diagnosis_on_real_data,
+    test_card_writer_step1_and_step14_on_real_data,
     test_card_writer_step13_calibration_on_real_data,
 ]
 
