@@ -44,6 +44,59 @@ def _design(train: pd.DataFrame, test: pd.DataFrame) -> tuple[pd.DataFrame, pd.D
     return common.design_matrix(train, test, _feature_cols())
 
 
+# ---------------------------------------------------------------------------
+# فیچرست اختصاصی S2 — بند 7.5.3 («خطی/منظم‌شده» و «رگرسیون کوانتایل خطی»)
+# ---------------------------------------------------------------------------
+
+@lru_cache(maxsize=1)
+def _feature_cols_s2() -> list[str]:
+    """فیچرست اختصاصی S2 برای خانواده‌ی خطی (بند 7.5.3، ردیف «خطی/منظم‌شده»).
+
+    پایه ``FS_full_A`` است — که از فاز ۵ خودش قبلاً پایه‌های فوریه (بند ۵.۹)، برهم‌کنش‌های
+    صریح (بند ۵.۱۸)، و هرس VIF دما (F44: `temp_mean`/`temp_max` حذف، `temp_min` نگه‌داشته)
+    را دارد. دو تغییر صریح این‌جا اضافه می‌شود:
+
+    - ``dow`` خام حذف می‌شود — با پایه‌های فوریه (``dow_sin*``/``dow_cos*``) کاملاً
+      هم‌خط است (VIF=∞، چون یکی تابع دترمینیستیک دیگری است)؛ سند صریحاً «پایه‌های
+      فوریه به‌جای dow خام» را برای این خانواده می‌خواهد.
+    - ``log_res_sq`` (جمله‌ی درجه‌دوم $\\log Res$) اضافه می‌شود — توسط ``_design_s2``
+      در لحظه‌ی ساخت ماتریس طراحی محاسبه می‌شود، چون در دیتافریم پایه وجود ندارد.
+
+    ⚠️ **یک خوشه‌ی هم‌خط دیگر عمداً دست‌نخورده ماند.** بررسی VIF نشان داد
+    ``cell_expanding_rate``/``cell_shrunk_rate``/``cell_dow_expanding_rate``/
+    ``cell_dow_shrunk_rate``/``food_expanding_rate``/``food_shrunk_rate`` با هم VIF
+    بین ۲۰۰۰ تا ۱۰۰۰۰ دارند (همه نسخه‌های هموارشده‌ی همان نرخ در سطوح تجمیع مختلف).
+    هرس دستیِ حریصانه روی *کل* ماتریس یک‌هات‌شده امتحان شد و **`log_res`، قوی‌ترین
+    فیچر پروژه، را هم حذف کرد** — نشانه‌ی روشن که آستانه‌ی VIF ساده برای این داده
+    (با دام دامی‌های یک‌هات چندسطحی) گمراه‌کننده است. طبق بند 7.5.4، روش انتخاب فیچر
+    این خانواده «مسیر L1» است: خودِ Lasso/ElasticNet/Adaptive-Lasso باید این افزونگی
+    را با اجماع ۵ fold (بند 7.5.2 گام ۳) در S2 حل کنند، نه هرس دستیِ زودهنگام اینجا.
+    """
+    from src.features.build import FEATURE_SETS_PATH
+    base = json.loads(FEATURE_SETS_PATH.read_text())["FS_full_A"]
+    return [c for c in base if c != "dow"] + ["log_res_sq"]
+
+
+@lru_cache(maxsize=1)
+def _feature_cols_s2_quantreg() -> list[str]:
+    """بند 7.5.3 ردیف «رگرسیون کوانتایل خطی» — همان بالا + حذف فیچرهای با <۱٪
+    تغییرپذیری، چون حل‌کننده‌ی LP (QuantReg/L1-QR/Composite-QR/Expectile) به فیچر
+    منحط حساس است. ``pre_holiday_x_block_len`` در ۱۰۰٪ سطرها همان یک مقدار (mode) را
+    دارد — فقط در بلوک‌های پیش‌تعطیلی غیرصفر می‌شود.
+    """
+    return [c for c in _feature_cols_s2() if c != "pre_holiday_x_block_len"]
+
+
+def _design_s2(train: pd.DataFrame, test: pd.DataFrame, quantreg: bool = False
+              ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """مثل ``_design`` ولی با فیچرست S2 (بند 7.5.3) به‌جای FS_day پیش‌فرض S0/S1."""
+    cols = _feature_cols_s2_quantreg() if quantreg else _feature_cols_s2()
+    tr, te = train.copy(), test.copy()
+    tr["log_res_sq"] = tr["log_res"] ** 2
+    te["log_res_sq"] = te["log_res"] ** 2
+    return common.design_matrix(tr, te, cols)
+
+
 def _add_const(Xtr: pd.DataFrame, Xte: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     Xtr_c = sm.add_constant(Xtr, has_constant="add")
     Xte_c = sm.add_constant(Xte, has_constant="add").reindex(columns=Xtr_c.columns, fill_value=0.0)

@@ -317,6 +317,44 @@ def test_s1_report_includes_baseline_and_marks_winners() -> tuple[bool, str]:
         s1_runner.PHASE7_DIR = original_dir
 
 
+def test_f01_s2_feature_set_resolves_dow_collinearity() -> tuple[bool, str]:
+    """فیچرست S2 (بند 7.5.3) باید `dow` خام را حذف کند (هم‌خط با پایه‌های فوریه)،
+    `log_res_sq` اضافه کند، و برای شاخه‌ی quantreg فیچر تقریباً ثابت را هم حذف کند —
+    و ماتریس طراحی حاصل نباید VIF بی‌نهایت بین `dow` و فوریه‌ها داشته باشد."""
+    import numpy as np
+    import pandas as pd
+    from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+    from src.cv import load_cv_folds
+    from src.models.families.f01_linear import _design_s2, _feature_cols_s2, _feature_cols_s2_quantreg
+
+    if not CV_FOLDS_PATH.exists():
+        return True, "رد شد (cv_folds.json هنوز موجود نیست) — نه شکست"
+
+    cols_lin, cols_q = _feature_cols_s2(), _feature_cols_s2_quantreg()
+    ok_dow = "dow" not in cols_lin
+    ok_quad = "log_res_sq" in cols_lin
+    ok_quantreg_pruned = "pre_holiday_x_block_len" in cols_lin and "pre_holiday_x_block_len" not in cols_q
+
+    from src.features.build import FEATURES_A_PATH
+    if not FEATURES_A_PATH.exists():
+        return ok_dow and ok_quad and ok_quantreg_pruned, "بدون features_A_v1.parquet — فقط فهرست ستون‌ها آزموده شد"
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values("date_gregorian").reset_index(drop=True)
+    folds, _ = load_cv_folds()
+    tr, te = folds[0].masks(df["date_gregorian"])
+    Xtr, Xte = _design_s2(df.loc[tr], df.loc[te])
+    ok_no_nan = Xtr.isna().sum().sum() == 0 and Xte.isna().sum().sum() == 0
+
+    fourier = [c for c in Xtr.columns if c.startswith("dow_sin") or c.startswith("dow_cos")]
+    vifs = [variance_inflation_factor(Xtr[fourier].to_numpy(), i) for i in range(len(fourier))]
+    ok_finite_vif = all(np.isfinite(vifs)) and max(vifs) < 10
+
+    ok = ok_dow and ok_quad and ok_quantreg_pruned and ok_no_nan and ok_finite_vif
+    return ok, (f"dow حذف={ok_dow} · log_res_sq اضافه={ok_quad} · هرس quantreg={ok_quantreg_pruned} · "
+                f"بدون NaN={ok_no_nan} · VIF فوریه متناهی={ok_finite_vif} (max={max(vifs):.1f})")
+
+
 def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۱۶ عضو ثبت‌شده‌ی F01 باید فیلد algorithm غیرخالی داشته باشد — چون این همان
     مقداری است که به‌عنوان tag اختصاصی model_type در MLflow می‌رود، نه model_id."""
@@ -386,6 +424,7 @@ _ALL_TESTS = [
     test_tracking_logs_dataset_and_model_type,
     test_code_reference_derivation,
     test_s1_report_includes_baseline_and_marks_winners,
+    test_f01_s2_feature_set_resolves_dow_collinearity,
     test_f01_all_specs_have_algorithm,
     test_card_completeness_and_roundtrip,
     test_card_require_complete_raises,
