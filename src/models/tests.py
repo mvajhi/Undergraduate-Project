@@ -431,6 +431,32 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_card_writer_renders_data_driven_sections() -> tuple[bool, str]:
+    """بخش‌های ۵،۶،۷،۸،۹،۱۰،۱۲ ``card_writer.draft_card`` باید از روی نتیجه‌ی S2 واقعی
+    (نه شبیه‌سازی) محتوای غیرخالی و سازگار با آن نتیجه بسازند."""
+    from src.models import card_writer
+
+    json_path = card_writer.PHASE7_DIR / "S2_tuning_F01.json"
+    if not json_path.exists():
+        return True, "رد شد (S2_tuning_F01.json هنوز موجود نیست) — نه شکست"
+
+    import json
+    payload = json.loads(json_path.read_text())
+    candidates = [k for k in payload if not k.startswith("_") and payload[k].get("n_trials", 0) > 0]
+    if not candidates:
+        return True, "رد شد (هیچ مدلی هنوز نتیجه ندارد) — نه شکست"
+    model_id = candidates[0]
+
+    card = card_writer.draft_card(model_id, "F01", feature_cols=["log_res", "log_res_sq"], quantreg=False)
+    filled = {5, 6, 7, 8, 9, 10, 12}
+    ok_filled = filled.issubset(card.sections.keys())
+    ok_nonempty = all(len(card.sections.get(i, "")) > 20 for i in filled)
+    ok_step8_has_trials = str(payload[model_id]["n_trials"]) in card.sections[8]
+    return (ok_filled and ok_nonempty and ok_step8_has_trials,
+           f"مدل={model_id} · بخش‌های پرشده={ok_filled} · غیرخالی={ok_nonempty} · "
+           f"تعداد trial در گام ۸={ok_step8_has_trials}")
+
+
 def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۱۶ عضو ثبت‌شده‌ی F01 باید فیلد algorithm غیرخالی داشته باشد — چون این همان
     مقداری است که به‌عنوان tag اختصاصی model_type در MLflow می‌رود، نه model_id."""
@@ -505,6 +531,7 @@ _ALL_TESTS = [
     test_f01_all_specs_have_algorithm,
     test_card_completeness_and_roundtrip,
     test_card_require_complete_raises,
+    test_card_writer_renders_data_driven_sections,
 ]
 
 
