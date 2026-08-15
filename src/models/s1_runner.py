@@ -30,7 +30,7 @@ import numpy as np  # noqa: E402
 import optuna  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from src.baselines import operational_metrics
+from src.baselines import b3_empirical_quantile, operational_metrics
 from src.config import REPORTS_DIR
 from src.models.axes import TUNING_TAU, RunConfig
 from src.models.spaces import SPACES, sample
@@ -198,6 +198,18 @@ def run_family_s1(family: str, level: str, family_module_path: str, model_ids: l
 
 
 # ---------------------------------------------------------------------------
+# مرجع خط پایه — گزارش S1 نباید بدون سقفِ مقایسه خوانده شود
+# ---------------------------------------------------------------------------
+
+def baseline_reference_multi_fold(folds: list[tuple[pd.DataFrame, pd.DataFrame]],
+                                  tau: float = S1_TAU) -> float:
+    """میانگین pinball خط پایه‌ی برنده‌ی فاز ۶ (B3) روی همان چند fold — سقفی که بند
+    7.25.4 سؤال ۱ می‌پرسد آیا هیچ مدلی معناداری آن را می‌برد یا نه."""
+    pbs = [operational_metrics(te, b3_empirical_quantile(tr, te, tau), tau)["pinball"] for tr, te in folds]
+    return float(np.mean(pbs))
+
+
+# ---------------------------------------------------------------------------
 # گزارش
 # ---------------------------------------------------------------------------
 
@@ -206,14 +218,21 @@ def _load_store(path) -> dict:
     return json.loads(path.read_text()) if path.exists() else {}
 
 
-def save_results(results: list[TrialResult], family: str, level: str) -> None:
-    """یک فایل JSON/MD به‌ازای هر خانواده — اجرای دوباره‌ی یک خانواده نتایج بقیه را پاک نمی‌کند."""
+def save_results(results: list[TrialResult], family: str, level: str,
+                 baseline_pinball: float | None = None) -> None:
+    """یک فایل JSON/MD به‌ازای هر خانواده — اجرای دوباره‌ی یک خانواده نتایج بقیه را پاک نمی‌کند.
+
+    ``baseline_pinball`` میانگین pinball خط پایه‌ی B3 (بند ۶.۵) روی همان ۳ fold است — تا
+    گزارش S1، مثل S0، مرجع مقایسه داشته باشد و رتبه‌بندی «در خلأ» نباشد.
+    """
     import json
 
     json_path = PHASE7_DIR / f"S1_screening_{family}.json"
     md_path = PHASE7_DIR / f"S1_screening_{family}.md"
     store = _load_store(json_path)
     store.setdefault(f"{family}/{level}", []).extend([_serialize(r) for r in results])
+    if baseline_pinball is not None:
+        store[f"_baseline_B3/{family}/{level}"] = baseline_pinball
     PHASE7_DIR.mkdir(parents=True, exist_ok=True)
     json_path.write_text(json.dumps(store, ensure_ascii=False, indent=2) + "\n")
     _render_markdown(store, md_path, family, level)
@@ -227,6 +246,7 @@ def _serialize(r: TrialResult) -> dict:
 
 def _render_markdown(store: dict, path, family: str, level: str) -> None:
     rows = store.get(f"{family}/{level}", [])
+    baseline = store.get(f"_baseline_B3/{family}/{level}")
     by_model: dict[str, list[dict]] = {}
     for r in rows:
         by_model.setdefault(r["model_id"], []).append(r)
@@ -238,6 +258,10 @@ def _render_markdown(store: dict, path, family: str, level: str) -> None:
         f"{S1_TAU}. **⚠️ هیچ مدلی حذف نشده** (بند 7.3.2) — این فقط رتبه‌بندی مقدماتی برای "
         "کالیبره‌کردن بودجه‌ی S2 است.",
         "",
+    ]
+    if baseline is not None:
+        lines += [f"🎯 **مرجع — خط پایه‌ی فاز ۶ (B3) روی همین ۳ fold: pinball_mean = {baseline:.5f}**", ""]
+    lines += [
         "## بهترین trial هر مدل (بر اساس میانگین pinball سه fold)",
         "",
         "| مدل | بهترین pinball_mean | بدترین | میانه | ٪شکست | بهترین هایپرپارامتر |",
@@ -263,5 +287,8 @@ def _render_markdown(store: dict, path, family: str, level: str) -> None:
         "",
         "## رتبه‌بندی مقدماتی (⚠️ فقط برای کالیبره‌کردن بودجه‌ی S2 — بند 7.3.2)",
         "",
-    ] + [f"{i}. `{mid}` — {pb:.5f}" for i, (mid, pb) in enumerate(summary, start=1)]
+    ]
+    for i, (mid, pb) in enumerate(summary, start=1):
+        mark = " 🎯 بهتر از B3" if baseline is not None and pb < baseline else ""
+        lines.append(f"{i}. `{mid}` — {pb:.5f}{mark}")
     path.write_text("\n".join(lines) + "\n")

@@ -81,6 +81,30 @@ def residual_quantile_by_res_quartile(train: pd.DataFrame, test: pd.DataFrame,
     return np.clip(mu_hat_test + offset, 0.0, 1.0)
 
 
+def gamma_glm_regularized(y_train: np.ndarray, Xtr_const: pd.DataFrame, Xte_const: pd.DataFrame,
+                          link, alpha: float = 0.01) -> tuple[np.ndarray, float]:
+    """GLM Gamma با منظم‌سازی L2 خفیف به‌جای ``.fit()`` خام.
+
+    ⚠️ **چرا لازم است.** یافته‌ی S1 خ۱ (بند 7.10): روی fold۲ با ۸۵ پارامتر (یک‌هات
+    دسته‌ای‌های پرسطح) و برازش MLE بدون منظم‌سازی، یک ضریب به ۸۹ میلیارد واگرا شد
+    (``converged=False``، شبه‌جدایی محتمل روی سطح کم‌داده‌ی یک دسته) و پیش‌بینی
+    خارج‌نمونه به ``inf`` رسید — که پایین‌دست کوانتایل را به ۱٫۰ می‌چسباند (بند 7.23.2).
+    ``alpha=0.01`` این واگرایی را کاملاً حذف می‌کند (بیشینه‌ی قدرمطلق ضریب از ~۸۹e9 به ~۲.۴).
+
+    دیسپرسیون (φ) با باقیمانده‌ی پیرسون روی train محاسبه می‌شود چون ``fit_regularized``
+    برخلاف ``fit()`` آن را برنمی‌گرداند.
+    """
+    import statsmodels.api as sm
+
+    model = sm.GLM(y_train, Xtr_const, family=sm.families.Gamma(link=link))
+    res = model.fit_regularized(alpha=alpha, L1_wt=0.0)
+    mu_train = np.asarray(model.predict(res.params, Xtr_const))
+    mu_test = np.asarray(model.predict(res.params, Xte_const))
+    resid_pearson = (y_train - mu_train) / np.clip(mu_train, 1e-9, None)
+    phi = float(np.sum(resid_pearson ** 2) / max(len(y_train) - Xtr_const.shape[1], 1))
+    return mu_test, phi
+
+
 def gamma_quantile(mu: np.ndarray, phi: float, tau: float) -> np.ndarray:
     """مسیر Q2 — GLM Gamma با پیوند log: میانگین=mu ⇒ shape=1/phi، scale=mu*phi."""
     shape = 1.0 / phi

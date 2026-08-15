@@ -287,6 +287,36 @@ def test_code_reference_derivation() -> tuple[bool, str]:
     return ok_self and ok_none, f"ref={ref!r} · none={code_reference(None)!r}"
 
 
+def test_s1_report_includes_baseline_and_marks_winners() -> tuple[bool, str]:
+    """``save_results(baseline_pinball=...)`` باید مرجع B3 را در گزارش بنویسد و مدل‌های
+    بهتر از آن را علامت بزند — یافته‌ی واقعی S1 خ۱ (چهار مدل B3 را بردند) وابسته به این است."""
+    import tempfile
+
+    from src.models import s1_runner
+
+    tmp_dir = Path(tempfile.mkdtemp())
+    original_dir = s1_runner.PHASE7_DIR
+    s1_runner.PHASE7_DIR = tmp_dir
+    try:
+        good = s1_runner.TrialResult("F99", "L1", "winner_model", 0, {}, "pass", 1.0,
+                                     [0.01, 0.01, 0.01], 0.01)
+        bad = s1_runner.TrialResult("F99", "L1", "loser_model", 0, {}, "pass", 1.0,
+                                    [0.05, 0.05, 0.05], 0.05)
+        s1_runner.save_results([good, bad], "F99", "L1", baseline_pinball=0.02)
+
+        md = (tmp_dir / "S1_screening_F99.md").read_text()
+        ranking_section = md.split("## رتبه‌بندی مقدماتی")[1]
+        winner_line = next(ln for ln in ranking_section.splitlines() if "winner_model" in ln)
+        loser_line = next(ln for ln in ranking_section.splitlines() if "loser_model" in ln)
+        has_baseline_line = "0.02000" in md
+        winner_marked = "بهتر از B3" in winner_line
+        loser_not_marked = "بهتر از B3" not in loser_line
+        ok = has_baseline_line and winner_marked and loser_not_marked
+        return ok, f"خط مرجع={has_baseline_line} · برنده علامت‌دار={winner_marked} · بازنده بدون علامت={loser_not_marked}"
+    finally:
+        s1_runner.PHASE7_DIR = original_dir
+
+
 def test_f01_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۱۶ عضو ثبت‌شده‌ی F01 باید فیلد algorithm غیرخالی داشته باشد — چون این همان
     مقداری است که به‌عنوان tag اختصاصی model_type در MLflow می‌رود، نه model_id."""
@@ -355,6 +385,7 @@ _ALL_TESTS = [
     test_space_sample_and_missing,
     test_tracking_logs_dataset_and_model_type,
     test_code_reference_derivation,
+    test_s1_report_includes_baseline_and_marks_winners,
     test_f01_all_specs_have_algorithm,
     test_card_completeness_and_roundtrip,
     test_card_require_complete_raises,

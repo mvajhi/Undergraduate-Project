@@ -230,13 +230,16 @@ _GAMMA_LINKS = {"log": sm.families.links.Log, "inverse": sm.families.links.Inver
 
 def fit_predict_glm_gamma(train: pd.DataFrame, test: pd.DataFrame, tau: float,
                           link: str = "log", **hp) -> np.ndarray:
-    """🔄 ارتقایافته — F04: Gamma بهترین برازش (KS=۰.۰۴۲۹) در برابر Beta (۰.۰۶۱۵)."""
+    """🔄 ارتقایافته — F04: Gamma بهترین برازش (KS=۰.۰۴۲۹) در برابر Beta (۰.۰۶۱۵).
+
+    منظم‌سازی L2 خفیف (بند ۱۱ زیر common.gamma_glm_regularized) — بدون آن، شبه‌جدایی روی
+    دسته‌ای‌های پرسطح می‌تواند MLE را واگرا کند (یافته‌ی S1 خ۱).
+    """
     Xtr, Xte = _design(train, test)
     Xtr_c, Xte_c = _add_const(Xtr, Xte)
     y = np.clip(train["rho"].to_numpy(), 1e-4, None)  # Gamma>0؛ صفرهای F03 برش می‌خورند
-    model = sm.GLM(y, Xtr_c, family=sm.families.Gamma(link=_GAMMA_LINKS[link]())).fit()
-    mu_te = np.asarray(model.predict(Xte_c))
-    return common.gamma_quantile(mu_te, float(model.scale), tau)
+    mu_te, phi = common.gamma_glm_regularized(y, Xtr_c, Xte_c, _GAMMA_LINKS[link]())
+    return common.gamma_quantile(mu_te, phi, tau)
 
 
 def fit_predict_glm_tweedie(train: pd.DataFrame, test: pd.DataFrame, tau: float,
@@ -258,7 +261,15 @@ _BETA_LINKS = {"logit": sm.families.links.Logit, "probit": sm.families.links.Pro
 
 def fit_predict_beta_regression(train: pd.DataFrame, test: pd.DataFrame, tau: float,
                                 link_mu: str = "logit", **hp) -> np.ndarray:
-    """🔄 تنزل‌یافته از انتخاب اول (F04) — نیاز به فشرده‌سازی $\\rho$ به $(0,1)$ باز."""
+    """🔄 تنزل‌یافته از انتخاب اول (F04) — نیاز به فشرده‌سازی $\\rho$ به $(0,1)$ باز.
+
+    ⚠️ **سقوط امن به Q3.** `BetaModel` برخلاف GLM متد `fit_regularized` ندارد. یافته‌ی
+    S1 خ۱: همان شبه‌جداییِ fold۲ که GLM Gamma را واگرا کرد (common.gamma_glm_regularized)
+    اینجا هم رخ می‌دهد (ضریب~۳۹ میلیارد، `mu_test` به ۱٫۰ می‌چسبد). چون نمی‌شود منظم‌سازی
+    کرد، واگرایی/خروجی غیرمنطقی تشخیص داده و به رگرسیون Ridge + کوانتایل باقیمانده
+    (همان مسیر Q3 مدل‌های ۱–۶) سقوط می‌شود — امن، ولی دیگر توزیعی نیست؛ این افت باید در
+    کارت مدل (گام ۱۱: تشخیص برازش) ذکر شود.
+    """
     from statsmodels.othermod.betareg import BetaModel
 
     Xtr, Xte = _design(train, test)
@@ -266,6 +277,14 @@ def fit_predict_beta_regression(train: pd.DataFrame, test: pd.DataFrame, tau: fl
     y = np.clip(train["rho"].to_numpy(), 1e-4, 1 - 1e-4)
     model = BetaModel(endog=y, exog=Xtr_c, link=_BETA_LINKS[link_mu]()).fit(disp=False)
     mu_te = np.asarray(model.predict(Xte_c))
+    converged = bool(model.mle_retvals.get("converged", False))
+
+    if not converged or not np.all(np.isfinite(mu_te)) or mu_te.max() > 0.999 or np.abs(model.params).max() > 1e6:
+        scaler = StandardScaler().fit(Xtr)
+        Ztr, Zte = scaler.transform(Xtr), scaler.transform(Xte)
+        ridge = Ridge(alpha=1.0).fit(Ztr, train["rho"])
+        return common.residual_quantile_by_res_quartile(train, test, ridge.predict(Ztr), ridge.predict(Zte), tau)
+
     phi = float(np.exp(model.params.iloc[-1]))  # پارامتر precision (لینک log، آخرین پارامتر مدل)
     return common.beta_quantile(mu_te, phi, tau)
 
@@ -314,23 +333,33 @@ def fit_predict_hurdle(train: pd.DataFrame, test: pd.DataFrame, tau: float,
     # τ تعدیل‌شده‌ی هر ردیف: سهمی از توزیع بخش دوم که به کوانتایل کل می‌رسد
     tau_adj = np.clip((tau - p_zero_te) / (1.0 - p_zero_te), 0.0, 1.0)
 
-    if part2_dist == "lognormal":
+    def _lognormal_fallback() -> np.ndarray:
+        """مسیر مطمئنِ ridge — سقوط امن هر دو شاخه‌ی زیر وقتی MLE واگرا می‌شود."""
         log_y = np.log(y_pos)
         m = Ridge(alpha=alpha).fit(Zpos.to_numpy(), log_y)
         sigma = float((log_y - m.predict(Zpos.to_numpy())).std(ddof=1))
-        q = np.exp(m.predict(Zte_c.to_numpy()) + sigma * stats.norm.ppf(np.clip(tau_adj, 1e-9, 1 - 1e-9)))
+        return np.exp(m.predict(Zte_c.to_numpy()) + sigma * stats.norm.ppf(np.clip(tau_adj, 1e-9, 1 - 1e-9)))
+
+    if part2_dist == "lognormal":
+        q = _lognormal_fallback()
     elif part2_dist == "gamma":
-        m = sm.GLM(y_pos, Zpos, family=sm.families.Gamma(link=sm.families.links.Log())).fit()
-        mu = np.asarray(m.predict(Zte_c))
-        phi = float(m.scale)
+        # ⚠️ منظم‌سازی L2 خفیف — بدون آن همان واگرایی MLE که common.gamma_glm_regularized
+        # مستند کرده (شبه‌جدایی روی دسته‌ای پرسطح، fold۲، ضریب~۸۹ میلیارد) اینجا هم رخ می‌دهد.
+        mu, phi = common.gamma_glm_regularized(y_pos, Zpos, Zte_c, sm.families.links.Log())
         q = stats.gamma.ppf(tau_adj, a=1.0 / phi, scale=np.clip(mu, 1e-9, None) * phi)
     elif part2_dist == "beta":
         from statsmodels.othermod.betareg import BetaModel
 
         m = BetaModel(endog=np.clip(y_pos, 1e-4, 1 - 1e-4), exog=Zpos).fit(disp=False)
         mu = np.clip(np.asarray(m.predict(Zte_c)), 1e-6, 1 - 1e-6)
-        phi = float(np.exp(m.params.iloc[-1]))
-        q = stats.beta.ppf(tau_adj, mu * phi, (1 - mu) * phi)
+        converged = bool(m.mle_retvals.get("converged", False))
+        # ⚠️ سقوط امن — BetaModel منظم‌سازی ندارد؛ همان واگرایی MLE که fit_predict_beta_regression
+        # مستند کرده (fold۲، ضریب~۳۹ میلیارد) اینجا هم رخ می‌دهد
+        if not converged or not np.all(np.isfinite(mu)) or mu.max() > 0.999 or np.abs(m.params).max() > 1e6:
+            q = _lognormal_fallback()
+        else:
+            phi = float(np.exp(m.params.iloc[-1]))
+            q = stats.beta.ppf(tau_adj, mu * phi, (1 - mu) * phi)
     else:
         raise ValueError(f"توزیع بخش دوم ناشناخته: {part2_dist!r}")
 
@@ -513,7 +542,14 @@ def _space_expectile_regression(trial: optuna.Trial) -> dict:
 
 @register_space("glm_gamma", version=1, n_hyperparams=1)
 def _space_glm_gamma(trial: optuna.Trial) -> dict:
-    return {"link": trial.suggest_categorical("link", ["log", "inverse", "identity"])}
+    """⚠️ **`inverse` از جدول 7.10.2 عمداً حذف شده — بند 7.27 (مدل‌های ناسازگار).**
+    یافته‌ی S1: با پیوند InversePower، $\\eta=X\\beta$ می‌تواند از صفر عبور کند و
+    $\\mu=1/\\eta$ به بی‌نهایت واگرا می‌شود — کاملاً پایدار، نه بدشانسی هایپرپارامتر
+    (خودِ statsmodels هشدار می‌دهد: «InversePower link does not respect the domain of
+    the Gamma family»). در ۲۰/۲۰ trial که `inverse` نمونه‌گیری شد، ``mu`` روی هر ۸۷۰
+    ردیف fold۰ غیرمتناهی بود. جایگزین مستند: `log` (پیش‌فرض، پیوند طبیعی Gamma) و
+    `identity` هر دو در S1 پاس شدند."""
+    return {"link": trial.suggest_categorical("link", ["log", "identity"])}
 
 
 @register_space("glm_tweedie", version=1, n_hyperparams=1)
@@ -588,7 +624,13 @@ def run_s1(n_jobs: int | None = None) -> None:
     from src.config import set_global_seed
     from src.cv import load_cv_folds, sha256_file
     from src.features.build import FEATURES_A_PATH
-    from src.models.s1_runner import DEFAULT_N_JOBS, N_SCREENING_FOLDS, run_family_s1, save_results
+    from src.models.s1_runner import (
+        DEFAULT_N_JOBS,
+        N_SCREENING_FOLDS,
+        baseline_reference_multi_fold,
+        run_family_s1,
+        save_results,
+    )
 
     set_global_seed()
     df = pd.read_parquet(FEATURES_A_PATH).sort_values("date_gregorian").reset_index(drop=True)
@@ -610,7 +652,8 @@ def run_s1(n_jobs: int | None = None) -> None:
                             feature_set=FEATURE_SET_S0, data_snapshot_hash=data_snapshot_hash,
                             cv_folds_hash=cv_folds_hash, dataset_source=str(FEATURES_A_PATH),
                             n_jobs=jobs)
-    save_results(results, FAMILY, LEVEL)
+    baseline = baseline_reference_multi_fold(screening_folds)
+    save_results(results, FAMILY, LEVEL, baseline_pinball=baseline)
 
     n_fail = sum(1 for r in results if r.status == "fail")
     print(f"\n{len(results)} trial تمام شد · {n_fail} شکست · "

@@ -14,12 +14,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "5ca6c264c82049cbaae02f5b46a71df3",
+    "mlflow_run_id": "2580ed0fa35641259e470af0921549b5",
     "model_id": "adaptive_lasso",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.18403410911560059,
+    "seconds": 0.18802642822265625,
     "status": "pass"
   },
   "F01/L1/beta_regression": {
@@ -37,12 +37,12 @@
       "surplus_portions": 9568.0,
       "waste_reduction_pct": 0.4528819762122598
     },
-    "mlflow_run_id": "f89310aeaf4748c3b6b78eaf0e9697d9",
+    "mlflow_run_id": "1f412fdde146422bb17c5162937fe52e",
     "model_id": "beta_regression",
     "output_max": 0.16682289948118806,
     "output_mean": 0.043960135009134385,
     "output_min": 0.00046624446862862656,
-    "seconds": 0.8167068958282471,
+    "seconds": 0.8002622127532959,
     "status": "pass"
   },
   "F01/L1/composite_quantile_regression": {
@@ -60,12 +60,12 @@
       "surplus_portions": 7687.0,
       "waste_reduction_pct": 0.5604414455626716
     },
-    "mlflow_run_id": "996584994fa94ac283632a2677cad574",
+    "mlflow_run_id": "b1b08165cf584f819e6a3e577e5e2b30",
     "model_id": "composite_quantile_regression",
     "output_max": 0.14230548488953065,
     "output_mean": 0.05152829624595762,
     "output_min": 0.0,
-    "seconds": 34.382768869400024,
+    "seconds": 35.11705756187439,
     "status": "pass"
   },
   "F01/L1/elasticnet": {
@@ -83,12 +83,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "9bbbdb27c69442b08fb25475a7690180",
+    "mlflow_run_id": "45ab92140e7345bb83076d27a7d108c9",
     "model_id": "elasticnet",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.17893242835998535,
+    "seconds": 0.1895585060119629,
     "status": "pass"
   },
   "F01/L1/expectile_regression": {
@@ -106,12 +106,12 @@
       "surplus_portions": 3911.0,
       "waste_reduction_pct": 0.7763609332113449
     },
-    "mlflow_run_id": "6aba21509fcd4feebdb32b71a4c74e89",
+    "mlflow_run_id": "2726f8e3fe16462790884701832b60fd",
     "model_id": "expectile_regression",
     "output_max": 0.21074235767633592,
     "output_mean": 0.0858557896640661,
     "output_min": 0.0,
-    "seconds": 0.2163524627685547,
+    "seconds": 0.2313547134399414,
     "status": "pass"
   },
   "F01/L1/gam": {
@@ -129,12 +129,12 @@
       "surplus_portions": 2781.0,
       "waste_reduction_pct": 0.840976669716377
     },
-    "mlflow_run_id": "cd0bcc31c8854caf92072b8c9b35cd6d",
+    "mlflow_run_id": "139d3135d6df442ab80edfbef7a67886",
     "model_id": "gam",
     "output_max": 0.23198526839225805,
     "output_mean": 0.12040184978586566,
     "output_min": 0.0062661881386957274,
-    "seconds": 0.39298295974731445,
+    "seconds": 0.34340786933898926,
     "status": "pass"
   },
   "F01/L1/glm_binomial": {
@@ -152,12 +152,12 @@
       "surplus_portions": 6915.0,
       "waste_reduction_pct": 0.6045860018298261
     },
-    "mlflow_run_id": "c17ca1208b2540f5b931a6b5f0c26113",
+    "mlflow_run_id": "fd92d8d7632e4775b7622c3d11e2e040",
     "model_id": "glm_binomial",
     "output_max": 0.2325384320172953,
     "output_mean": 0.061691184292604395,
     "output_min": 0.0,
-    "seconds": 1.095400094985962,
+    "seconds": 0.4310479164123535,
     "status": "pass"
   },
   "F01/L1/glm_gamma": {
@@ -165,22 +165,22 @@
     "family": "F01",
     "level": "L1",
     "metrics": {
-      "MAE_portions": 9.891954022988505,
-      "MAE_rho": 0.05734427704441352,
-      "RMSE_rho": 0.08476360509954864,
+      "MAE_portions": 12.448275862068966,
+      "MAE_rho": 0.06997142448269164,
+      "RMSE_rho": 0.09903043669560996,
       "n": 870,
-      "pinball": 0.01510297397867675,
-      "shortage_portions": 307.0,
-      "shortage_rate": 0.06666666666666667,
-      "surplus_portions": 8299.0,
-      "waste_reduction_pct": 0.5254460201280878
+      "pinball": 0.016545866585870483,
+      "shortage_portions": 183.0,
+      "shortage_rate": 0.06896551724137931,
+      "surplus_portions": 10647.0,
+      "waste_reduction_pct": 0.39118252516010976
     },
-    "mlflow_run_id": "a8a22c87deec42f58116e37a0e74a2f4",
+    "mlflow_run_id": "fa676af384244c5b892c50f16264ab4a",
     "model_id": "glm_gamma",
-    "output_max": 0.25654413268533377,
-    "output_mean": 0.061670375586994564,
-    "output_min": 0.013566779654242252,
-    "seconds": 0.4708518981933594,
+    "output_max": 0.08064071100759684,
+    "output_mean": 0.04543477188051014,
+    "output_min": 0.02651253216519636,
+    "seconds": 0.25789809226989746,
     "status": "pass"
   },
   "F01/L1/glm_tweedie": {
@@ -198,12 +198,12 @@
       "surplus_portions": 7610.0,
       "waste_reduction_pct": 0.5648444647758464
     },
-    "mlflow_run_id": "fa662a9d014143e48010b4b8ee3da656",
+    "mlflow_run_id": "2d6dbfc9a824495385ad84fede207028",
     "model_id": "glm_tweedie",
     "output_max": 0.32306980426182963,
     "output_mean": 0.06932943592492465,
     "output_min": 0.00864300970147821,
-    "seconds": 0.8028895854949951,
+    "seconds": 0.6402454376220703,
     "status": "pass"
   },
   "F01/L1/group_lasso": {
@@ -221,12 +221,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "1374baf50ab143c8a0a2adb3ccf1f88b",
+    "mlflow_run_id": "5325b0d799b14eb9a05e644b87015808",
     "model_id": "group_lasso",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.6361527442932129,
+    "seconds": 0.6584937572479248,
     "status": "pass"
   },
   "F01/L1/hurdle": {
@@ -244,12 +244,12 @@
       "surplus_portions": 6582.0,
       "waste_reduction_pct": 0.6236276303751144
     },
-    "mlflow_run_id": "b4b60cc5f36543cbacbf36233a58e060",
+    "mlflow_run_id": "737163fef25e443d99fe538b2321fa0d",
     "model_id": "hurdle",
     "output_max": 0.23331739872857943,
     "output_mean": 0.06438704065456606,
     "output_min": 0.0,
-    "seconds": 0.7620317935943604,
+    "seconds": 0.8208284378051758,
     "status": "pass"
   },
   "F01/L1/l1_quantile_regression": {
@@ -267,12 +267,12 @@
       "surplus_portions": 7681.0,
       "waste_reduction_pct": 0.5607845379688929
     },
-    "mlflow_run_id": "6ca8ef081a044c3b8fe59b9b3e9a2d4d",
+    "mlflow_run_id": "cf51c60d7d2d44c69f722fbe18994233",
     "model_id": "l1_quantile_regression",
     "output_max": 0.12419221703006302,
     "output_mean": 0.05545266950054167,
     "output_min": 0.0,
-    "seconds": 1.2524797916412354,
+    "seconds": 1.278165340423584,
     "status": "pass"
   },
   "F01/L1/lasso": {
@@ -290,12 +290,12 @@
       "surplus_portions": 10215.0,
       "waste_reduction_pct": 0.4158851784080513
     },
-    "mlflow_run_id": "49890f68e3824deba79dbfe3d3550bb4",
+    "mlflow_run_id": "e8cc9191762d46829aafc1e14316b742",
     "model_id": "lasso",
     "output_max": 0.04342799698416684,
     "output_mean": 0.03695600832407587,
     "output_min": 0.03264433357091944,
-    "seconds": 0.1882314682006836,
+    "seconds": 0.1991121768951416,
     "status": "pass"
   },
   "F01/L1/ols": {
@@ -313,12 +313,12 @@
       "surplus_portions": 4630.0,
       "waste_reduction_pct": 0.7352470265324794
     },
-    "mlflow_run_id": "8cacbb0d9a7843d4ace6d2b7a6c43add",
+    "mlflow_run_id": "58dfe47c44824b6b8f0ccd414b8edca7",
     "model_id": "ols",
     "output_max": 0.24007657883020592,
     "output_mean": 0.07742208296341885,
     "output_min": 0.0,
-    "seconds": 1.1075334548950195,
+    "seconds": 0.3650929927825928,
     "status": "pass"
   },
   "F01/L1/quantile_regression": {
@@ -336,12 +336,12 @@
       "surplus_portions": 6613.0,
       "waste_reduction_pct": 0.6218549862763038
     },
-    "mlflow_run_id": "52463eca63f34cf28c61919d537c0b32",
+    "mlflow_run_id": "12304313fbcd4378929672d53e3649d9",
     "model_id": "quantile_regression",
     "output_max": 0.14793150991045342,
     "output_mean": 0.061824091930308786,
     "output_min": 0.0,
-    "seconds": 0.7875716686248779,
+    "seconds": 0.8701977729797363,
     "status": "pass"
   },
   "F01/L1/ridge": {
@@ -359,12 +359,12 @@
       "surplus_portions": 4704.0,
       "waste_reduction_pct": 0.7310155535224154
     },
-    "mlflow_run_id": "57bf5100603d411a823749883b979259",
+    "mlflow_run_id": "2e0b3f8c4afa47fa890a58da432647a8",
     "model_id": "ridge",
     "output_max": 0.23919462662837962,
     "output_mean": 0.07694138508372783,
     "output_min": 0.0,
-    "seconds": 0.23071599006652832,
+    "seconds": 0.2418358325958252,
     "status": "pass"
   },
   "_baseline_B3": {

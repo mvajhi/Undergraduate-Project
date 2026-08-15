@@ -1,0 +1,5869 @@
+{
+  "F01/L1": [
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 12,
+      "hyperparams": {
+        "alpha": 32.01123069983255,
+        "gamma": 1.4177319500606251
+      },
+      "status": "pass",
+      "seconds": 0.33010101318359375,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "9db176e2136549189ba19c384f4e7053"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 10,
+      "hyperparams": {
+        "alpha": 0.0006206685185261728,
+        "gamma": 1.9766687087804442
+      },
+      "status": "pass",
+      "seconds": 0.3088052272796631,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "6777af6e836a42c7a433f19b715610ce"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 9,
+      "hyperparams": {
+        "alpha": 0.04272437129788933,
+        "gamma": 1.661178298735032
+      },
+      "status": "pass",
+      "seconds": 0.36207032203674316,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "8ad47edacfec48dcbfddf613a659ebff"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 8,
+      "hyperparams": {
+        "alpha": 0.31902083830875577,
+        "gamma": 1.6029835251252584
+      },
+      "status": "pass",
+      "seconds": 0.8774819374084473,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "b35af2dd2f4a4fcc90ee404edf159314"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 13,
+      "hyperparams": {
+        "alpha": 0.4913989021970301,
+        "gamma": 1.799479174907805
+      },
+      "status": "pass",
+      "seconds": 0.459026575088501,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "61d489fdb98943888c0fb82963767684"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 4,
+      "hyperparams": {
+        "alpha": 0.25379197607707144,
+        "gamma": 1.8423174536733575
+      },
+      "status": "pass",
+      "seconds": 0.2807767391204834,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "31d4630a2d47439ea893dd87fc5431c8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 2,
+      "hyperparams": {
+        "alpha": 0.23404597198925478,
+        "gamma": 1.71916801040499
+      },
+      "status": "pass",
+      "seconds": 0.5240352153778076,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "ede8c87283b84fe09b71eb8a332ae586"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 3,
+      "hyperparams": {
+        "link_mu": "cloglog"
+      },
+      "status": "pass",
+      "seconds": 4.059073448181152,
+      "fold_pinballs": [
+        0.016386863818165103,
+        0.01682309532481687,
+        0.029465476720381807
+      ],
+      "mean_pinball": 0.02089181195445459,
+      "error": null,
+      "mlflow_run_id": "b88633a6e96b4c0fb5386f9779182500"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 7,
+      "hyperparams": {
+        "alpha": 0.22435278061494246,
+        "gamma": 1.0162640442936084
+      },
+      "status": "pass",
+      "seconds": 0.5332322120666504,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "0538fab13d084a0b88f1020e0483ee8e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 2,
+      "hyperparams": {
+        "link_mu": "probit"
+      },
+      "status": "pass",
+      "seconds": 3.274550199508667,
+      "fold_pinballs": [
+        0.016398818187709756,
+        0.016875048334460203,
+        0.030088998048865178
+      ],
+      "mean_pinball": 0.021120954857011712,
+      "error": null,
+      "mlflow_run_id": "3314bfd282e6444a94a444b2984b7dc6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 6,
+      "hyperparams": {
+        "alpha": 0.47489977105844255,
+        "gamma": 1.2663678430234595
+      },
+      "status": "pass",
+      "seconds": 0.48629236221313477,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "88042ba8b2894855872e3a99cf51b17b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 11,
+      "hyperparams": {
+        "alpha": 37.84252855486258,
+        "gamma": 0.5891409649777085
+      },
+      "status": "pass",
+      "seconds": 0.90071702003479,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "e0e14519a1d7400991c573406571dbc6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 5,
+      "hyperparams": {
+        "alpha": 0.005582977327307919,
+        "gamma": 1.2059711198885368
+      },
+      "status": "pass",
+      "seconds": 0.26166772842407227,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "6aeaf21e610543028e91047c70debcd8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 18,
+      "hyperparams": {
+        "alpha": 0.07787923892937348,
+        "gamma": 1.4617871927767128
+      },
+      "status": "pass",
+      "seconds": 1.0691592693328857,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "e8c8c2c7477841aca50e6773dc4dca5d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 19,
+      "hyperparams": {
+        "alpha": 0.022806604526582012,
+        "gamma": 1.5168283658799888
+      },
+      "status": "pass",
+      "seconds": 0.4425966739654541,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "d3fd941b9c8f4fe381be4c417c843915"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 3,
+      "hyperparams": {
+        "alpha": 2.4373255548923827,
+        "gamma": 1.9611584544268696
+      },
+      "status": "pass",
+      "seconds": 0.4531514644622803,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "e1de3e96c55b495b939d999910f3fd7f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 16,
+      "hyperparams": {
+        "alpha": 0.000626010165566085,
+        "gamma": 0.6446491102633121
+      },
+      "status": "pass",
+      "seconds": 0.3482203483581543,
+      "fold_pinballs": [
+        0.014124754623758241,
+        0.016509238760871195,
+        0.027128494305817874
+      ],
+      "mean_pinball": 0.019254162563482436,
+      "error": null,
+      "mlflow_run_id": "3303214b938a4374af07bed599fd8c61"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 0,
+      "hyperparams": {
+        "alpha": 0.025466140662589138,
+        "gamma": 1.1174273892428277
+      },
+      "status": "pass",
+      "seconds": 0.6051039695739746,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "3cb60883446147318148bef3f393cac2"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 15,
+      "hyperparams": {
+        "alpha": 20.933699064699525,
+        "gamma": 0.7765415517584082
+      },
+      "status": "pass",
+      "seconds": 0.3464183807373047,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "187a80635b824b62adbd37cda159ad3c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 1,
+      "hyperparams": {
+        "alpha": 0.08979199753901478,
+        "gamma": 1.9456135943381572
+      },
+      "status": "pass",
+      "seconds": 0.47984814643859863,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "b78fe711f9264548b28668fef40bff11"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 14,
+      "hyperparams": {
+        "alpha": 0.00024413349207768703,
+        "gamma": 0.9152722471954408
+      },
+      "status": "pass",
+      "seconds": 0.5084645748138428,
+      "fold_pinballs": [
+        0.014116502494203802,
+        0.016498173492878954,
+        0.027087597022302533
+      ],
+      "mean_pinball": 0.01923409100312843,
+      "error": null,
+      "mlflow_run_id": "0e3337059861423d9f1ba542c1b900cb"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "adaptive_lasso",
+      "trial_idx": 17,
+      "hyperparams": {
+        "alpha": 0.00652288545690267,
+        "gamma": 1.0865965187713544
+      },
+      "status": "pass",
+      "seconds": 0.6263682842254639,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "92a2c3bb19924ce4890f55127c2f0d67"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 1,
+      "hyperparams": {
+        "link_mu": "probit"
+      },
+      "status": "pass",
+      "seconds": 5.597829103469849,
+      "fold_pinballs": [
+        0.016398818187709756,
+        0.016875048334460203,
+        0.030088998048865178
+      ],
+      "mean_pinball": 0.021120954857011712,
+      "error": null,
+      "mlflow_run_id": "75b30290de974309b36d08f879a237e4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 0,
+      "hyperparams": {
+        "link_mu": "probit"
+      },
+      "status": "pass",
+      "seconds": 5.915927171707153,
+      "fold_pinballs": [
+        0.016398818187709756,
+        0.016875048334460203,
+        0.030088998048865178
+      ],
+      "mean_pinball": 0.021120954857011712,
+      "error": null,
+      "mlflow_run_id": "baaf7140ba8d4e5ba2d554fda90269dc"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 7,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 3.862816333770752,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "22e40adc10b84db09c98cd8eb90cb81d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 5,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 6.278253793716431,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "c46927bf9a8f447c9ae3b13729f0f74d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 8,
+      "hyperparams": {
+        "link_mu": "cloglog"
+      },
+      "status": "pass",
+      "seconds": 4.049534797668457,
+      "fold_pinballs": [
+        0.016386863818165103,
+        0.01682309532481687,
+        0.029465476720381807
+      ],
+      "mean_pinball": 0.02089181195445459,
+      "error": null,
+      "mlflow_run_id": "dc73a1afbf744c059fbd33571c38917a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 4,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 7.3309924602508545,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "a485be042102497985002e2c1e15c338"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 6,
+      "hyperparams": {
+        "link_mu": "probit"
+      },
+      "status": "pass",
+      "seconds": 7.42562198638916,
+      "fold_pinballs": [
+        0.016398818187709756,
+        0.016875048334460203,
+        0.030088998048865178
+      ],
+      "mean_pinball": 0.021120954857011712,
+      "error": null,
+      "mlflow_run_id": "cabf2060a1174f1fb90dec7e09a24d4a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 9,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 6.079649448394775,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "b08986409ab841e8ba4a769c56e6ad85"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 10,
+      "hyperparams": {
+        "link_mu": "probit"
+      },
+      "status": "pass",
+      "seconds": 7.7401087284088135,
+      "fold_pinballs": [
+        0.016398818187709756,
+        0.016875048334460203,
+        0.030088998048865178
+      ],
+      "mean_pinball": 0.021120954857011712,
+      "error": null,
+      "mlflow_run_id": "7975a80c2d474a889832e88c03c97314"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 12,
+      "hyperparams": {
+        "link_mu": "cloglog"
+      },
+      "status": "pass",
+      "seconds": 6.320441246032715,
+      "fold_pinballs": [
+        0.016386863818165103,
+        0.01682309532481687,
+        0.029465476720381807
+      ],
+      "mean_pinball": 0.02089181195445459,
+      "error": null,
+      "mlflow_run_id": "1ff93706277d464b96c06b7737d27586"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 15,
+      "hyperparams": {
+        "link_mu": "cloglog"
+      },
+      "status": "pass",
+      "seconds": 5.954071998596191,
+      "fold_pinballs": [
+        0.016386863818165103,
+        0.01682309532481687,
+        0.029465476720381807
+      ],
+      "mean_pinball": 0.02089181195445459,
+      "error": null,
+      "mlflow_run_id": "2f487855ea084cda9b2c4ccd2cf345f2"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 11,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 9.473323345184326,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "d64eea034def4c72a87837fb8eba5027"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 14,
+      "hyperparams": {
+        "link_mu": "probit"
+      },
+      "status": "pass",
+      "seconds": 6.815276622772217,
+      "fold_pinballs": [
+        0.016398818187709756,
+        0.016875048334460203,
+        0.030088998048865178
+      ],
+      "mean_pinball": 0.021120954857011712,
+      "error": null,
+      "mlflow_run_id": "0deb45c44eec4cacb6aede0eb7ce0a13"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 13,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 9.139091730117798,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "5a1e40303f744d8f804e9ba2b7f14922"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 17,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 6.239091634750366,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "31b87e15569d4359ad71bcdf9872449f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 16,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 8.155885696411133,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "5a2925ea52894fc4ad4805967424effe"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 18,
+      "hyperparams": {
+        "link_mu": "cloglog"
+      },
+      "status": "pass",
+      "seconds": 7.794753789901733,
+      "fold_pinballs": [
+        0.016386863818165103,
+        0.01682309532481687,
+        0.029465476720381807
+      ],
+      "mean_pinball": 0.02089181195445459,
+      "error": null,
+      "mlflow_run_id": "acf1da8b931b49e09b896e7908fcd1c2"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "beta_regression",
+      "trial_idx": 19,
+      "hyperparams": {
+        "link_mu": "logit"
+      },
+      "status": "pass",
+      "seconds": 8.54511833190918,
+      "fold_pinballs": [
+        0.016377240234383604,
+        0.01683362242125947,
+        0.02971514370294068
+      ],
+      "mean_pinball": 0.02097533545286125,
+      "error": null,
+      "mlflow_run_id": "2fc27b98b0214168bf4cec3ba1a17e0d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 5,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 685.0976550579071,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "5efa35dcdace4d7c950a7a4206001c5e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 1,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 768.5567772388458,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "a8262e85df404bf182e293b62133d96d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 4,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 769.0174024105072,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "9828cdf8e279448f9bd8ab6a3cbef951"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 2,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 855.0316412448883,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "71236f2e9b4d4a2fa60dd75514dab0bd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 7,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1505.8292858600616,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "8120d54ae6924cc5937b79b756355e1d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 6,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1615.8246612548828,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "62eaf8e6be374ce6aa23cf69e03b6d8a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 3,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1689.7138302326202,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "1641a04c56e2448392f9aa167f6dcec5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 0,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1761.836844921112,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "1350b91c287447c5bce78fb79fa31651"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 13,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 687.7172770500183,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "b2b44c64d3084078ba21f7af2a6fa71d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 12,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 836.7981293201447,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "6c641a9c62854efbb967a9f80d275ae5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 8,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1669.413533449173,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "8a55d01193f84b629f1b66cb05a7025b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 11,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1592.3051953315735,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "ddf5475cc58f4c76bbcf929794f255e4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 9,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1681.2046484947205,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "9f7624977ed2412d8cf52c875b1fcabc"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 0,
+      "hyperparams": {
+        "alpha": 0.07760763297787385,
+        "l1_ratio": 0.4545592669855157
+      },
+      "status": "pass",
+      "seconds": 1.0870966911315918,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "f9186d0cbca24d0e98e18fc29596b757"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 1,
+      "hyperparams": {
+        "alpha": 3.9269798978575485,
+        "l1_ratio": 0.2809300948581022
+      },
+      "status": "pass",
+      "seconds": 0.7589366436004639,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "3c9c0a5c4ece4c0b958be650f5012632"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 2,
+      "hyperparams": {
+        "alpha": 98.30668418938565,
+        "l1_ratio": 0.9025213108106377
+      },
+      "status": "pass",
+      "seconds": 0.5575380325317383,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "1f8b547269104f4ea162d397527f90c9"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 3,
+      "hyperparams": {
+        "alpha": 0.001856990146179852,
+        "l1_ratio": 0.192008399954194
+      },
+      "status": "pass",
+      "seconds": 3.1040565967559814,
+      "fold_pinballs": [
+        0.01618132973510236,
+        0.01541917867365079,
+        0.02986141106747524
+      ],
+      "mean_pinball": 0.02048730649207613,
+      "error": null,
+      "mlflow_run_id": "c6df4e52c9d34fba9194c4fa7dbc9991"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 4,
+      "hyperparams": {
+        "alpha": 0.2384210435317166,
+        "l1_ratio": 0.4339880178579369
+      },
+      "status": "pass",
+      "seconds": 1.0543019771575928,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "ef2b214b28374e2ea6be78628777fa9e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 5,
+      "hyperparams": {
+        "alpha": 0.7394846300104545,
+        "l1_ratio": 0.8536052715725474
+      },
+      "status": "pass",
+      "seconds": 1.1110379695892334,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "8efdc0020d52477d81a33f53b461a9d6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 6,
+      "hyperparams": {
+        "alpha": 0.00784831521277309,
+        "l1_ratio": 0.6669872979460325
+      },
+      "status": "pass",
+      "seconds": 1.2563586235046387,
+      "fold_pinballs": [
+        0.014459170960305173,
+        0.015704810092125782,
+        0.02743439243169558
+      ],
+      "mean_pinball": 0.01919945782804218,
+      "error": null,
+      "mlflow_run_id": "f8a54e2388fa4864bb7106197adc74e6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 7,
+      "hyperparams": {
+        "alpha": 0.00023197624718752411,
+        "l1_ratio": 0.37361447002313813
+      },
+      "status": "pass",
+      "seconds": 1.7816662788391113,
+      "fold_pinballs": [
+        0.016000091406026026,
+        0.01569955777951475,
+        0.0314264736833855
+      ],
+      "mean_pinball": 0.021042040956308756,
+      "error": null,
+      "mlflow_run_id": "72d8a43723e649b4af0ebb7003f7ca27"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 8,
+      "hyperparams": {
+        "alpha": 0.06439713814406328,
+        "l1_ratio": 0.22471756544434535
+      },
+      "status": "pass",
+      "seconds": 1.040597677230835,
+      "fold_pinballs": [
+        0.014421363747612869,
+        0.016595114305934956,
+        0.028194104229628845
+      ],
+      "mean_pinball": 0.01973686076105889,
+      "error": null,
+      "mlflow_run_id": "71a2974297ea427a9d0ce2348ea8f346"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 9,
+      "hyperparams": {
+        "alpha": 6.577908720045688,
+        "l1_ratio": 0.5658625664328105
+      },
+      "status": "pass",
+      "seconds": 1.146711826324463,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "f136433e3b984da28d1a52b538f61630"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 10,
+      "hyperparams": {
+        "alpha": 0.1020911785827805,
+        "l1_ratio": 0.520751829876462
+      },
+      "status": "pass",
+      "seconds": 1.018608808517456,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "a039e401032e4e0f9982d8788940257e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 11,
+      "hyperparams": {
+        "alpha": 0.1457000310955059,
+        "l1_ratio": 0.7521113395643283
+      },
+      "status": "pass",
+      "seconds": 0.5621540546417236,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "4c25551fa5a749ac85df0d22ca60badc"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 12,
+      "hyperparams": {
+        "alpha": 2.9251856118845176,
+        "l1_ratio": 0.07741186858669279
+      },
+      "status": "pass",
+      "seconds": 0.5370118618011475,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "aa5eaa6a7e0c4e6cb6d0ade7e52890a7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 13,
+      "hyperparams": {
+        "alpha": 0.02427770143589704,
+        "l1_ratio": 0.9002920087958927
+      },
+      "status": "pass",
+      "seconds": 0.5622110366821289,
+      "fold_pinballs": [
+        0.015092778199323958,
+        0.017451928336223468,
+        0.028869721153525506
+      ],
+      "mean_pinball": 0.020471475896357644,
+      "error": null,
+      "mlflow_run_id": "bb2c8c1967a94f3fa1c8860b8ca37038"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 14,
+      "hyperparams": {
+        "alpha": 0.014776093673564304,
+        "l1_ratio": 0.33163779847995184
+      },
+      "status": "pass",
+      "seconds": 0.6268653869628906,
+      "fold_pinballs": [
+        0.01448693992530084,
+        0.015666135747776505,
+        0.027299955114438765
+      ],
+      "mean_pinball": 0.01915101026250537,
+      "error": null,
+      "mlflow_run_id": "bb0a7da013f9458c9cb3670b7e294cc4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 15,
+      "hyperparams": {
+        "alpha": 0.38709741585839796,
+        "l1_ratio": 0.3412842588109423
+      },
+      "status": "pass",
+      "seconds": 0.5510127544403076,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "65ce4ed0f46246b091aa3ddac97d06cc"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 16,
+      "hyperparams": {
+        "alpha": 11.953415718328321,
+        "l1_ratio": 0.22950702810248735
+      },
+      "status": "pass",
+      "seconds": 0.5602407455444336,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "5fd07a5536a643f09c423fdd7d0a5dfb"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 17,
+      "hyperparams": {
+        "alpha": 0.010163800893487255,
+        "l1_ratio": 0.48193549267758234
+      },
+      "status": "pass",
+      "seconds": 0.5710134506225586,
+      "fold_pinballs": [
+        0.014502868635744728,
+        0.01566396608783535,
+        0.02732454249588656
+      ],
+      "mean_pinball": 0.01916379240648888,
+      "error": null,
+      "mlflow_run_id": "de77ce4a1017469ebc9bea50e20b993c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 18,
+      "hyperparams": {
+        "alpha": 2.5230733267697514,
+        "l1_ratio": 0.2067718249881082
+      },
+      "status": "pass",
+      "seconds": 0.6140503883361816,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "a26f73e11fe84f6ab0865e68da2feb70"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "elasticnet",
+      "trial_idx": 19,
+      "hyperparams": {
+        "alpha": 0.0026878660688679713,
+        "l1_ratio": 0.29530711573496665
+      },
+      "status": "pass",
+      "seconds": 1.2131757736206055,
+      "fold_pinballs": [
+        0.015446013974818864,
+        0.01532756307603703,
+        0.02913219469918745
+      ],
+      "mean_pinball": 0.01996859058334778,
+      "error": null,
+      "mlflow_run_id": "e2e2b31de30f4795b26847228a5f6444"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 0,
+      "hyperparams": {
+        "alpha": 0.00011670272607212749
+      },
+      "status": "pass",
+      "seconds": 0.7462372779846191,
+      "fold_pinballs": [
+        0.016449922089120182,
+        0.016389939803188692,
+        0.03027471500403793
+      ],
+      "mean_pinball": 0.02103819229878227,
+      "error": null,
+      "mlflow_run_id": "8231903aeb8d4b16ba8a3d08ce02c109"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 1,
+      "hyperparams": {
+        "alpha": 3.9492314030357735e-05
+      },
+      "status": "pass",
+      "seconds": 0.7667405605316162,
+      "fold_pinballs": [
+        0.01644993760110183,
+        0.016389939433916204,
+        0.030274702868731507
+      ],
+      "mean_pinball": 0.021038193301249845,
+      "error": null,
+      "mlflow_run_id": "ab88a651c3fc420596b299d0d0e4a251"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 2,
+      "hyperparams": {
+        "alpha": 0.008665512109754355
+      },
+      "status": "pass",
+      "seconds": 0.8714871406555176,
+      "fold_pinballs": [
+        0.016448208700681678,
+        0.01638998003331758,
+        0.030276051187374038
+      ],
+      "mean_pinball": 0.0210380799737911,
+      "error": null,
+      "mlflow_run_id": "bf2eb19c7fd249329530d89702b3124c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 3,
+      "hyperparams": {
+        "alpha": 0.010183460536831869
+      },
+      "status": "pass",
+      "seconds": 1.3022277355194092,
+      "fold_pinballs": [
+        0.016447905312311377,
+        0.016389987002568933,
+        0.030276286910126387
+      ],
+      "mean_pinball": 0.0210380597416689,
+      "error": null,
+      "mlflow_run_id": "89f868f036384044a8d403ce86d1e8e8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 4,
+      "hyperparams": {
+        "alpha": 0.0015810512301560897
+      },
+      "status": "pass",
+      "seconds": 0.7512578964233398,
+      "fold_pinballs": [
+        0.016449628020356974,
+        0.016389946786525587,
+        0.030274944929363258
+      ],
+      "mean_pinball": 0.021038173245415275,
+      "error": null,
+      "mlflow_run_id": "721755d8310142189032184fa3e8b9ce"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 5,
+      "hyperparams": {
+        "alpha": 3.089536174906425
+      },
+      "status": "pass",
+      "seconds": 1.3769211769104004,
+      "fold_pinballs": [
+        0.0160935889734751,
+        0.016375587088460795,
+        0.03046786026124322
+      ],
+      "mean_pinball": 0.020979012107726375,
+      "error": null,
+      "mlflow_run_id": "f44bce467de24674b9b635e45e48ffe8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 6,
+      "hyperparams": {
+        "alpha": 5.051660904518501e-06
+      },
+      "status": "pass",
+      "seconds": 1.3804800510406494,
+      "fold_pinballs": [
+        0.016449944520627882,
+        0.016389939269163288,
+        0.030274697455238236
+      ],
+      "mean_pinball": 0.021038193748343134,
+      "error": null,
+      "mlflow_run_id": "1b84fd81db5b47aba349061ef598f82f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 7,
+      "hyperparams": {
+        "alpha": 0.00634713628758936
+      },
+      "status": "pass",
+      "seconds": 1.4289178848266602,
+      "fold_pinballs": [
+        0.01644867255786708,
+        0.016389969251215514,
+        0.03027569027712707
+      ],
+      "mean_pinball": 0.02103811069540322,
+      "error": null,
+      "mlflow_run_id": "1d01a536330d4934b76f12411ef3405b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 8,
+      "hyperparams": {
+        "alpha": 3.2584010655359922e-06
+      },
+      "status": "pass",
+      "seconds": 1.4207308292388916,
+      "fold_pinballs": [
+        0.016449944880918197,
+        0.016389939260584328,
+        0.03027469717336125
+      ],
+      "mean_pinball": 0.02103819377162126,
+      "error": null,
+      "mlflow_run_id": "216208a3919441529206437d4deaf34d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 9,
+      "hyperparams": {
+        "alpha": 1.0865114562239214e-06
+      },
+      "status": "pass",
+      "seconds": 1.4149925708770752,
+      "fold_pinballs": [
+        0.01644994531728086,
+        0.016389939250193934,
+        0.030274696831967745
+      ],
+      "mean_pinball": 0.02103819379981418,
+      "error": null,
+      "mlflow_run_id": "db9b66ccf1494ed593ef30bd344f0422"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 10,
+      "hyperparams": {
+        "alpha": 0.00041029248747993905
+      },
+      "status": "pass",
+      "seconds": 0.8719241619110107,
+      "fold_pinballs": [
+        0.016449863111490836,
+        0.016389941206360416,
+        0.030274761137038756
+      ],
+      "mean_pinball": 0.021038188484963336,
+      "error": null,
+      "mlflow_run_id": "8b32c6732f4e4347bf58e7e11acaae72"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 11,
+      "hyperparams": {
+        "alpha": 0.9166431214721785
+      },
+      "status": "pass",
+      "seconds": 1.3046398162841797,
+      "fold_pinballs": [
+        0.01630585323380167,
+        0.016389683901815253,
+        0.030380926054344934
+      ],
+      "mean_pinball": 0.021025487729987285,
+      "error": null,
+      "mlflow_run_id": "b859f4fe890c427f8a775f890271c172"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 12,
+      "hyperparams": {
+        "alpha": 0.08396434411114943
+      },
+      "status": "pass",
+      "seconds": 1.4299087524414062,
+      "fold_pinballs": [
+        0.0164335728892533,
+        0.016390276886560383,
+        0.030287195957035648
+      ],
+      "mean_pinball": 0.02103701524428311,
+      "error": null,
+      "mlflow_run_id": "0a75a758c28e4c87a1cbd1fcfa93a7e1"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 13,
+      "hyperparams": {
+        "alpha": 0.027006120278407427
+      },
+      "status": "pass",
+      "seconds": 1.4165174961090088,
+      "fold_pinballs": [
+        0.01644455971416199,
+        0.016390061504411847,
+        0.030278868883663965
+      ],
+      "mean_pinball": 0.021037830034079264,
+      "error": null,
+      "mlflow_run_id": "f8ef028d01364f29b12d66e2db08417d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 14,
+      "hyperparams": {
+        "alpha": 1.5636229231589363
+      },
+      "status": "pass",
+      "seconds": 1.39461350440979,
+      "fold_pinballs": [
+        0.0162308899437694,
+        0.016386604350493796,
+        0.03042499837165791
+      ],
+      "mean_pinball": 0.0210141642219737,
+      "error": null,
+      "mlflow_run_id": "9439749bfef14baabd2a947a6938c5bd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 15,
+      "hyperparams": {
+        "alpha": 0.006749697462601263
+      },
+      "status": "pass",
+      "seconds": 1.427751064300537,
+      "fold_pinballs": [
+        0.016448591971462808,
+        0.016389971130220327,
+        0.030275753022580364
+      ],
+      "mean_pinball": 0.021038105374754496,
+      "error": null,
+      "mlflow_run_id": "08629889e6b64e78a337525ef77d9cea"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 16,
+      "hyperparams": {
+        "alpha": 1.8254797515310344
+      },
+      "status": "pass",
+      "seconds": 1.4068033695220947,
+      "fold_pinballs": [
+        0.016204762559846833,
+        0.01638496087152304,
+        0.03043704262256547
+      ],
+      "mean_pinball": 0.021008922017978448,
+      "error": null,
+      "mlflow_run_id": "5f653fc7104a4bdd928a66aca25e9610"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 17,
+      "hyperparams": {
+        "alpha": 0.5528663565755391
+      },
+      "status": "pass",
+      "seconds": 1.4074184894561768,
+      "fold_pinballs": [
+        0.016355051172624337,
+        0.01639056698848256,
+        0.030343191316683525
+      ],
+      "mean_pinball": 0.02102960315926347,
+      "error": null,
+      "mlflow_run_id": "bc7ff1919d9d4772bee2d7beefc73540"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 18,
+      "hyperparams": {
+        "alpha": 7.633348603893956
+      },
+      "status": "pass",
+      "seconds": 1.6455862522125244,
+      "fold_pinballs": [
+        0.015911714304430134,
+        0.01633770112383067,
+        0.03040999154231147
+      ],
+      "mean_pinball": 0.020886468990190758,
+      "error": null,
+      "mlflow_run_id": "ab54408f4a3f4a31b4ae79444ee457f4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 10,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1722.5374269485474,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "92579522b4f1439eb4fccf38fc5091dd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "expectile_regression",
+      "trial_idx": 19,
+      "hyperparams": {
+        "alpha": 1.2495046718997695
+      },
+      "status": "pass",
+      "seconds": 1.3041679859161377,
+      "fold_pinballs": [
+        0.016265587780510835,
+        0.01638831703886328,
+        0.030406609896933414
+      ],
+      "mean_pinball": 0.02102017157210251,
+      "error": null,
+      "mlflow_run_id": "c9950b54021445b483bbf4023e6f1348"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 0,
+      "hyperparams": {
+        "n_splines": 18,
+        "lam": 0.6961461135089281,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.4656472206115723,
+      "fold_pinballs": [
+        0.028109074176418242,
+        0.027933504985471737,
+        0.09394482580111331
+      ],
+      "mean_pinball": 0.049995801654334426,
+      "error": null,
+      "mlflow_run_id": "a42716ad79224b06b1cf55a05c47684d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 1,
+      "hyperparams": {
+        "n_splines": 14,
+        "lam": 9.67916548059327,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.3378174304962158,
+      "fold_pinballs": [
+        0.030258710512114498,
+        0.020185874350978582,
+        0.04463278723940018
+      ],
+      "mean_pinball": 0.031692457367497755,
+      "error": null,
+      "mlflow_run_id": "3018ee9949054b7599a2d0f5d3a246cd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 2,
+      "hyperparams": {
+        "n_splines": 9,
+        "lam": 407.8744650242014,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.1323461532592773,
+      "fold_pinballs": [
+        0.017057588856893048,
+        0.0185453909543499,
+        0.027498365514211264
+      ],
+      "mean_pinball": 0.021033781775151403,
+      "error": null,
+      "mlflow_run_id": "d346ad310643465b8104862967d0ded1"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 3,
+      "hyperparams": {
+        "n_splines": 22,
+        "lam": 0.02260547990277655,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.5110208988189697,
+      "fold_pinballs": [
+        0.024706644208860647,
+        0.05074291882045001,
+        0.07635055658239408
+      ],
+      "mean_pinball": 0.05060003987056825,
+      "error": null,
+      "mlflow_run_id": "c13d9713e742402caf76c881e111d080"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 4,
+      "hyperparams": {
+        "n_splines": 16,
+        "lam": 0.2770615516808564,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.2693119049072266,
+      "fold_pinballs": [
+        0.024185272541046694,
+        0.026614773462539397,
+        0.1002907860114746
+      ],
+      "mean_pinball": 0.0503636106716869,
+      "error": null,
+      "mlflow_run_id": "c71bc3f5cada4f06b37d002410b66dae"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 5,
+      "hyperparams": {
+        "n_splines": 8,
+        "lam": 0.0026573894545315582,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.137929916381836,
+      "fold_pinballs": [
+        0.03990888771977616,
+        0.019821367345519633,
+        0.07549817479125319
+      ],
+      "mean_pinball": 0.045076143285516325,
+      "error": null,
+      "mlflow_run_id": "b1235a6b282e4a9abb099996b99093a3"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 6,
+      "hyperparams": {
+        "n_splines": 23,
+        "lam": 0.0965137455531534,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 1.121978759765625,
+      "fold_pinballs": [
+        0.02492261029320338,
+        0.044647340199477505,
+        0.09757803045981603
+      ],
+      "mean_pinball": 0.0557159936508323,
+      "error": null,
+      "mlflow_run_id": "8195af06e61b40ae817d2c3f4f711788"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 8,
+      "hyperparams": {
+        "n_splines": 8,
+        "lam": 4.14673664055612,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 0.6066374778747559,
+      "fold_pinballs": [
+        0.020437678482426096,
+        0.019623600114416405,
+        0.033075787442356445
+      ],
+      "mean_pinball": 0.024379022013066316,
+      "error": null,
+      "mlflow_run_id": "cca0659a1b534d4eb31830444fcf7ca0"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 9,
+      "hyperparams": {
+        "n_splines": 16,
+        "lam": 857.7819229011767,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 1.0481102466583252,
+      "fold_pinballs": [
+        0.01720287115067787,
+        0.018626134819092432,
+        0.028753268853893815
+      ],
+      "mean_pinball": 0.02152742494122137,
+      "error": null,
+      "mlflow_run_id": "1c8da7471dda435a8160b3957010c731"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 7,
+      "hyperparams": {
+        "n_splines": 22,
+        "lam": 68.17865626091677,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.9939556121826172,
+      "fold_pinballs": [
+        0.028850484122372334,
+        0.019926240094105187,
+        0.0413428805221508
+      ],
+      "mean_pinball": 0.03003986824620944,
+      "error": null,
+      "mlflow_run_id": "84b6c19c31ad4589907b16faf0f74e7f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 10,
+      "hyperparams": {
+        "n_splines": 12,
+        "lam": 0.031402206445113615,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.2230212688446045,
+      "fold_pinballs": [
+        0.03106929463936886,
+        0.06269593917499629,
+        0.22834421146942194
+      ],
+      "mean_pinball": 0.1073698150945957,
+      "error": null,
+      "mlflow_run_id": "b2dcea3f0601452486b0fc3316ab764b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 11,
+      "hyperparams": {
+        "n_splines": 25,
+        "lam": 0.02535091150301032,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 2.1148786544799805,
+      "fold_pinballs": [
+        0.01941343022560464,
+        0.05203042102591371,
+        0.09393708417058377
+      ],
+      "mean_pinball": 0.05512697847403405,
+      "error": null,
+      "mlflow_run_id": "a412f8c9cf104a569729d316750ba204"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 12,
+      "hyperparams": {
+        "n_splines": 17,
+        "lam": 0.004404031605015214,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 1.4873247146606445,
+      "fold_pinballs": [
+        0.02937151961468768,
+        0.07809583529101133,
+        0.1398126474075102
+      ],
+      "mean_pinball": 0.0824266674377364,
+      "error": null,
+      "mlflow_run_id": "f08b7ea6430942f5bc348c0a0539d66a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 13,
+      "hyperparams": {
+        "n_splines": 23,
+        "lam": 0.03854956888316401,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 1.1522367000579834,
+      "fold_pinballs": [
+        0.020750947398916045,
+        0.05099969812086047,
+        0.08799006813402949
+      ],
+      "mean_pinball": 0.05324690455126866,
+      "error": null,
+      "mlflow_run_id": "05c5480135bf411f899230e356bbdf47"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 15,
+      "hyperparams": {
+        "n_splines": 17,
+        "lam": 2.8605745875131507,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 0.8874177932739258,
+      "fold_pinballs": [
+        0.03156305702892564,
+        0.02170951200123114,
+        0.07234764176188087
+      ],
+      "mean_pinball": 0.04187340359734588,
+      "error": null,
+      "mlflow_run_id": "1bc07feea696437bb2d08be49637f03d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 14,
+      "hyperparams": {
+        "n_splines": 18,
+        "lam": 1.320203945417907,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 1.7461457252502441,
+      "fold_pinballs": [
+        0.028422536776492716,
+        0.02407561015844409,
+        0.0839211778686422
+      ],
+      "mean_pinball": 0.04547310826785966,
+      "error": null,
+      "mlflow_run_id": "3369d0aa1a2144e0b3d4772516c3e7e5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 16,
+      "hyperparams": {
+        "n_splines": 5,
+        "lam": 0.3660928070116057,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 0.5726099014282227,
+      "fold_pinballs": [
+        0.01730682576198558,
+        0.01872480793390803,
+        0.029155895552101775
+      ],
+      "mean_pinball": 0.021729176415998464,
+      "error": null,
+      "mlflow_run_id": "eadd9b850e75470e8ea8ac50dc48f7d9"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 17,
+      "hyperparams": {
+        "n_splines": 14,
+        "lam": 4.052310768671784,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 1.3453612327575684,
+      "fold_pinballs": [
+        0.03253310647650733,
+        0.020117952083324012,
+        0.0484823399932557
+      ],
+      "mean_pinball": 0.033711132851029016,
+      "error": null,
+      "mlflow_run_id": "65f18dc13afd424fa81b49b58ad89ec7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 18,
+      "hyperparams": {
+        "n_splines": 15,
+        "lam": 0.04318285889029485,
+        "spline_order": 2
+      },
+      "status": "pass",
+      "seconds": 0.9698665142059326,
+      "fold_pinballs": [
+        0.021500866567353026,
+        0.038364640491161464,
+        0.09173137491223832
+      ],
+      "mean_pinball": 0.050532293990250936,
+      "error": null,
+      "mlflow_run_id": "4d718af59be141c89d163fec77d8ae07"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "gam",
+      "trial_idx": 19,
+      "hyperparams": {
+        "n_splines": 6,
+        "lam": 0.9016338101531389,
+        "spline_order": 3
+      },
+      "status": "pass",
+      "seconds": 0.5975072383880615,
+      "fold_pinballs": [
+        0.017777541811487826,
+        0.01890589912329964,
+        0.0306579946264912
+      ],
+      "mean_pinball": 0.022447145187092888,
+      "error": null,
+      "mlflow_run_id": "061e6d41b92a4214b1ec0eaa8d9cb57b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 0,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.7418901920318604,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "bd94365a4dbd4be68f6171b07ceea8d6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 1,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.6886708736419678,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "5b717db363e346aca530e3b23679b4d8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 2,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.1963865756988525,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "25c1c03fe675454f81415ae32d4d7fb6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 3,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.7025394439697266,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "b76ae9762ef447d298f686706ab93001"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 4,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.8660423755645752,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "d48a390ac72e451eb90098923b36c520"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 5,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.0728211402893066,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "4d0d29a94d774f70b11cc26fc0334410"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 6,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.5586693286895752,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "25e2bb98dc6344249038d3e63b802a37"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 7,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.4481642246246338,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "8d4e45c190e44a23a882c6c0fd476dbc"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 9,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.3342232704162598,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "9444aadda121413f84e7f8513aef06cb"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 8,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 2.0339248180389404,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "42902044b0844afe9ebf7c8bb659c2b8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 10,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.6808974742889404,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "72e482b9e59a4f878beb68b79b5b4260"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 12,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 1.039247989654541,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "ce549fdc56d948558226f49a893b8f27"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 11,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.6147494316101074,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "159fc1eeef9c40cea9163ebdda1388e8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 13,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.8504393100738525,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "bd1e42c1692c4062b1ed2fb47440f101"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 15,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.6783926486968994,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "eefc3c83f24b44fca23d643ffdd036f9"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 16,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.7795987129211426,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "74b22af1a04e4072ba494fdc677a917f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 14,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.8869712352752686,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "4094c7ab6d1640d8a62abccb7d58fc04"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 18,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 0.7185845375061035,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "5af6c31ffc3f4ec7b1ea47cc13dae7b7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 17,
+      "hyperparams": {
+        "link": "identity"
+      },
+      "status": "pass",
+      "seconds": 1.2981128692626953,
+      "fold_pinballs": [
+        0.021380184813085585,
+        0.024926768648035762,
+        0.035229622787846984
+      ],
+      "mean_pinball": 0.02717885874965611,
+      "error": null,
+      "mlflow_run_id": "5d30a7c8f91e4421bec4e363dc1f81a1"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_gamma",
+      "trial_idx": 19,
+      "hyperparams": {
+        "link": "log"
+      },
+      "status": "pass",
+      "seconds": 1.3901610374450684,
+      "fold_pinballs": [
+        0.016545866585870483,
+        0.01948034272959295,
+        0.030445396193825143
+      ],
+      "mean_pinball": 0.022157201836429524,
+      "error": null,
+      "mlflow_run_id": "e699278d33c14b5f9aa0a8524b6138ce"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 0,
+      "hyperparams": {
+        "power": 1.082447636959256
+      },
+      "status": "pass",
+      "seconds": 3.8011181354522705,
+      "fold_pinballs": [
+        0.01655083273105387,
+        0.01651876805606553,
+        0.029680868027430658
+      ],
+      "mean_pinball": 0.020916822938183352,
+      "error": null,
+      "mlflow_run_id": "31c7e001aa1f49359bf7b5d2dfc30f2a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 1,
+      "hyperparams": {
+        "power": 1.7849702914383503
+      },
+      "status": "pass",
+      "seconds": 3.41683030128479,
+      "fold_pinballs": [
+        0.015321268115634005,
+        0.016474176611007852,
+        0.029337108038903045
+      ],
+      "mean_pinball": 0.020377517588514967,
+      "error": null,
+      "mlflow_run_id": "36562619e7df4b44b76c4aa787957760"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 2,
+      "hyperparams": {
+        "power": 1.8285562107905964
+      },
+      "status": "pass",
+      "seconds": 5.058300018310547,
+      "fold_pinballs": [
+        0.015312436536688966,
+        0.016398812418097736,
+        0.02932586254311582
+      ],
+      "mean_pinball": 0.020345703832634177,
+      "error": null,
+      "mlflow_run_id": "2f7763c4b0f344c1900a66aab11d368c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 3,
+      "hyperparams": {
+        "power": 1.7527110297349595
+      },
+      "status": "pass",
+      "seconds": 5.533375024795532,
+      "fold_pinballs": [
+        0.015363656367289726,
+        0.0163571402926873,
+        0.02943647422495494
+      ],
+      "mean_pinball": 0.020385756961643988,
+      "error": null,
+      "mlflow_run_id": "8779ec90753e4e9cbffa41db96f4c5f5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 4,
+      "hyperparams": {
+        "power": 1.9116338590341848
+      },
+      "status": "pass",
+      "seconds": 4.974131107330322,
+      "fold_pinballs": [
+        0.01527720155384382,
+        0.01645445596872697,
+        0.02929159410025186
+      ],
+      "mean_pinball": 0.020341083874274215,
+      "error": null,
+      "mlflow_run_id": "c69502e5735d4715bc097964f2fa479c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 6,
+      "hyperparams": {
+        "power": 1.1034943511397808
+      },
+      "status": "pass",
+      "seconds": 2.0722732543945312,
+      "fold_pinballs": [
+        0.01656977955507102,
+        0.01660039461946908,
+        0.029516185740012968
+      ],
+      "mean_pinball": 0.020895453304851024,
+      "error": null,
+      "mlflow_run_id": "811a14f09a7e47dc880759e2a77b75d1"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 5,
+      "hyperparams": {
+        "power": 1.8744108576249632
+      },
+      "status": "pass",
+      "seconds": 7.822352409362793,
+      "fold_pinballs": [
+        0.015173238874888827,
+        0.016480493410130918,
+        0.029333511645230046
+      ],
+      "mean_pinball": 0.020329081310083263,
+      "error": null,
+      "mlflow_run_id": "5a321c524f834fe19d58b7ac9e525836"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 8,
+      "hyperparams": {
+        "power": 1.277572863229459
+      },
+      "status": "pass",
+      "seconds": 2.1546263694763184,
+      "fold_pinballs": [
+        0.016138789388167693,
+        0.01643681174913338,
+        0.02965852798171416
+      ],
+      "mean_pinball": 0.020744709706338408,
+      "error": null,
+      "mlflow_run_id": "c5dc644dbad04a0882a35d5c78de53cd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 7,
+      "hyperparams": {
+        "power": 1.6888950139843013
+      },
+      "status": "pass",
+      "seconds": 5.826551198959351,
+      "fold_pinballs": [
+        0.015445528153493794,
+        0.016340157911999168,
+        0.02923866250307603
+      ],
+      "mean_pinball": 0.020341449522856332,
+      "error": null,
+      "mlflow_run_id": "ee16a184da0a437397dfca90d4a02e0a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 9,
+      "hyperparams": {
+        "power": 1.4621542660144509
+      },
+      "status": "pass",
+      "seconds": 2.614844799041748,
+      "fold_pinballs": [
+        0.01580980125413802,
+        0.01640873058372747,
+        0.029491720445724144
+      ],
+      "mean_pinball": 0.02057008409452988,
+      "error": null,
+      "mlflow_run_id": "380591b978a9495f9359d57d6448744a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 10,
+      "hyperparams": {
+        "power": 1.4096380052451705
+      },
+      "status": "pass",
+      "seconds": 3.2701492309570312,
+      "fold_pinballs": [
+        0.01590832248152801,
+        0.01644321225214008,
+        0.02941344684640859
+      ],
+      "mean_pinball": 0.02058832719335889,
+      "error": null,
+      "mlflow_run_id": "c007f7eb8b9b40a4a5d500f114427f7f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 15,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 781.4551661014557,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "47a0853a769d4affb7e2e88c770b16c1"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 11,
+      "hyperparams": {
+        "power": 1.7005369842237317
+      },
+      "status": "pass",
+      "seconds": 4.314209938049316,
+      "fold_pinballs": [
+        0.015460977960726005,
+        0.01637902244904639,
+        0.029425424652558773
+      ],
+      "mean_pinball": 0.02042180835411039,
+      "error": null,
+      "mlflow_run_id": "5f1dedd7b3b84f899527725aa7a132aa"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 13,
+      "hyperparams": {
+        "power": 1.606484426904496
+      },
+      "status": "pass",
+      "seconds": 3.1434504985809326,
+      "fold_pinballs": [
+        0.01557985788619287,
+        0.01643357261693147,
+        0.029408817874955726
+      ],
+      "mean_pinball": 0.020474082792693356,
+      "error": null,
+      "mlflow_run_id": "fcb69bb38ce44716ada4065eed3ea7bd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 12,
+      "hyperparams": {
+        "power": 1.7834397692749788
+      },
+      "status": "pass",
+      "seconds": 5.172451496124268,
+      "fold_pinballs": [
+        0.015286700465830019,
+        0.016448218736069612,
+        0.029425921604442913
+      ],
+      "mean_pinball": 0.020386946935447514,
+      "error": null,
+      "mlflow_run_id": "90a29195b7c847bbb6fb2fd2eb22c1d8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 15,
+      "hyperparams": {
+        "power": 1.5663283026297683
+      },
+      "status": "pass",
+      "seconds": 2.8334853649139404,
+      "fold_pinballs": [
+        0.0155111604815095,
+        0.016425321498199686,
+        0.02937443513038651
+      ],
+      "mean_pinball": 0.0204369723700319,
+      "error": null,
+      "mlflow_run_id": "ec6eeb5d09b946149c83728e0624aca7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 16,
+      "hyperparams": {
+        "power": 1.2815162209044169
+      },
+      "status": "pass",
+      "seconds": 2.4536588191986084,
+      "fold_pinballs": [
+        0.016132415649816885,
+        0.016468484391317813,
+        0.029476524540518183
+      ],
+      "mean_pinball": 0.02069247486055096,
+      "error": null,
+      "mlflow_run_id": "898b721fa77343d29f81e5e24b4648bf"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 14,
+      "hyperparams": {
+        "power": 1.8876813225820879
+      },
+      "status": "pass",
+      "seconds": 6.485797882080078,
+      "fold_pinballs": [
+        0.015181509574914496,
+        0.01645754814193462,
+        0.029452253488336445
+      ],
+      "mean_pinball": 0.02036377040172852,
+      "error": null,
+      "mlflow_run_id": "ecaa165baf424427a3e29d40e0ac73be"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 17,
+      "hyperparams": {
+        "power": 1.0601328357216615
+      },
+      "status": "pass",
+      "seconds": 1.8853256702423096,
+      "fold_pinballs": [
+        0.01662038703253304,
+        0.01659857532945214,
+        0.029662685281897055
+      ],
+      "mean_pinball": 0.02096054921462741,
+      "error": null,
+      "mlflow_run_id": "cb0b005e8d634d3586d38a7fc8581168"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 19,
+      "hyperparams": {
+        "power": 1.2283453981050587
+      },
+      "status": "pass",
+      "seconds": 2.23732590675354,
+      "fold_pinballs": [
+        0.016265046982448128,
+        0.016500840158646883,
+        0.029583151676277307
+      ],
+      "mean_pinball": 0.020783012939124105,
+      "error": null,
+      "mlflow_run_id": "6b30bfd8af7948d2835c547a289d87e2"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "glm_tweedie",
+      "trial_idx": 18,
+      "hyperparams": {
+        "power": 1.0659732437102587
+      },
+      "status": "pass",
+      "seconds": 4.038835048675537,
+      "fold_pinballs": [
+        0.01655218886193958,
+        0.016617149245993525,
+        0.029676404929335015
+      ],
+      "mean_pinball": 0.020948581012422706,
+      "error": null,
+      "mlflow_run_id": "fcfcfbbb090249ae8755ec4085663c72"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 0,
+      "hyperparams": {
+        "alpha": 1.3183408690605076,
+        "group_reg": 0.0008730578243344619
+      },
+      "status": "pass",
+      "seconds": 9.889797687530518,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "adfba46e84964d34b3e424c6fe4d6c4f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 2,
+      "hyperparams": {
+        "alpha": 2.669406413195344,
+        "group_reg": 0.10233277368036998
+      },
+      "status": "pass",
+      "seconds": 10.72283124923706,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "5c9e4caf9d334b18ad0722b2a838216c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 1,
+      "hyperparams": {
+        "alpha": 0.7985679255175404,
+        "group_reg": 0.0003448834043148646
+      },
+      "status": "pass",
+      "seconds": 12.230676174163818,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "ba4c913c652744bcb0e55b6487c3ceef"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 3,
+      "hyperparams": {
+        "alpha": 1.8312225148691,
+        "group_reg": 0.4487000305417146
+      },
+      "status": "pass",
+      "seconds": 12.057799577713013,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "23cf2fa9b7384c269803bd9655e9dd24"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 5,
+      "hyperparams": {
+        "alpha": 0.008539733194666043,
+        "group_reg": 0.05271766947916201
+      },
+      "status": "pass",
+      "seconds": 10.780085325241089,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "f6ac8926f9ce40c3917ef8a18fa97ce1"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 4,
+      "hyperparams": {
+        "alpha": 0.3235496080864714,
+        "group_reg": 0.00163050522973258
+      },
+      "status": "pass",
+      "seconds": 12.901906728744507,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "1857ee137937479bb2f288aa9a056c34"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 6,
+      "hyperparams": {
+        "alpha": 0.0007122938437620849,
+        "group_reg": 0.016949642003594993
+      },
+      "status": "pass",
+      "seconds": 12.861305475234985,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "f9fd5b43287b4ff9b64bffe121f3b8fe"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 7,
+      "hyperparams": {
+        "alpha": 2.0877955397273906,
+        "group_reg": 7.713266481098646
+      },
+      "status": "pass",
+      "seconds": 10.489807844161987,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "fb030c0d1ff34cad8200e953f59ca3f3"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 8,
+      "hyperparams": {
+        "alpha": 2.3989487613267997,
+        "group_reg": 0.23140464170361807
+      },
+      "status": "pass",
+      "seconds": 12.746858358383179,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "83f9a887979a42899265a18e6f26c460"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 10,
+      "hyperparams": {
+        "alpha": 4.731075559942296,
+        "group_reg": 0.13649141986505114
+      },
+      "status": "pass",
+      "seconds": 11.134875059127808,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "2b29848a74c74715bccbe50e9b8135bc"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 9,
+      "hyperparams": {
+        "alpha": 0.39025738621159756,
+        "group_reg": 0.00022124939059270035
+      },
+      "status": "pass",
+      "seconds": 12.524712324142456,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "8d7b990edc9046ed85b8ca0aa00f6afd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 11,
+      "hyperparams": {
+        "alpha": 0.15377247263872781,
+        "group_reg": 0.7754842255736291
+      },
+      "status": "pass",
+      "seconds": 12.238560199737549,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "f8b41cef5a3b49ea9a89819fe962e193"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 12,
+      "hyperparams": {
+        "alpha": 0.05309689339025091,
+        "group_reg": 0.012926950430613166
+      },
+      "status": "pass",
+      "seconds": 11.316713094711304,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "4e0d825daefd4b3598c0d85c289b88a2"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 13,
+      "hyperparams": {
+        "alpha": 0.6870260701358563,
+        "group_reg": 0.01243207024495311
+      },
+      "status": "pass",
+      "seconds": 13.12453317642212,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "a29af865bd3449328d63af921e6ebf36"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 14,
+      "hyperparams": {
+        "alpha": 0.4449310765360419,
+        "group_reg": 2.8495408253751453
+      },
+      "status": "pass",
+      "seconds": 12.251332759857178,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "5826b474bd014b6e909556974944325d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 15,
+      "hyperparams": {
+        "alpha": 0.1609840544310783,
+        "group_reg": 0.00021593130402189264
+      },
+      "status": "pass",
+      "seconds": 10.004471063613892,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "8fbd01b2a52f4a9eb5e94ded5b1f1301"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 16,
+      "hyperparams": {
+        "alpha": 8.041053917805908,
+        "group_reg": 0.0002718171780013722
+      },
+      "status": "pass",
+      "seconds": 13.521703243255615,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "791a9aecc8e1470eb52c3051ccbfa5ff"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 17,
+      "hyperparams": {
+        "alpha": 0.00041198048042986754,
+        "group_reg": 0.000691827218647319
+      },
+      "status": "pass",
+      "seconds": 12.087854146957397,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "d482d3cbe59941d2908da8c969a3f988"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 18,
+      "hyperparams": {
+        "alpha": 2.054522932142387,
+        "group_reg": 0.001987715088966097
+      },
+      "status": "pass",
+      "seconds": 11.678250312805176,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "48992f3511874a9b9c6f00db934f58dd"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 0,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "lognormal"
+      },
+      "status": "pass",
+      "seconds": 6.282113313674927,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "7c1058b7891f43e1a49ae66fe4e07ecf"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "group_lasso",
+      "trial_idx": 19,
+      "hyperparams": {
+        "alpha": 0.020150825382871242,
+        "group_reg": 0.009367181860823123
+      },
+      "status": "pass",
+      "seconds": 10.89951777458191,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "3540c4abdf1a4bdb87e0322c7cb55819"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 1,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "lognormal"
+      },
+      "status": "pass",
+      "seconds": 9.32653546333313,
+      "fold_pinballs": [
+        0.015302946230684615,
+        0.015698181460048942,
+        0.028518952228414225
+      ],
+      "mean_pinball": 0.019840026639715926,
+      "error": null,
+      "mlflow_run_id": "69f17582031b4756896672888b7a7adf"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 3,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "lognormal"
+      },
+      "status": "pass",
+      "seconds": 8.549581527709961,
+      "fold_pinballs": [
+        0.015302946230684615,
+        0.015698181460048942,
+        0.028518952228414225
+      ],
+      "mean_pinball": 0.019840026639715926,
+      "error": null,
+      "mlflow_run_id": "a93094a9da20455fa67a5c4ff0388089"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 2,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "beta"
+      },
+      "status": "pass",
+      "seconds": 12.943724870681763,
+      "fold_pinballs": [
+        0.015302946230684615,
+        0.015698181460048942,
+        0.028518952228414225
+      ],
+      "mean_pinball": 0.019840026639715926,
+      "error": null,
+      "mlflow_run_id": "e12eb807ba384c0eb0094c4336433146"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 4,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 8.865126609802246,
+      "fold_pinballs": [
+        0.015183173348146823,
+        0.01648536444829193,
+        0.02979972035638508
+      ],
+      "mean_pinball": 0.02048941938427461,
+      "error": null,
+      "mlflow_run_id": "971e755e06384285ad2c00246dde2993"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 5,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 7.396700143814087,
+      "fold_pinballs": [
+        0.015419994054304702,
+        0.016165739416239347,
+        0.02880764070417417
+      ],
+      "mean_pinball": 0.020131124724906076,
+      "error": null,
+      "mlflow_run_id": "ac253924e1fa41e1bc7e64cff4263580"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 7,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "beta"
+      },
+      "status": "pass",
+      "seconds": 10.364391326904297,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "39f5a4c222ad4989944a30e8e3adf8ae"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 6,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 13.402276277542114,
+      "fold_pinballs": [
+        0.015419994054304702,
+        0.016165739416239347,
+        0.02880764070417417
+      ],
+      "mean_pinball": 0.020131124724906076,
+      "error": null,
+      "mlflow_run_id": "d8697361b3c247bf85e8974abccb0a14"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 8,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 10.953797817230225,
+      "fold_pinballs": [
+        0.015419994054304702,
+        0.016165739416239347,
+        0.02880764070417417
+      ],
+      "mean_pinball": 0.020131124724906076,
+      "error": null,
+      "mlflow_run_id": "64c69c262d9f475fa627d987d41494ac"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 9,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "lognormal"
+      },
+      "status": "pass",
+      "seconds": 7.845184087753296,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "15a3dc1d51af44c28b5c25936cd9ec75"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 10,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 8.720677614212036,
+      "fold_pinballs": [
+        0.015419994054304702,
+        0.016165739416239347,
+        0.02880764070417417
+      ],
+      "mean_pinball": 0.020131124724906076,
+      "error": null,
+      "mlflow_run_id": "62eb8a99c37b4155b59fed7998c3aa88"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 11,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "beta"
+      },
+      "status": "pass",
+      "seconds": 10.175643920898438,
+      "fold_pinballs": [
+        0.015302946230684615,
+        0.015698181460048942,
+        0.028518952228414225
+      ],
+      "mean_pinball": 0.019840026639715926,
+      "error": null,
+      "mlflow_run_id": "d95a87771072493da6b241fceed001be"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 13,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 6.698165416717529,
+      "fold_pinballs": [
+        0.015183173348146823,
+        0.01648536444829193,
+        0.02979972035638508
+      ],
+      "mean_pinball": 0.02048941938427461,
+      "error": null,
+      "mlflow_run_id": "7b12d807821c46a488121ebef6f31047"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 12,
+      "hyperparams": {
+        "part1_link": "logit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 12.93761658668518,
+      "fold_pinballs": [
+        0.015419994054304702,
+        0.016165739416239347,
+        0.02880764070417417
+      ],
+      "mean_pinball": 0.020131124724906076,
+      "error": null,
+      "mlflow_run_id": "f475a0d881f1443fa759d1e2c2fcfa5b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 14,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "lognormal"
+      },
+      "status": "pass",
+      "seconds": 7.471567392349243,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "a84bf28cf3684f8ea8faef42b4d51646"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 15,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "gamma"
+      },
+      "status": "pass",
+      "seconds": 8.406843662261963,
+      "fold_pinballs": [
+        0.015183173348146823,
+        0.01648536444829193,
+        0.02979972035638508
+      ],
+      "mean_pinball": 0.02048941938427461,
+      "error": null,
+      "mlflow_run_id": "b7e0b86d1eb0415d91dd07b05cf66a27"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 17,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "lognormal"
+      },
+      "status": "pass",
+      "seconds": 8.620893955230713,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "518bb2a9c050493c8cdc2fa96fd0ffb5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 16,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "beta"
+      },
+      "status": "pass",
+      "seconds": 10.687074661254883,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "f8e0e66d3633479b87830688f2af352a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 18,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "beta"
+      },
+      "status": "pass",
+      "seconds": 12.914921045303345,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "c65d707cd2444c099b0a2e9efbb452a5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "hurdle",
+      "trial_idx": 19,
+      "hyperparams": {
+        "part1_link": "probit",
+        "part2_dist": "lognormal"
+      },
+      "status": "pass",
+      "seconds": 10.540156126022339,
+      "fold_pinballs": [
+        0.015153252874787125,
+        0.016017874594059452,
+        0.029564704777577937
+      ],
+      "mean_pinball": 0.020245277415474838,
+      "error": null,
+      "mlflow_run_id": "a062ddbab64b438c9307337b1e2b8629"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 0,
+      "hyperparams": {
+        "alpha": 0.0002036513648939587
+      },
+      "status": "pass",
+      "seconds": 50.779757022857666,
+      "fold_pinballs": [
+        0.014793436548019673,
+        0.01537242355556956,
+        0.030983812930134247
+      ],
+      "mean_pinball": 0.020383224344574496,
+      "error": null,
+      "mlflow_run_id": "d6d03e6be457491fbc60a69a24be5513"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 3,
+      "hyperparams": {
+        "alpha": 0.6395526023576562
+      },
+      "status": "pass",
+      "seconds": 6.762593984603882,
+      "fold_pinballs": [
+        0.016835804157447266,
+        0.01914154948536593,
+        0.029941784686798763
+      ],
+      "mean_pinball": 0.021973046109870654,
+      "error": null,
+      "mlflow_run_id": "d3c92d301c8642dcbfc34acba1810b01"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 1,
+      "hyperparams": {
+        "alpha": 0.0017952202126419927
+      },
+      "status": "pass",
+      "seconds": 52.95419359207153,
+      "fold_pinballs": [
+        0.015557029981018865,
+        0.015415211616912056,
+        0.02886425726463936
+      ],
+      "mean_pinball": 0.01994549962085676,
+      "error": null,
+      "mlflow_run_id": "4e2441725d2f481a96aef09ce6a1f391"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 2,
+      "hyperparams": {
+        "alpha": 2.7752646524776666e-05
+      },
+      "status": "pass",
+      "seconds": 57.63999557495117,
+      "fold_pinballs": [
+        0.014573812922764126,
+        0.01534654189275851,
+        0.030929242310169566
+      ],
+      "mean_pinball": 0.0202831990418974,
+      "error": null,
+      "mlflow_run_id": "77acfc25f6e44cbf9c430609e76a1f4d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 5,
+      "hyperparams": {
+        "alpha": 0.05746059690437969
+      },
+      "status": "pass",
+      "seconds": 9.416862964630127,
+      "fold_pinballs": [
+        0.014761513903063874,
+        0.01694247935479517,
+        0.02867247556707878
+      ],
+      "mean_pinball": 0.020125489608312605,
+      "error": null,
+      "mlflow_run_id": "88f940d32d474893b41012ba86fbcda8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 6,
+      "hyperparams": {
+        "alpha": 0.14743697881211684
+      },
+      "status": "pass",
+      "seconds": 7.524193525314331,
+      "fold_pinballs": [
+        0.016176573472656646,
+        0.018548133749271983,
+        0.02971209637342105
+      ],
+      "mean_pinball": 0.021478934531783223,
+      "error": null,
+      "mlflow_run_id": "b727b243b5b84b209b72cdf5b7758d6f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 8,
+      "hyperparams": {
+        "alpha": 0.7821474799458934
+      },
+      "status": "pass",
+      "seconds": 6.894408464431763,
+      "fold_pinballs": [
+        0.016835804157447266,
+        0.01914154948536593,
+        0.029941784686798763
+      ],
+      "mean_pinball": 0.021973046109870654,
+      "error": null,
+      "mlflow_run_id": "f2216f84a8564491a401fab82edc628e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 7,
+      "hyperparams": {
+        "alpha": 0.020606171599187085
+      },
+      "status": "pass",
+      "seconds": 14.717603206634521,
+      "fold_pinballs": [
+        0.014072515160640224,
+        0.01614146274505245,
+        0.026512820690766038
+      ],
+      "mean_pinball": 0.018908932865486238,
+      "error": null,
+      "mlflow_run_id": "29f75999f5974325b96c81bccb5f93ad"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 9,
+      "hyperparams": {
+        "alpha": 0.3090880725665132
+      },
+      "status": "pass",
+      "seconds": 7.247551441192627,
+      "fold_pinballs": [
+        0.016835804157447266,
+        0.01914154948536593,
+        0.029941784686798763
+      ],
+      "mean_pinball": 0.021973046109870654,
+      "error": null,
+      "mlflow_run_id": "7860bc91aee84a0b8c8ae872fe15311c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 4,
+      "hyperparams": {
+        "alpha": 0.0030514189306962616
+      },
+      "status": "pass",
+      "seconds": 36.641406536102295,
+      "fold_pinballs": [
+        0.015195585134229063,
+        0.015483625056784899,
+        0.027985305274812917
+      ],
+      "mean_pinball": 0.01955483848860896,
+      "error": null,
+      "mlflow_run_id": "260559528c3349af9e9557c2cfbef551"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 11,
+      "hyperparams": {
+        "alpha": 0.1198107014133723
+      },
+      "status": "pass",
+      "seconds": 8.017870664596558,
+      "fold_pinballs": [
+        0.015613846968857068,
+        0.01790672088291849,
+        0.029437350903668936
+      ],
+      "mean_pinball": 0.020985972918481494,
+      "error": null,
+      "mlflow_run_id": "a6b54670ba3649a0876fbe14b5ffb22b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 10,
+      "hyperparams": {
+        "alpha": 3.7347409158870915e-05
+      },
+      "status": "pass",
+      "seconds": 64.94912362098694,
+      "fold_pinballs": [
+        0.014598114785231738,
+        0.015345191650964362,
+        0.030931008108402405
+      ],
+      "mean_pinball": 0.020291438181532836,
+      "error": null,
+      "mlflow_run_id": "7e714dbfb8ca4a1685f8bc6f1b639e2a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 12,
+      "hyperparams": {
+        "alpha": 1.220145077840501e-05
+      },
+      "status": "pass",
+      "seconds": 55.666797161102295,
+      "fold_pinballs": [
+        0.014613178105567592,
+        0.015345932367613854,
+        0.030912782874157895
+      ],
+      "mean_pinball": 0.02029063111577978,
+      "error": null,
+      "mlflow_run_id": "c1eca34143134462910e17444798645f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 15,
+      "hyperparams": {
+        "alpha": 0.12177094174014663
+      },
+      "status": "pass",
+      "seconds": 5.5419275760650635,
+      "fold_pinballs": [
+        0.015658189615504137,
+        0.017929626560522247,
+        0.02944878917153168
+      ],
+      "mean_pinball": 0.021012201782519353,
+      "error": null,
+      "mlflow_run_id": "e54084e11722406c873f0cced1b0f54a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 13,
+      "hyperparams": {
+        "alpha": 0.0002541162471472152
+      },
+      "status": "pass",
+      "seconds": 59.639928579330444,
+      "fold_pinballs": [
+        0.01480225192879206,
+        0.015375170340799322,
+        0.03093366560291015
+      ],
+      "mean_pinball": 0.020370362624167176,
+      "error": null,
+      "mlflow_run_id": "586a179fc1dd49d987a517809b920ec0"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 16,
+      "hyperparams": {
+        "alpha": 0.14493095543577433
+      },
+      "status": "pass",
+      "seconds": 5.926884174346924,
+      "fold_pinballs": [
+        0.016140334257939138,
+        0.018474417653069324,
+        0.029670072684784932
+      ],
+      "mean_pinball": 0.021428274865264465,
+      "error": null,
+      "mlflow_run_id": "c5b2104afae1488294db06a0003f100b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 18,
+      "hyperparams": {
+        "alpha": 0.06894838260187469
+      },
+      "status": "pass",
+      "seconds": 7.263246774673462,
+      "fold_pinballs": [
+        0.014903378757240408,
+        0.017143459663642408,
+        0.028760402696158194
+      ],
+      "mean_pinball": 0.020269080372347006,
+      "error": null,
+      "mlflow_run_id": "8415bd8b1c4c48818d69286421ebf359"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 19,
+      "hyperparams": {
+        "alpha": 0.2171250183056729
+      },
+      "status": "pass",
+      "seconds": 7.025511980056763,
+      "fold_pinballs": [
+        0.016835804157447266,
+        0.01914154948536593,
+        0.029941784686798763
+      ],
+      "mean_pinball": 0.021973046109870654,
+      "error": null,
+      "mlflow_run_id": "76584dcb1db6405fac51c3a95ea9daca"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 0,
+      "hyperparams": {
+        "alpha": 0.0009894047291665285
+      },
+      "status": "pass",
+      "seconds": 0.6739072799682617,
+      "fold_pinballs": [
+        0.015299427836006053,
+        0.015363539346783408,
+        0.02928573103129995
+      ],
+      "mean_pinball": 0.019982899404696473,
+      "error": null,
+      "mlflow_run_id": "08168bb874ab47b88571dbf57ad69991"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 1,
+      "hyperparams": {
+        "alpha": 1.6994009790777984
+      },
+      "status": "pass",
+      "seconds": 0.64774489402771,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "ec98a5f892a8461f8a68971bdbfe17af"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 2,
+      "hyperparams": {
+        "alpha": 0.2863478453297228
+      },
+      "status": "pass",
+      "seconds": 0.5625667572021484,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "6793efcbcc2044c6a34e26e12531fcdb"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 3,
+      "hyperparams": {
+        "alpha": 2.011339388712066
+      },
+      "status": "pass",
+      "seconds": 0.7071883678436279,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "d656748e81b346128a44f8122a806818"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 4,
+      "hyperparams": {
+        "alpha": 17.95342741587113
+      },
+      "status": "pass",
+      "seconds": 0.5959131717681885,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "3599a65d3bdf41159b7edfdacea557f3"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 5,
+      "hyperparams": {
+        "alpha": 0.07682917957964858
+      },
+      "status": "pass",
+      "seconds": 0.6206450462341309,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "7c13c5d3266b43418bd152ec05d4e1bb"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 6,
+      "hyperparams": {
+        "alpha": 40.245733428671
+      },
+      "status": "pass",
+      "seconds": 0.62884521484375,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "fdcd4bc08c7d4e819f314d408cb16cf4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 7,
+      "hyperparams": {
+        "alpha": 0.00605453612374447
+      },
+      "status": "pass",
+      "seconds": 1.064861536026001,
+      "fold_pinballs": [
+        0.014351493055298124,
+        0.015778947860669808,
+        0.02764986608275721
+      ],
+      "mean_pinball": 0.01926010233290838,
+      "error": null,
+      "mlflow_run_id": "577cdc0b71274c86a3915c6702e01983"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 8,
+      "hyperparams": {
+        "alpha": 0.7942122219628752
+      },
+      "status": "pass",
+      "seconds": 1.1129870414733887,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "bd848e952d57405b8e8032f564d50a7d"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 9,
+      "hyperparams": {
+        "alpha": 0.22857688320315847
+      },
+      "status": "pass",
+      "seconds": 1.1238343715667725,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "0f10befb2acc490e83722756b385ee66"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 10,
+      "hyperparams": {
+        "alpha": 0.0007209794743882833
+      },
+      "status": "pass",
+      "seconds": 1.4581663608551025,
+      "fold_pinballs": [
+        0.01551646933284355,
+        0.015332028648304652,
+        0.02917774908486493
+      ],
+      "mean_pinball": 0.020008749022004377,
+      "error": null,
+      "mlflow_run_id": "592f9de856f4445e803767dbb6e733f7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 11,
+      "hyperparams": {
+        "alpha": 0.0003249626990890355
+      },
+      "status": "pass",
+      "seconds": 2.038114309310913,
+      "fold_pinballs": [
+        0.01629071896245465,
+        0.015431162192098846,
+        0.029971064655991742
+      ],
+      "mean_pinball": 0.020564315270181748,
+      "error": null,
+      "mlflow_run_id": "8780c2c034594b43b5af0ead35b5f252"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 12,
+      "hyperparams": {
+        "alpha": 0.0003616558568829024
+      },
+      "status": "pass",
+      "seconds": 2.0430681705474854,
+      "fold_pinballs": [
+        0.016188156245797364,
+        0.015417222623512371,
+        0.029880503135303965
+      ],
+      "mean_pinball": 0.020495294001537902,
+      "error": null,
+      "mlflow_run_id": "2936e64760f74c86a88ebd12ae471a1c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 13,
+      "hyperparams": {
+        "alpha": 0.4452952225745851
+      },
+      "status": "pass",
+      "seconds": 1.2183377742767334,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "ff9a26746e0043859af9a76655937790"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 14,
+      "hyperparams": {
+        "alpha": 0.007786415458914843
+      },
+      "status": "pass",
+      "seconds": 1.3293585777282715,
+      "fold_pinballs": [
+        0.014223243116034474,
+        0.015969383227933048,
+        0.02796513138858934
+      ],
+      "mean_pinball": 0.01938591924418562,
+      "error": null,
+      "mlflow_run_id": "c452d1c803f84d8cbddeeadfdebd4ab3"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 15,
+      "hyperparams": {
+        "alpha": 0.007335829697269994
+      },
+      "status": "pass",
+      "seconds": 1.2939484119415283,
+      "fold_pinballs": [
+        0.0142556639906334,
+        0.015934100041331403,
+        0.027874408709424384
+      ],
+      "mean_pinball": 0.019354724247129727,
+      "error": null,
+      "mlflow_run_id": "498adfcd595843e4920fe5ed79d68bea"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 16,
+      "hyperparams": {
+        "alpha": 32.472730176883005
+      },
+      "status": "pass",
+      "seconds": 1.1405279636383057,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "b34638439f224832866a5649f45697ca"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 17,
+      "hyperparams": {
+        "alpha": 0.006696791399680945
+      },
+      "status": "pass",
+      "seconds": 1.2521014213562012,
+      "fold_pinballs": [
+        0.014296083610782313,
+        0.015840824001509508,
+        0.027750148164902608
+      ],
+      "mean_pinball": 0.019295685259064808,
+      "error": null,
+      "mlflow_run_id": "442656c80b2a4eaba8434bd11f99a67e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 18,
+      "hyperparams": {
+        "alpha": 1.104204430680111
+      },
+      "status": "pass",
+      "seconds": 1.1462488174438477,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "da1601c538cc466c9c6cb33b36749efb"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "lasso",
+      "trial_idx": 19,
+      "hyperparams": {
+        "alpha": 9.55647959848777
+      },
+      "status": "pass",
+      "seconds": 1.2064862251281738,
+      "fold_pinballs": [
+        0.01683348814081627,
+        0.01913348125386143,
+        0.029887525747093177
+      ],
+      "mean_pinball": 0.021951498380590292,
+      "error": null,
+      "mlflow_run_id": "45d8d6a7a40b4b2c8f8099a502fd359f"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 0,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.2495956420898438,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "044bc4c801474d90a347c4d11aca2fef"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 1,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.2005980014801025,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "0ecf13bd9a93444fb16ddb328bceb75e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 2,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.2223570346832275,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "bc80098985eb43caa878dfad21276ec4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 3,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.1989531517028809,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "db8336627fbd452c89298d2ce83f9cd9"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 4,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.7378640174865723,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "a319341f5f474f829e661a45364f8823"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 17,
+      "hyperparams": {
+        "alpha": 5.441613761319207e-05
+      },
+      "status": "pass",
+      "seconds": 47.73682260513306,
+      "fold_pinballs": [
+        0.0145798329006411,
+        0.015349368660478223,
+        0.030959207580705733
+      ],
+      "mean_pinball": 0.020296136380608353,
+      "error": null,
+      "mlflow_run_id": "fde83ef4b93a4751ba13ffa1993c92fb"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 5,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.6610531806945801,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "e84474d58b25480fb81eccaf569c7aa9"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 6,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.7641668319702148,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "79ef7874c08b4628afa4caab67f01b39"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 7,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.599104642868042,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "6f4c3a39b52e4e0fb52199ffe3723ea0"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 9,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.5985636711120605,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "141ad56b28be43908c26cf466e660352"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 8,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.2840359210968018,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "6c5b0fd7d4b54502ae957909822dd3c5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 11,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.6218404769897461,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "9594f706e4ee4c0698c61d035355dcb0"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 10,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.9655156135559082,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "fda2b8aab72548e5a40c3b209045372b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 12,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.6068141460418701,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "cddfb177014740b4a1b2e10c02fdccaf"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 14,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.6179695129394531,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "e48fbf4c8d194c778f43e03bb33c6165"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 13,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.2711145877838135,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "77802d3fe1b44ec190627ba3f86d38d4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 15,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.7406530380249023,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "a14b33286cca4584b5f64486a1696bc8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 16,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.0511436462402344,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "c1cfd8ef8c0e4f23b2c48fc1a8c37cd5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 17,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 0.6135344505310059,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "12a49555e11048ea8384db17dc583247"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 18,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.223848819732666,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "b3bd64863a984ba7846282eac4f23ec0"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ols",
+      "trial_idx": 19,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 1.1148359775543213,
+      "fold_pinballs": [
+        0.01591406541475859,
+        0.015819702711495704,
+        0.032283333832703445
+      ],
+      "mean_pinball": 0.021339033986319245,
+      "error": null,
+      "mlflow_run_id": "87a8d361a57b43f7a155bdcb3e07f4bf"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "l1_quantile_regression",
+      "trial_idx": 14,
+      "hyperparams": {
+        "alpha": 7.167346935911287e-05
+      },
+      "status": "pass",
+      "seconds": 63.73278999328613,
+      "fold_pinballs": [
+        0.014597042145018495,
+        0.015347379760013075,
+        0.030977373253908612
+      ],
+      "mean_pinball": 0.02030726505298006,
+      "error": null,
+      "mlflow_run_id": "478f555c5c674e4e808d7aefa76eab4b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 0,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 9.439854860305786,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "428a7cf3db1f4ad390917a0c65894093"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 1,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 9.681466341018677,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "d6ed909cb7dc401f99160316ac492e22"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 2,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 8.558566331863403,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "d103ea6a531b4811be56a1578a627c7b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 3,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 7.5425028800964355,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "3204de31831b4128abe77f59d75f8e1c"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 5,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 7.488579750061035,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "7cf36ae8855e4177b4491196bc2358d9"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 4,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 9.443495988845825,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "e01a3ddc9ef74a49a7b6232f77b20e27"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 7,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 7.976163625717163,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "f06bde497a964b2aa0debe5b0d3e7ed7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 6,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 9.027624368667603,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "65f1ddaf162445b9a001c35bbab9a075"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 8,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 7.297784328460693,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "11eb293ec33d4e649d1a752497f8bc92"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 9,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 6.542340278625488,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "5d0722a3531a4522b5e4b4c1344f52e8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 11,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 8.228161811828613,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "cc251be40915472195256a39ca38ad2e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 10,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 9.185255289077759,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "78b72665efe946fdaf87f3602c53b7d7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 12,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 8.803123474121094,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "6094a35629bc4586ace6df5ce14b5f06"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 14,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 8.230278491973877,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "2d2f41cd66d440f38aab6bc3f16343af"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 13,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 9.527846813201904,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "5ca1639e4a13412d89cc2ab4205964ac"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 15,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 6.127543926239014,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "1898be43e83c46afaea4729aa01ba3be"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 16,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 7.6569836139678955,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "befb0166290a40498cfd4b45dbb96136"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 17,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 10.142274856567383,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "e7c27550887d4720b3253550fe041960"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 0,
+      "hyperparams": {
+        "alpha": 0.0003255531088943341
+      },
+      "status": "pass",
+      "seconds": 1.114281415939331,
+      "fold_pinballs": [
+        0.015914053084604193,
+        0.015819704215803223,
+        0.03228336617391447
+      ],
+      "mean_pinball": 0.021339041158107294,
+      "error": null,
+      "mlflow_run_id": "043cb586a58241a5866bc93e0a49504e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 18,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 8.635294914245605,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "d8d5690520be448096740155084a3dfa"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 2,
+      "hyperparams": {
+        "alpha": 0.09708532915308031
+      },
+      "status": "pass",
+      "seconds": 0.6089954376220703,
+      "fold_pinballs": [
+        0.015910423165611094,
+        0.015820251179005155,
+        0.03229277489878443
+      ],
+      "mean_pinball": 0.021341149747800228,
+      "error": null,
+      "mlflow_run_id": "3d95b91e67e8438093fb1ee0e05efd84"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 1,
+      "hyperparams": {
+        "alpha": 0.10199004331391451
+      },
+      "status": "pass",
+      "seconds": 1.1438181400299072,
+      "fold_pinballs": [
+        0.01591024235438085,
+        0.01582028037845814,
+        0.03229324124440483
+      ],
+      "mean_pinball": 0.021341254659081276,
+      "error": null,
+      "mlflow_run_id": "757ec211d2be4d8480c261b5204a7567"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 3,
+      "hyperparams": {
+        "alpha": 0.004784596483283714
+      },
+      "status": "pass",
+      "seconds": 0.6933374404907227,
+      "fold_pinballs": [
+        0.01591388425141784,
+        0.015819724778551293,
+        0.03228380867422485
+      ],
+      "mean_pinball": 0.021339139234731325,
+      "error": null,
+      "mlflow_run_id": "8b52d125cfde46d9939372b08ffe92f0"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 4,
+      "hyperparams": {
+        "alpha": 3.5491866194175
+      },
+      "status": "pass",
+      "seconds": 1.1159217357635498,
+      "fold_pinballs": [
+        0.015808745666675967,
+        0.015822856874106887,
+        0.032485416442932506
+      ],
+      "mean_pinball": 0.021372339661238453,
+      "error": null,
+      "mlflow_run_id": "761ff9eea698486ea836c88b044a8ce8"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "quantile_regression",
+      "trial_idx": 19,
+      "hyperparams": {},
+      "status": "pass",
+      "seconds": 6.817167043685913,
+      "fold_pinballs": [
+        0.014618157220205702,
+        0.015340267058884761,
+        0.030886436428717128
+      ],
+      "mean_pinball": 0.020281620235935865,
+      "error": null,
+      "mlflow_run_id": "4557a4881aa8462a9ac57c74bdd75658"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 5,
+      "hyperparams": {
+        "alpha": 59.70122570225561
+      },
+      "status": "pass",
+      "seconds": 1.0588781833648682,
+      "fold_pinballs": [
+        0.015826642066920128,
+        0.015716854176313473,
+        0.031962092172051
+      ],
+      "mean_pinball": 0.021168529471761538,
+      "error": null,
+      "mlflow_run_id": "dfa37ea3452d4291848b7a324b3cea09"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 7,
+      "hyperparams": {
+        "alpha": 13.960417066029862
+      },
+      "status": "pass",
+      "seconds": 0.5931472778320312,
+      "fold_pinballs": [
+        0.015690464278404894,
+        0.015798175047314934,
+        0.03253818135992994
+      ],
+      "mean_pinball": 0.021342273561883257,
+      "error": null,
+      "mlflow_run_id": "3e34e8d48c744541a9b73c8f76b04dd4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 6,
+      "hyperparams": {
+        "alpha": 0.014933982273899023
+      },
+      "status": "pass",
+      "seconds": 1.1542725563049316,
+      "fold_pinballs": [
+        0.01591350031598848,
+        0.01581977129484771,
+        0.03228481259834626
+      ],
+      "mean_pinball": 0.02133936140306082,
+      "error": null,
+      "mlflow_run_id": "5b1dc1ca82a3425788cb839a50631218"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 8,
+      "hyperparams": {
+        "alpha": 0.0002403572875958573
+      },
+      "status": "pass",
+      "seconds": 0.5753004550933838,
+      "fold_pinballs": [
+        0.015914056311302816,
+        0.015819703822172303,
+        0.032283357710814795
+      ],
+      "mean_pinball": 0.02133903928142997,
+      "error": null,
+      "mlflow_run_id": "cd6e0197522e415782e3d685cb84b7e2"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 9,
+      "hyperparams": {
+        "alpha": 0.0012314520043722342
+      },
+      "status": "pass",
+      "seconds": 0.7726304531097412,
+      "fold_pinballs": [
+        0.015914018776810902,
+        0.015819708399587514,
+        0.032283456143361824
+      ],
+      "mean_pinball": 0.021339061106586746,
+      "error": null,
+      "mlflow_run_id": "5700adadcaa4453bb5f194d69a33a4f7"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 11,
+      "hyperparams": {
+        "alpha": 0.003030891770525265
+      },
+      "status": "pass",
+      "seconds": 0.5674452781677246,
+      "fold_pinballs": [
+        0.01591395064082577,
+        0.01581971670061334,
+        0.03228363474731646
+      ],
+      "mean_pinball": 0.02133910069625185,
+      "error": null,
+      "mlflow_run_id": "1bae795ee1d34cad84dbbedfc74a4f44"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 12,
+      "hyperparams": {
+        "alpha": 51.870609814617296
+      },
+      "status": "pass",
+      "seconds": 0.5799062252044678,
+      "fold_pinballs": [
+        0.015803937727312308,
+        0.01572290201013701,
+        0.03204908026457049
+      ],
+      "mean_pinball": 0.021191973334006603,
+      "error": null,
+      "mlflow_run_id": "327222cb54ff472d90f7d339cefab8b2"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 10,
+      "hyperparams": {
+        "alpha": 45.708427395351734
+      },
+      "status": "pass",
+      "seconds": 1.0311946868896484,
+      "fold_pinballs": [
+        0.015778042696694035,
+        0.015731849467212965,
+        0.032133201106255074
+      ],
+      "mean_pinball": 0.021214364423387356,
+      "error": null,
+      "mlflow_run_id": "789a9ce0e9b74fac8657c9bf8f8b1872"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 13,
+      "hyperparams": {
+        "alpha": 2.0540089327920645
+      },
+      "status": "pass",
+      "seconds": 0.9108030796051025,
+      "fold_pinballs": [
+        0.01584365908142803,
+        0.015825395259451567,
+        0.032427540274399154
+      ],
+      "mean_pinball": 0.02136553153842625,
+      "error": null,
+      "mlflow_run_id": "5c1f6821f9b641f1982f971adbe90df4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 15,
+      "hyperparams": {
+        "alpha": 0.0025592740574191418
+      },
+      "status": "pass",
+      "seconds": 0.6061694622039795,
+      "fold_pinballs": [
+        0.015913968497193003,
+        0.015819714526203125,
+        0.03228358795058854
+      ],
+      "mean_pinball": 0.021339090324661556,
+      "error": null,
+      "mlflow_run_id": "8e44caafe0d64f83a1c6ec162c34472a"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 14,
+      "hyperparams": {
+        "alpha": 0.7659564444816587
+      },
+      "status": "pass",
+      "seconds": 0.7421505451202393,
+      "fold_pinballs": [
+        0.015886674362787224,
+        0.015823255125559155,
+        0.03234870902032313
+      ],
+      "mean_pinball": 0.021352879502889832,
+      "error": null,
+      "mlflow_run_id": "8ab1cd99d8424c348b5e254f3857a6a4"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 17,
+      "hyperparams": {
+        "alpha": 0.017491253765053835
+      },
+      "status": "pass",
+      "seconds": 0.5925726890563965,
+      "fold_pinballs": [
+        0.015913403655225634,
+        0.015819782952539982,
+        0.03228506483699008
+      ],
+      "mean_pinball": 0.021339417148251896,
+      "error": null,
+      "mlflow_run_id": "c6ea3f8bdb314c60a5e3971f1eb26ea5"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 18,
+      "hyperparams": {
+        "alpha": 0.3450150477998957
+      },
+      "status": "pass",
+      "seconds": 0.9179897308349609,
+      "fold_pinballs": [
+        0.015901348302787676,
+        0.015821163942376853,
+        0.03231520417894241
+      ],
+      "mean_pinball": 0.021345905474702314,
+      "error": null,
+      "mlflow_run_id": "226c4130a27d45f191147e07ee298569"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 16,
+      "hyperparams": {
+        "alpha": 46.19983847110809
+      },
+      "status": "pass",
+      "seconds": 1.1656010150909424,
+      "fold_pinballs": [
+        0.015780336617994134,
+        0.01573134480014439,
+        0.032126349114875066
+      ],
+      "mean_pinball": 0.021212676844337863,
+      "error": null,
+      "mlflow_run_id": "b518d9b895834edaa37c94415ed9eef0"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "ridge",
+      "trial_idx": 19,
+      "hyperparams": {
+        "alpha": 0.5759745452624878
+      },
+      "status": "pass",
+      "seconds": 0.7169754505157471,
+      "fold_pinballs": [
+        0.015892943287876837,
+        0.01582182302479948,
+        0.03233411788111565
+      ],
+      "mean_pinball": 0.021349628064597323,
+      "error": null,
+      "mlflow_run_id": "b81efe8958be446f95a1478e4358979b"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 16,
+      "hyperparams": {
+        "taus": [
+          0.05,
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "status": "pass",
+      "seconds": 793.3234159946442,
+      "fold_pinballs": [
+        0.015015301564595828,
+        0.015832254302098038,
+        0.03152184342449089
+      ],
+      "mean_pinball": 0.020789799763728252,
+      "error": null,
+      "mlflow_run_id": "9342ed2969824e608a312e00412a2fc6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 14,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1492.9783763885498,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "d936a8d1878046559e7e952c8a1243b6"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 17,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1079.2904889583588,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "10626b65579e4a4890d84161fd7a879e"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 19,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 998.4393603801727,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "45101a2fa4fc4f4d9d8c68f3a45b37ad"
+    },
+    {
+      "family": "F01",
+      "level": "L1",
+      "model_id": "composite_quantile_regression",
+      "trial_idx": 18,
+      "hyperparams": {
+        "taus": [
+          0.02,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25
+        ]
+      },
+      "status": "pass",
+      "seconds": 1140.723444223404,
+      "fold_pinballs": [
+        0.014965969360756996,
+        0.015727336842835237,
+        0.03138211009740493
+      ],
+      "mean_pinball": 0.020691805433665722,
+      "error": null,
+      "mlflow_run_id": "a8d666f41e294082962f6cabd7122a41"
+    }
+  ],
+  "_baseline_B3/F01/L1": 0.0195445193758531
+}
