@@ -24,13 +24,20 @@ class RegisteredSpace:
     n_hyperparams: int    # برای بودجه‌ی trial (بند 7.6.2) — نه لزوماً len(space)، چون
                            # بعضی پارامترها شرطی‌اند (مثلاً degree فقط وقتی kernel=poly)
     fn: SpaceFn
+    #: کاردینالیتی واقعی فضا اگر **متناهی و کوچک** است (تعداد ترکیب ممکن)، وگرنه
+    #: ``None`` (فضای پیوسته/بزرگ — جدول 7.6.2 معمولی حاکم است). بند 7.6.2 بازنویسی‌شده
+    #: (ردیف ۳۷ decision_log): بودجه هیچ‌وقت نباید از کاردینالیتی واقعی بیشتر باشد —
+    #: `composite_quantile_regression` با کاردینالیتی ۲ ولی بودجه‌ی ۲۵، ۷.۳ ساعت
+    #: محاسبه‌ی عیناً تکراری بود.
+    cardinality: int | None = None
 
 
 #: رجیستری فضاها — خالی شروع می‌شود، هر خانواده هنگام پیاده‌سازی پر می‌کند.
 SPACES: dict[str, RegisteredSpace] = {}
 
 
-def register_space(model_id: str, version: int, n_hyperparams: int) -> Callable[[SpaceFn], SpaceFn]:
+def register_space(model_id: str, version: int, n_hyperparams: int,
+                   cardinality: int | None = None) -> Callable[[SpaceFn], SpaceFn]:
     """دکوراتور ثبت. مثال::
 
         @register_space("lightgbm_quantile", version=1, n_hyperparams=8)
@@ -40,6 +47,10 @@ def register_space(model_id: str, version: int, n_hyperparams: int) -> Callable[
                 "min_child_samples": trial.suggest_int("min_child_samples", 5, 200, log=True),
                 ...
             }
+
+    ``cardinality`` را فقط برای فضاهای **متناهی و کوچک** بدهید (مثلاً یک هایپرپارامتر
+    دسته‌ای با ۲-۳ گزینه، یا صفر هایپرپارامتر آزاد ⇒ ``cardinality=1``). برای فضای
+    پیوسته (اکثر مدل‌ها) خالی بگذارید — پیش‌فرض ``None`` یعنی «کِران‌نکردن».
     """
     def deco(fn: SpaceFn) -> SpaceFn:
         prev = SPACES.get(model_id)
@@ -48,7 +59,7 @@ def register_space(model_id: str, version: int, n_hyperparams: int) -> Callable[
                 f"{model_id}: نسخه‌ی {version} باید بزرگ‌تر از نسخه‌ی ثبت‌شده‌ی قبلی "
                 f"({prev.version}) باشد — بند 7.6.3 تغییر فضا را نسخه‌بندی می‌خواهد"
             )
-        SPACES[model_id] = RegisteredSpace(model_id, version, n_hyperparams, fn)
+        SPACES[model_id] = RegisteredSpace(model_id, version, n_hyperparams, fn, cardinality)
         return fn
     return deco
 
@@ -88,3 +99,28 @@ def trial_budget(n_hyperparams: int, stage: str) -> int:
         if n_hyperparams <= cap:
             return budgets[stage]
     raise AssertionError("unreachable — آخرین سقف جدول بی‌نهایت است")
+
+
+def effective_budget(model_id: str, stage: str) -> int:
+    """بند 7.6.2 بازنویسی‌شده (ردیف ۳۷ decision_log): ``min(جدول بالا, کاردینالیتی)``.
+
+    اگر فضا کاردینالیتی ثبت‌شده نداشته باشد (اکثر مدل‌ها — پیوسته/بزرگ)، همان
+    ``trial_budget`` معمولی برمی‌گردد. اگر داشته باشد (مثل فضای ۲-حالته‌ی
+    ``composite_quantile_regression``)، بودجه هرگز از کاردینالیتی بیشتر نمی‌شود —
+    نمونه‌گیری تصادفی از یک فضای ۲-عضوی ۲۵ بار، فقط تکرار عیناً همان دو نتیجه است.
+    """
+    space = SPACES.get(model_id)
+    table_budget = trial_budget(space.n_hyperparams if space else 0, stage)
+    if space is None or space.cardinality is None:
+        return table_budget
+    return min(table_budget, space.cardinality)
+
+
+def recommended_sampler(model_id: str, seed: int) -> optuna.samplers.BaseSampler:
+    """فضای متناهی/کوچک ⇒ **شمارش کامل** (``BruteForceSampler``) به‌جای TPE — نمونه‌گیری
+    تصادفی روی فضای ۲-۳ عضوی بی‌معناست و فقط همان چند حالت را عیناً تکرار می‌کند
+    (بند 7.6.2 بازنویسی‌شده). فضای پیوسته/بزرگ همچنان TPE می‌گیرد (پیش‌فرض S2)."""
+    space = SPACES.get(model_id)
+    if space is not None and space.cardinality is not None and space.cardinality <= 30:
+        return optuna.samplers.BruteForceSampler(seed=seed)
+    return optuna.samplers.TPESampler(seed=seed)

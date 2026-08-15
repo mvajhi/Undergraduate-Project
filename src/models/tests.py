@@ -431,6 +431,101 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_effective_budget_caps_to_cardinality() -> tuple[bool, str]:
+    """بند 7.6.2 بازنویسی‌شده (ردیف ۳۷ decision_log): بودجه هرگز نباید از کاردینالیتی
+    واقعی فضا بیشتر شود — ریشه‌ی ۷.۳ ساعت اتلاف در composite_quantile_regression."""
+    from src.models.spaces import SPACES, effective_budget, register_space, trial_budget
+
+    if "test_finite_dummy" not in SPACES:
+        @register_space("test_finite_dummy", version=1, n_hyperparams=1, cardinality=2)
+        def _space(trial):
+            return {"mode": trial.suggest_categorical("mode", ["a", "b"])}
+
+    b_finite = effective_budget("test_finite_dummy", "S2")
+    b_normal = effective_budget("ridge", "S2") if "ridge" in SPACES else trial_budget(1, "S2")
+    ok_capped = b_finite == 2  # نه ۲۵ جدول پیش‌فرض
+    ok_normal = b_normal == trial_budget(1, "S2")  # فضای بدون cardinality دست‌نخورده می‌ماند
+    return (ok_capped and ok_normal,
+           f"بودجه‌ی فضای ۲-حالته={b_finite} (باید=۲) · بودجه‌ی عادی دست‌نخورده={ok_normal}")
+
+
+def test_recommended_sampler_uses_bruteforce_for_finite_space() -> tuple[bool, str]:
+    """فضای کوچک‌متناهی باید BruteForceSampler بگیرد (شمارش کامل)، نه TPE — نمونه‌گیری
+    تصادفی از یک فضای ۲-عضوی فقط همان دو حالت را بارها عیناً تکرار می‌کند."""
+    import optuna
+
+    from src.models.spaces import SPACES, recommended_sampler, register_space
+
+    if "test_finite_dummy2" not in SPACES:
+        @register_space("test_finite_dummy2", version=1, n_hyperparams=1, cardinality=3)
+        def _space(trial):
+            return {"mode": trial.suggest_categorical("mode", ["a", "b", "c"])}
+
+    s_finite = recommended_sampler("test_finite_dummy2", seed=1)
+    s_continuous = recommended_sampler("ridge", seed=1) if "ridge" in SPACES else \
+        recommended_sampler("__unregistered__", seed=1)
+    ok_finite = isinstance(s_finite, optuna.samplers.BruteForceSampler)
+    ok_continuous = isinstance(s_continuous, optuna.samplers.TPESampler)
+    return (ok_finite and ok_continuous,
+           f"فضای متناهی→BruteForce={ok_finite} · فضای پیوسته/ثبت‌نشده→TPE={ok_continuous}")
+
+
+def test_s2_model_time_cap_stops_early() -> tuple[bool, str]:
+    """⚠️ **تست ضدبازگشت مستقیم برای اتلاف ۷.۳ ساعته.** با سقف زمانی مصنوعی خیلی کوچک،
+    ``_run_model_s2`` باید پیش از اتمام بودجه‌ی کامل trial متوقف شود و ``budget_capped``
+    را True کند — به‌جای ادامه‌ی بی‌قید تا آخر بودجه، مهم‌ نیست هر trial چقدر طول بکشد."""
+    import shutil
+    import tempfile
+    import time as time_mod
+
+    import numpy as np
+
+    from src.models import s2_runner
+    from src.models.registry import MODELS as MODEL_REGISTRY
+    from src.models.registry import ModelSpec, register
+    from src.models.spaces import SPACES, register_space
+
+    tmp_dir = Path(tempfile.mkdtemp())
+    original_dir = s2_runner.OPTUNA_STUDIES_DIR
+    original_cap = s2_runner.MODEL_TIME_CAP_SECONDS
+    s2_runner.OPTUNA_STUDIES_DIR = tmp_dir / "optuna_studies"
+    s2_runner.MODEL_TIME_CAP_SECONDS = 0.3  # هر trial مصنوعی ۰.۲ ثانیه می‌خوابد ⇒ ۱-۲ trial قبل از سقف
+    try:
+        if "test_slow_dummy" not in MODEL_REGISTRY:
+            register(ModelSpec(model_id="test_slow_dummy", family="F01", levels=("L1",),
+                               quantile_route="Q1", algorithm="pytest.SlowDummy"))
+        if "test_slow_dummy" not in SPACES:
+            @register_space("test_slow_dummy", version=1, n_hyperparams=1)
+            def _space(trial):
+                return {"alpha": trial.suggest_float("alpha", 0.1, 1.0)}
+
+        def slow_fit_predict(tr, te, tau, alpha=1.0, **hp):
+            time_mod.sleep(0.2)
+            return np.full(len(te), 0.1)
+
+        n = 20
+        df = pd.DataFrame({"rho": np.full(n, 0.1), "Res": np.full(n, 20.0),
+                          "Recv": np.full(n, 18.0),
+                          "date_gregorian": pd.date_range("2024-01-01", periods=n)})
+        train, test = df.iloc[:10], df.iloc[10:]
+        folds = [(train, test)] * 5
+        design_fn = lambda tr, te: (tr, te)  # noqa: E731
+
+        r = s2_runner._run_model_s2("test_slow_dummy", slow_fit_predict, design_fn, folds,
+                                    "F01", "L1", "snap", "cvhash", "src", seed=1)
+        # بودجه‌ی جدول برای ۱ هایپرپارامتر = ۲۵؛ با سقف ۰.۳ ثانیه و هر trial ~۱ ثانیه
+        # (۵ fold × ۰.۲s)، باید خیلی زودتر از ۲۵ متوقف شده باشد
+        ok_capped = r.budget_capped is True
+        ok_fewer = len(r.trial_history) < 25
+        return (ok_capped and ok_fewer,
+               f"budget_capped={r.budget_capped} · trial زده‌شده={len(r.trial_history)} (باید <۲۵)")
+    finally:
+        s2_runner.OPTUNA_STUDIES_DIR = original_dir
+        s2_runner.MODEL_TIME_CAP_SECONDS = original_cap
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        MODEL_REGISTRY.pop("test_slow_dummy", None)
+
+
 def test_operational_metrics_has_mandated_keys() -> tuple[bool, str]:
     """بند 7.7.2 معیارهای اجباری را فهرست کرده — این تست تضمین می‌کند
     `operational_metrics` هیچ‌کدام را جا نینداخته، و مقادیرشان درست‌اند."""
@@ -745,6 +840,9 @@ _ALL_TESTS = [
     test_card_writer_step13_calibration_on_real_data,
     test_operational_metrics_has_mandated_keys,
     test_all_operational_metrics_reach_mlflow,
+    test_effective_budget_caps_to_cardinality,
+    test_recommended_sampler_uses_bruteforce_for_finite_space,
+    test_s2_model_time_cap_stops_early,
 ]
 
 

@@ -43,6 +43,11 @@ PHASE7_DIR = REPORTS_DIR / "phase7"
 #: بند 7.3.1
 N_TRIALS = 20
 N_SCREENING_FOLDS = 3
+
+#: بند 7.3.3 بازنویسی‌شده (R1، ردیف ۳۷ decision_log) — سقف زمانی سخت هر trial. عبور از
+#: سقف وسط حلقه‌ی fold یعنی fold باقی‌مانده رد می‌شود و trial با تگ «timeout» ثبت
+#: می‌شود — به‌جای ادامه‌ی بی‌قید که کل صف را عقب می‌اندازد.
+TRIAL_TIME_CAP_SECONDS = 600
 S1_TAU = TUNING_TAU
 #: ۱۲ هسته‌ی سیستم — چند تا برای OS/بقیه‌ی کارها آزاد می‌ماند
 DEFAULT_N_JOBS = max(1, min(10, (os.cpu_count() or 4) - 2))
@@ -130,6 +135,11 @@ def _run_one_trial(job: TrialJob, fn: Callable, folds: list) -> TrialResult:
         try:
             fold_metrics = []
             for fold_idx, (tr, te) in enumerate(folds):
+                # بند 7.3.3 بازنویسی‌شده (R1) — سقف زمانی سخت هر trial؛ fold باقی‌مانده
+                # رد می‌شود تا یک مدل ذاتاً کند صف کل خانواده را عقب نیندازد
+                if time.time() - t0 > TRIAL_TIME_CAP_SECONDS:
+                    raise TimeoutError(
+                        f"trial از سقف {TRIAL_TIME_CAP_SECONDS}s گذشت (fold{fold_idx} شروع‌نشده)")
                 out = np.asarray(fn(tr, te, S1_TAU, **job.hyperparams), dtype=float)
                 if out.shape != (len(te),) or not np.all(np.isfinite(out)):
                     raise ValueError(f"شکل/مقدار نامعتبر در fold{fold_idx}: shape={out.shape}")

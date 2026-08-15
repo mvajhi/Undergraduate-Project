@@ -35,7 +35,7 @@ import pandas as pd  # noqa: E402
 from src.baselines import b3_empirical_quantile, operational_metrics
 from src.config import REPORTS_DIR, ROOT_DIR
 from src.models.axes import TUNING_TAU, RunConfig
-from src.models.spaces import SPACES, sample, trial_budget
+from src.models.spaces import SPACES, effective_budget, recommended_sampler, sample
 from src.models.tracking import aggregate_fold_metrics, log_metrics_dict, start_model_run
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -57,6 +57,14 @@ _STABILITY_MIN_FOLDS = 3
 _CONVERGENCE_TAIL_FRACTION = 0.25
 _CONVERGENCE_IMPROVEMENT_THRESHOLD = 0.01
 
+#: بند 7.3.2 بازنویسی‌شده (ردیف ۳۷ decision_log) — سقف زمانی سخت **کل تنظیم یک مدل**،
+#: مستقل از بودجه‌ی trial. ریشه‌ی این قاعده: composite_quantile_regression با بودجه‌ی
+#: «مجاز» ۲۵ trial، ۲۸٬۵۷۰ ثانیه (۷.۹ ساعت) گرفت چون هر trial خودش تا ~۲۰ دقیقه طول
+#: می‌کشید. عبور از سقف ⇒ توقف با بهترین تا آن لحظه + `budget_capped=True` در نتیجه،
+#: نه ادامه‌ی بی‌قید. عدد ۹۰ دقیقه: `doc/decisions/37-phase7-rescope.md` بند ۴ («سه کاری
+#: که همین امروز می‌شود کرد»).
+MODEL_TIME_CAP_SECONDS = 90 * 60
+
 
 @dataclass
 class ModelS2Result:
@@ -71,6 +79,9 @@ class ModelS2Result:
     seconds: float
     n_fail: int
     stable_top10pct_folds: int  # در چند از ۵ fold، بهترین پیکربندی در ۱۰٪ برتر همان fold هم بود
+    #: بند 7.3.2 بازنویسی‌شده — True یعنی سقف زمانی (MODEL_TIME_CAP_SECONDS) قبل از اتمام
+    #: بودجه‌ی trial رسید؛ نتیجه هنوز معتبر است (best-so-far) ولی «تنظیم کامل» نیست.
+    budget_capped: bool = False
 
 
 def _feature_set_label(quantreg: bool) -> str:
@@ -92,12 +103,13 @@ def _run_model_s2(model_id: str, fn: Callable, design_fn: Callable, folds: list,
     نمی‌روند و فقط باقیِ بودجه اجرا می‌شود.
     """
     n_hp = SPACES[model_id].n_hyperparams
-    n_trials = trial_budget(n_hp, "S2")
+    # بند 7.6.2 بازنویسی‌شده — کِران به کاردینالیتی واقعی فضا، نه فقط تعداد هایپرپارامتر
+    n_trials = effective_budget(model_id, "S2")
     feature_set = _feature_set_label(quantreg)
 
     study = optuna.create_study(
         study_name=f"{family}_{model_id}_S2", storage=study_storage_url(model_id),
-        direction="minimize", sampler=optuna.samplers.TPESampler(seed=seed), load_if_exists=True,
+        direction="minimize", sampler=recommended_sampler(model_id, seed), load_if_exists=True,
     )
     already_done = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
     n_remaining = max(0, n_trials - len(already_done))
@@ -105,11 +117,17 @@ def _run_model_s2(model_id: str, fn: Callable, design_fn: Callable, folds: list,
                                         for t in already_done]
     per_fold_pinballs: dict[int, list[float]] = {}  # trial_idx -> [pinball هر fold] — فقط trialهای این اجرا
     n_fail = 0
+    budget_capped = False
     t0 = time.time()
 
     designed_folds = [design_fn(tr, te) for tr, te in folds]  # یک‌بار برای کل study
 
     for _ in range(n_remaining):
+        # بند 7.3.2 بازنویسی‌شده — سقف زمانی سخت کل تنظیم این مدل، مستقل از بودجه‌ی
+        # trial. اینجا و نه فقط بعد از حلقه، چون trial بعدی ممکن است خودش ۲۰ دقیقه بگیرد.
+        if time.time() - t0 > MODEL_TIME_CAP_SECONDS:
+            budget_capped = True
+            break
         trial = study.ask()
         trial_idx = trial.number
         hp = sample(model_id, trial)
@@ -154,7 +172,7 @@ def _run_model_s2(model_id: str, fn: Callable, design_fn: Callable, folds: list,
     ok_trials = [h for h in history if np.isfinite(h[1])]
     if not ok_trials:
         return ModelS2Result(model_id, n_hp, n_trials, float("nan"), {}, [], history, False,
-                             time.time() - t0, n_fail, 0)
+                             time.time() - t0, n_fail, 0, budget_capped)
 
     best_idx, best_pb = min(ok_trials, key=lambda h: h[1])
     best_trial = next(t for t in study.trials if t.number == best_idx)
@@ -187,7 +205,8 @@ def _run_model_s2(model_id: str, fn: Callable, design_fn: Callable, folds: list,
             stable_count += 1
 
     return ModelS2Result(model_id, n_hp, n_trials, best_pb, best_trial.params,
-                         fold_pinballs_at_best, history, converged, time.time() - t0, n_fail, stable_count)
+                         fold_pinballs_at_best, history, converged, time.time() - t0, n_fail,
+                         stable_count, budget_capped)
 
 
 # ---------------------------------------------------------------------------
@@ -297,16 +316,18 @@ def _render_markdown(payload: dict, path, family: str, level: str) -> None:
         lines += [f"🎯 **مرجع — خط پایه‌ی فاز ۶ (B3) روی هر ۵ fold: pinball_mean = {baseline:.5f}**", ""]
 
     lines += [
-        "| مدل | بهترین pinball | trialها | همگرا (A6) | پایداری (۷.۶.۳) | شکست | زمان |",
-        "|---|---|---|---|---|---|---|",
+        # بند ۴ سند تصمیم ۳۷ («گزارش آگاه به هزینه») — ستون ساعت-هسته اجباری از این‌جا به بعد
+        "| مدل | بهترین pinball | trialها | همگرا (A6) | پایداری (۷.۶.۳) | شکست | زمان | ساعت-هسته |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     ranked = sorted(rows.items(), key=lambda kv: kv[1]["best_pinball"] if np.isfinite(kv[1]["best_pinball"]) else 1e9)
     for mid, r in ranked:
         mark = " 🎯" if baseline is not None and np.isfinite(r["best_pinball"]) and r["best_pinball"] < baseline else ""
+        cap = " ⏱️budget-capped" if r.get("budget_capped") else ""
         conv = "✅" if r["converged"] else "⚠️"
         lines.append(
-            f"| `{mid}`{mark} | **{r['best_pinball']:.5f}** | {r['n_trials']} | {conv} | "
-            f"{r['stable_top10pct_folds']}/5 | {r['n_fail']} | {r['seconds']:.0f}s |"
+            f"| `{mid}`{mark}{cap} | **{r['best_pinball']:.5f}** | {r['n_trials']} | {conv} | "
+            f"{r['stable_top10pct_folds']}/5 | {r['n_fail']} | {r['seconds']:.0f}s | {r['seconds']/3600:.2f}h |"
         )
     path.write_text("\n".join(lines) + "\n")
 

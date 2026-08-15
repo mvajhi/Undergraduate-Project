@@ -523,6 +523,13 @@ for _model_id, _route in _QUANTILE_ROUTES.items():
 # ---------------------------------------------------------------------------
 # فضای هایپرپارامتر — بند 7.10.2. هر تابع یک optuna.Trial می‌گیرد و دیکشنری
 # هایپرپارامتر متناظر با امضای fit_predict همان مدل برمی‌گرداند.
+#
+# ⚠️ کاردینالیتی: ۶ مدل زیر (ols, quantile_regression, composite_quantile_regression,
+# glm_gamma, beta_regression, hurdle) با ``cardinality`` برچسب خورده‌اند — پس از این
+# که اجرای واقعی S2 نشان داد بودجه‌ی ۲۵-trial روی فضای ۲-حالته‌ی
+# composite_quantile_regression هر حالت را ~۱۲ بار عیناً تکرار کرد (۷.۳ ساعت اتلاف،
+# ردیف ۳۷ decision_log). این برچسب فقط آینده‌نگر است — S2 خ۱ خودش دوباره اجرا نمی‌شود؛
+# افزودنش اینجا فقط ثبت درست کاردینالیتی برای ابزارهای گزارشی (fANOVA/`spaces.py`) است.
 # ---------------------------------------------------------------------------
 
 #: عضو #۱۴ (GLM Binomial) طبق بند 7.10.1 «رد‌شده — ولی یک‌بار اجرا و گزارش می‌شود» است؛
@@ -531,7 +538,7 @@ for _model_id, _route in _QUANTILE_ROUTES.items():
 TUNING_EXCLUDED = frozenset({"glm_binomial"})
 
 
-@register_space("ols", version=1, n_hyperparams=0)
+@register_space("ols", version=1, n_hyperparams=0, cardinality=1)
 def _space_ols(trial: optuna.Trial) -> dict:
     return {}  # بدون هایپرپارامتر — فقط به‌عنوان مرجع مطلق در جدول می‌ماند (بند 7.10.1 عضو ۱)
 
@@ -572,7 +579,7 @@ def _space_group_lasso(trial: optuna.Trial) -> dict:
     }
 
 
-@register_space("quantile_regression", version=1, n_hyperparams=0)
+@register_space("quantile_regression", version=1, n_hyperparams=0, cardinality=1)
 def _space_quantile_regression(trial: optuna.Trial) -> dict:
     """`q`=τ در سطح run ثابت می‌شود، نه هایپرپارامتر Optuna. statsmodels.QuantReg بدون
     منظم‌سازی هیچ هایپرپارامتر آزاد دیگری ندارد (سطر «QuantReg» جدول 7.10.2 عملاً برای
@@ -585,7 +592,7 @@ def _space_l1_quantile_regression(trial: optuna.Trial) -> dict:
     return {"alpha": trial.suggest_float("alpha", 1e-5, 1e0, log=True)}
 
 
-@register_space("composite_quantile_regression", version=1, n_hyperparams=1)
+@register_space("composite_quantile_regression", version=1, n_hyperparams=1, cardinality=2)
 def _space_composite_quantile_regression(trial: optuna.Trial) -> dict:
     """محور تنظیم این مدل مجموعه‌ی τهای هم‌زمان‌برازش‌شده است، نه یک عدد پیوسته
     (بند 7.10.1 عضو ۹) — یک هایپرپارامتر دسته‌ای طبق جدول 7.10.2."""
@@ -600,7 +607,7 @@ def _space_expectile_regression(trial: optuna.Trial) -> dict:
     return {"alpha": trial.suggest_float("alpha", 1e-6, 1e1, log=True)}
 
 
-@register_space("glm_gamma", version=1, n_hyperparams=1)
+@register_space("glm_gamma", version=1, n_hyperparams=1, cardinality=2)
 def _space_glm_gamma(trial: optuna.Trial) -> dict:
     """⚠️ **`inverse` از جدول 7.10.2 عمداً حذف شده — بند 7.27 (مدل‌های ناسازگار).**
     یافته‌ی S1: با پیوند InversePower، $\\eta=X\\beta$ می‌تواند از صفر عبور کند و
@@ -617,12 +624,12 @@ def _space_glm_tweedie(trial: optuna.Trial) -> dict:
     return {"power": trial.suggest_float("power", 1.01, 1.99)}
 
 
-@register_space("beta_regression", version=1, n_hyperparams=1)
+@register_space("beta_regression", version=1, n_hyperparams=1, cardinality=3)
 def _space_beta_regression(trial: optuna.Trial) -> dict:
     return {"link_mu": trial.suggest_categorical("link_mu", ["logit", "probit", "cloglog"])}
 
 
-@register_space("hurdle", version=1, n_hyperparams=2)
+@register_space("hurdle", version=1, n_hyperparams=2, cardinality=6)
 def _space_hurdle(trial: optuna.Trial) -> dict:
     return {
         "part1_link": trial.suggest_categorical("part1_link", ["logit", "probit"]),
