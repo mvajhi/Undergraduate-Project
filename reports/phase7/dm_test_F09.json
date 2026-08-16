@@ -1,0 +1,22 @@
+[
+  {
+    "model":"lightgbm_lss_beta",
+    "reference":"B3",
+    "pinball_model":0.0153466708,
+    "pinball_reference":0.0133468493,
+    "delta_pinball":0.0019998214,
+    "dm_stat":9.9959178578,
+    "p_value":0.0,
+    "significant_at_0.05":false
+  },
+  {
+    "model":"lightgbm_lss_beta",
+    "reference":"B6",
+    "pinball_model":0.0153466708,
+    "pinball_reference":0.0150209744,
+    "delta_pinball":0.0003256963,
+    "dm_stat":1.458846924,
+    "p_value":0.1446072442,
+    "significant_at_0.05":false
+  }
+]

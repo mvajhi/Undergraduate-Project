@@ -484,6 +484,33 @@ def test_f11_res_weighted_fit_reduces_real_newsvendor_cost() -> tuple[bool, str]
     return ok, f"هزینه‌ی بدون‌وزن={cost_unweighted:.2f} · هزینه‌ی Res-وزن‌دار={cost_weighted:.2f} · کمتر={ok}"
 
 
+def test_f09_lightgbm_lss_beta_on_real_data() -> tuple[bool, str]:
+    """مدل توزیعی خ۹ (LightGBM دوسری برای μ/σ → کوانتایل Beta) باید روی داده‌ی واقعی
+    خروجی معتبر بدهد؛ φ برآوردی هرگز نباید به سقوط امن (φ سراسری) کاملاً وابسته باشد."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import numpy as np
+    import pandas as pd
+
+    from src.cv import DATE_COL, load_cv_folds
+    from src.models.families.f09_distributional import fit_predict_lightgbm_lss_beta
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    folds, _ = load_cv_folds()
+    tr_mask, te_mask = folds[0].masks(df[DATE_COL])
+    train, test = df.loc[tr_mask], df.loc[te_mask]
+
+    out = np.asarray(fit_predict_lightgbm_lss_beta(train, test, 0.20))
+    ok_shape = out.shape == (len(test),)
+    ok_finite = np.all(np.isfinite(out))
+    ok_range = out.min() >= 0.0 and out.max() <= 1.0
+    return (ok_shape and ok_finite and ok_range,
+           f"شکل={ok_shape} · متناهی={ok_finite} · داخل [0,1]={ok_range}")
+
+
 def test_f02_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۳ عضو کوتاه‌فهرست‌شده‌ی F02 (اسپرینت C) باید algorithm غیرخالی و فضای
     هایپرپارامتر ثبت‌شده داشته باشند."""
@@ -1031,6 +1058,7 @@ _ALL_TESTS = [
     test_significance_run_significance_is_family_agnostic,
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
+    test_f09_lightgbm_lss_beta_on_real_data,
 ]
 
 

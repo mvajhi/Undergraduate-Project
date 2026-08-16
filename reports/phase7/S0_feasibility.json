@@ -451,6 +451,34 @@
     "seconds": 7.076573133468628,
     "status": "pass"
   },
+  "F09/L1/lightgbm_lss_beta": {
+    "error": null,
+    "family": "F09",
+    "level": "L1",
+    "metrics": {
+      "MAE_portions": 6.23448275862069,
+      "MAE_rho": 0.04619116807604067,
+      "R2_rho": 0.11706892101167854,
+      "RMSE_portions": 11.632989159352347,
+      "RMSE_rho": 0.0760785877961369,
+      "coverage": 0.36666666666666664,
+      "coverage_gap": 0.16666666666666663,
+      "n": 870,
+      "pinball": 0.017814601728959007,
+      "pinball_portions": 2.1417040353625025,
+      "shortage_portions": 1183.0,
+      "shortage_rate": 0.23448275862068965,
+      "surplus_portions": 4241.0,
+      "waste_reduction_pct": 0.7574908508691675
+    },
+    "mlflow_run_id": "452e40638a2b456b80c364a33e46a988",
+    "model_id": "lightgbm_lss_beta",
+    "output_max": 0.3883203696448302,
+    "output_mean": 0.08929764970189016,
+    "output_min": 0.012251187762400285,
+    "seconds": 0.8408386707305908,
+    "status": "pass"
+  },
   "F11/L1/erm_newsvendor": {
     "error": null,
     "family": "F11",
