@@ -1,0 +1,11 @@
+{
+  "pinball_reconciled":0.0151163675,
+  "pinball_B3":0.0133468493,
+  "pinball_lightgbm_quantile":0.0121075669,
+  "delta_vs_B3":0.0017695181,
+  "delta_vs_B3_ci_lo":0.0009194025,
+  "delta_vs_B3_ci_hi":0.0029944623,
+  "beats_B3_significant":false,
+  "n_raw":3880,
+  "n_eff":331.9786096257
+}

@@ -838,6 +838,31 @@ def test_f03_l3_series_no_gaps_and_calendar_never_nan() -> tuple[bool, str]:
            f"هر دو وعده حاضر={ok_meals} · " + " · ".join(f"{k}={v}" for k, v in checks.items()))
 
 
+def test_f03_reconciled_ma_honors_l1_contract() -> tuple[bool, str]:
+    """بند 7.24: ``fit_predict_l3_reconciled_ma`` باید قرارداد یکسان L1 را رعایت کند
+    (شکل=len(test)، متناهی، داخل [۰,۱]) — برخلاف بقیه‌ی ماژول خ۳ که سطح L3 دارند،
+    این تابع مستقیماً با ``model_comparison.py`` سازگار است."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import numpy as np
+    import pandas as pd
+
+    from src.cv import DATE_COL, load_cv_folds
+    from src.models.families.f03_reconciled import fit_predict_l3_reconciled_ma
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    fold_meta, _ = load_cv_folds()
+    m1, m2 = fold_meta[0].masks(df[DATE_COL])
+    train, test = df.loc[m1], df.loc[m2]
+
+    pred = np.asarray(fit_predict_l3_reconciled_ma(train, test, 0.20), dtype=float)
+    ok = pred.shape == (len(test),) and np.all(np.isfinite(pred)) and pred.min() >= 0.0 and pred.max() <= 1.0
+    return ok, f"شکل/متناهی/بازه‌ی [۰,۱]={ok}"
+
+
 def test_f03_full_classical_roster_and_city_filter() -> tuple[bool, str]:
     """درخواست صریح کاربر (۲۰۲۶-۰۸-۱۶): تمام مدل‌های کلاسیک خ۳ باید ثبت شده باشند
     (AR/MA/ARMA/ARIMA/SARIMA/SARIMAX/auto_arima/ETS/Theta/STL/MSTL/Prophet = ۱۲ مدل؛
@@ -1468,6 +1493,7 @@ _ALL_TESTS = [
     test_f03_models_fit_predict_on_real_fold,
     test_f04_l4_panel_shape_and_dfm_output_bounded,
     test_f03_full_classical_roster_and_city_filter,
+    test_f03_reconciled_ma_honors_l1_contract,
     test_significance_run_significance_is_family_agnostic,
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
