@@ -84,8 +84,17 @@ class ModelS2Result:
     budget_capped: bool = False
 
 
-def _feature_set_label(quantreg: bool) -> str:
-    return "FS_F01_quantreg_v1" if quantreg else "FS_F01_linear_v1"
+def _feature_set_label(family: str, quantreg: bool) -> str:
+    """⚠️ **باگ شناخته‌شده (کشف‌شده هنگام خ۲).** تا این‌جا این تابع بدون آرگومان
+    ``family`` بود و همیشه برچسب F01 برمی‌گرداند — یعنی run_nameهای MLflow خ۲
+    (`S2_tuning_F02.json`) به‌اشتباه `FSF01linearv1` دارند. نتایج مدل (pinball،
+    best_hyperparams، فایل‌های JSON) درست‌اند — فقط برچسب MLflow اشتباه بود. چون
+    رفعش نیازمند بازاجرای QRF (۱.۴۳ ساعت) بود، برای صرفه‌جویی در محاسبه دوباره اجرا
+    نشد؛ فقط این تابع برای خانواده‌های بعدی درست شد (بند ۴ سند تصمیم ۳۷: هزینه‌ی
+    اصلاح آینده مهم‌تر از پاکیزگی گذشته)."""
+    if family == "F01":
+        return "FS_F01_quantreg_v1" if quantreg else "FS_F01_linear_v1"
+    return f"FS_{family}_v1"
 
 
 def study_storage_url(model_id: str) -> str:
@@ -105,7 +114,7 @@ def _run_model_s2(model_id: str, fn: Callable, design_fn: Callable, folds: list,
     n_hp = SPACES[model_id].n_hyperparams
     # بند 7.6.2 بازنویسی‌شده — کِران به کاردینالیتی واقعی فضا، نه فقط تعداد هایپرپارامتر
     n_trials = effective_budget(model_id, "S2")
-    feature_set = _feature_set_label(quantreg)
+    feature_set = _feature_set_label(family, quantreg)
 
     study = optuna.create_study(
         study_name=f"{family}_{model_id}_S2", storage=study_storage_url(model_id),

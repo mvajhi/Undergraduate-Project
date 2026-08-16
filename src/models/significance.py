@@ -64,15 +64,16 @@ def model_row_losses(model_id: str, family: str, folds: list, tau: float) -> np.
     return pinball_loss(oof["actual"].to_numpy(), oof["pred_q"].to_numpy(), tau)
 
 
-def run_f01_significance(tau: float = TUNING_TAU) -> pd.DataFrame:
-    """برای هر برنده‌ی خ۱: DM-test در برابر B3 **و** B6 روی همان ۵ fold رسمی."""
+def run_significance(family: str, model_ids: tuple[str, ...], tau: float = TUNING_TAU) -> pd.DataFrame:
+    """برای هر مدل: DM-test در برابر B3 **و** B6 روی همان ۵ fold رسمی — عمومی، برای هر
+    خانواده (نه فقط خ۱)."""
     folds = _load_official_folds()
     losses_b3 = baseline_row_losses(folds, tau, "B3")
     losses_b6 = baseline_row_losses(folds, tau, "B6")
 
     rows = []
-    for mid in F01_WINNERS:
-        losses_m = model_row_losses(mid, "F01", folds, tau)
+    for mid in model_ids:
+        losses_m = model_row_losses(mid, family, folds, tau)
         for ref_name, losses_ref in (("B3", losses_b3), ("B6", losses_b6)):
             dm, p = diebold_mariano(losses_m, losses_ref)
             rows.append({
@@ -86,19 +87,23 @@ def run_f01_significance(tau: float = TUNING_TAU) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def render_report(df: pd.DataFrame, tau: float) -> str:
+def run_f01_significance(tau: float = TUNING_TAU) -> pd.DataFrame:
+    return run_significance("F01", F01_WINNERS, tau)
+
+
+def render_report(df: pd.DataFrame, tau: float, family: str = "F01") -> str:
     lines = [
-        "# آزمون معناداری S2 خ۱ — Diebold-Mariano در برابر B3 و B6",
+        f"# آزمون معناداری S2 {family} — Diebold-Mariano در برابر B3 و B6",
         "",
-        f"> اسپرینت A، بند ۱ سند تصمیم `doc/decisions/37-phase7-rescope.md`. τ={tau}، هر ۵ "
+        f"> اسپرینت A/C، بند ۱ سند تصمیم `doc/decisions/37-phase7-rescope.md`. τ={tau}، هر ۵ "
         "fold رسمی (`cv_folds.json`)، زیان **هر ردیف** (نه میانگین fold) — بند ۶.۶.",
         "",
-        "⚠️ **وزن‌دهی pinball اینجا با `S2_tuning_F01.md` فرق دارد و عمدی است.** جدول‌های S2 "
-        "میانگین pinball را با **وزن برابر برای هر fold** گزارش می‌کنند (B3=۰.۰۱۵۹۰) — "
+        f"⚠️ **وزن‌دهی pinball اینجا با `S2_tuning_{family}.md` فرق دارد و عمدی است.** "
+        "جدول‌های S2 میانگین pinball را با **وزن برابر برای هر fold** گزارش می‌کنند — "
         "fold۲ فقط ۱۸۵ ردیف دارد (بازه‌ی شکاف رمضان) ولی وزن کامل می‌گیرد و میانگین را بالا "
-        "می‌کشد (pinball آن fold به‌تنهایی ۰.۰۲۸۶). آزمون DM اما به یک بردار زیان **تک‌ردیفی** "
-        "نیاز دارد، پس اینجا همه‌ی ۳٬۸۸۰ ردیف با وزن برابر تجمیع شده‌اند (B3=۰.۰۱۳۳۵) — عدد "
-        "پایین‌تر، نه خطا، فقط سؤال متفاوت («میانگین هر ردیف» به‌جای «میانگین هر fold»).",
+        "می‌کشد. آزمون DM اما به یک بردار زیان **تک‌ردیفی** نیاز دارد، پس اینجا همه‌ی "
+        "۳٬۸۸۰ ردیف با وزن برابر تجمیع شده‌اند — عدد B3/B6 پایین‌تر از S2_tuning است، "
+        "نه خطا، فقط سؤال متفاوت («میانگین هر ردیف» به‌جای «میانگین هر fold»).",
         "",
         "| مدل | مرجع | pinball مدل | pinball مرجع | Δ | آماره‌ی DM | p-value | معنادار (۰.۰۵)؟ |",
         "|---|---|---|---|---|---|---|---|",
@@ -117,30 +122,27 @@ def render_report(df: pd.DataFrame, tau: float) -> str:
         "",
         f"**نتیجه: {n_sig} از {len(df)} مقایسه معنادار (p<۰.۰۵) به‌نفع مدل بود.**",
         "",
-        f"- در برابر **B3**: {int(vs_b3['significant_at_0.05'].sum())}/{len(vs_b3)} معنادار "
-        "— یعنی ادعای «سه مدل B3 را بردند» (یافته‌ی ۷/۱۱ doc/progress) با DM-test **تأیید "
-        "نشد**؛ اختلاف در حد نویز آماری است.",
+        f"- در برابر **B3**: {int(vs_b3['significant_at_0.05'].sum())}/{len(vs_b3)} معنادار.",
         f"- در برابر **B6**: {int(vs_b6['significant_at_0.05'].sum())}/{len(vs_b6)} معنادار "
-        "— ولی نه چون مدل‌های خطی قوی‌اند: **B6 خودش از B3 به‌وضوح ضعیف‌تر بود** "
-        f"(B6={vs_b6['pinball_reference'].iloc[0]:.5f} در برابر B3="
-        f"{vs_b3['pinball_reference'].iloc[0]:.5f})، برخلاف انتظار سند تصمیم ۳۷ "
-        "(بند ۱-۴، F59/F61) که B6 را «رقیب جدی» پیش‌بینی کرده بود.",
+        f"(B6 خودش pinball={vs_b6['pinball_reference'].iloc[0]:.5f} در برابر B3="
+        f"{vs_b3['pinball_reference'].iloc[0]:.5f} دارد — قبل از تفسیر برد در برابر B6، "
+        "این عدد را با B3 مقایسه کنید).",
     ]
     return "\n".join(lines)
 
 
-def main() -> None:
+def main(family: str = "F01", model_ids: tuple[str, ...] = F01_WINNERS) -> None:
     from src.config import REPORTS_DIR, set_global_seed
 
     set_global_seed()
-    df = run_f01_significance()
-    report = render_report(df, TUNING_TAU)
+    df = run_significance(family, model_ids)
+    report = render_report(df, TUNING_TAU, family)
     out_dir = REPORTS_DIR / "phase7"
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "dm_test_F01.md").write_text(report + "\n")
-    df.to_json(out_dir / "dm_test_F01.json", orient="records", indent=2, force_ascii=False)
+    (out_dir / f"dm_test_{family}.md").write_text(report + "\n")
+    df.to_json(out_dir / f"dm_test_{family}.json", orient="records", indent=2, force_ascii=False)
     print(report)
-    print(f"\nذخیره شد در {out_dir / 'dm_test_F01.md'}")
+    print(f"\nذخیره شد در {out_dir / f'dm_test_{family}.md'}")
 
 
 if __name__ == "__main__":

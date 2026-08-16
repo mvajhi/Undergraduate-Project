@@ -473,6 +473,28 @@ def test_f02_models_fit_predict_on_real_data() -> tuple[bool, str]:
     return all(results.values()), " · ".join(f"{k}={v}" for k, v in results.items())
 
 
+def test_significance_run_significance_is_family_agnostic() -> tuple[bool, str]:
+    """``run_significance`` باید برای هر خانواده کار کند (نه فقط F01 هاردکدشده) — روی
+    نتایج واقعی F02 اگر موجود باشد."""
+    from src.models import card_writer, significance
+
+    json_path = card_writer.PHASE7_DIR / "S2_tuning_F02.json"
+    if not json_path.exists():
+        return True, "رد شد (S2_tuning_F02.json هنوز موجود نیست) — نه شکست"
+    import json
+    payload = json.loads(json_path.read_text())
+    model_ids = tuple(m for m in ("lightgbm_quantile", "catboost_quantile", "qrf")
+                      if payload.get(m, {}).get("n_trials", 0) > 0)
+    if not model_ids:
+        return True, "رد شد (هنوز نتیجه‌ی S2 هیچ مدل F02 نیست) — نه شکست"
+
+    df = significance.run_significance("F02", model_ids)
+    ok_shape = len(df) == len(model_ids) * 2
+    report = significance.render_report(df, 0.20, "F02")
+    ok_report = "F02" in report and "S2_tuning_F02" in report
+    return ok_shape and ok_report, f"شکل={ok_shape} ({len(df)} ردیف) · گزارش سالم={ok_report}"
+
+
 def test_axis_screening_weighting_axis_end_to_end() -> tuple[bool, str]:
     """اسپرینت A، بند 7.9.1 بازنویسی‌شده: پیمایش محور «وزن‌دهی» با هر دو کاوشگر باید
     روی داده‌ی واقعی L1 کامل اجرا شود و خروجی سازگار با قرارداد δ بدهد — سبک‌ترین محور
@@ -953,6 +975,7 @@ _ALL_TESTS = [
     test_axis_screening_weighting_axis_end_to_end,
     test_f02_all_specs_have_algorithm,
     test_f02_models_fit_predict_on_real_data,
+    test_significance_run_significance_is_family_agnostic,
 ]
 
 
