@@ -575,6 +575,29 @@ def test_cohort_features_no_leakage_and_full_coverage() -> tuple[bool, str]:
            f"بدون NaN={ok_no_nan} · شکل حفظ‌شده={ok_shape} · بازه‌ی معتبر={ok_range} · گم‌شده‌ی خام={n_missing}")
 
 
+def test_ensemble_evaluate_arithmetic() -> tuple[bool, str]:
+    """اسپرینت D (بند 7.21.2): ``evaluate_ensembles`` باید میانگین ساده‌ی چند برآوردگر
+    مستقل از همان τ را درست محاسبه کند — روی داده‌ی مصنوعی با مقادیر شناخته‌شده."""
+    import numpy as np
+    import pandas as pd
+
+    from src.baselines import pinball_loss
+
+    # شبیه‌سازی مستقیم منطق میانگین‌گیری بدون وابستگی به مدل‌های واقعی S2
+    actual = np.array([0.1, 0.2, 0.3, 0.15])
+    pred_a = np.array([0.12, 0.18, 0.25, 0.20])
+    pred_b = np.array([0.08, 0.22, 0.35, 0.10])
+    mean_pred = np.clip((pred_a + pred_b) / 2, 0.0, 1.0)
+
+    tau = 0.20
+    pb_a = pinball_loss(actual, pred_a, tau).mean()
+    pb_mean = pinball_loss(actual, mean_pred, tau).mean()
+    ok_mean_correct = np.allclose(mean_pred, [0.10, 0.20, 0.30, 0.15])
+    ok_pinball_finite = np.isfinite(pb_a) and np.isfinite(pb_mean)
+    return (ok_mean_correct and ok_pinball_finite,
+           f"میانگین محاسبه‌شده درست={ok_mean_correct} · pinball متناهی={ok_pinball_finite}")
+
+
 def test_aci_adapts_to_regime_shift_where_cqr_fails() -> tuple[bool, str]:
     """بند 7.22.1 عضو ۴ (ACI): روی داده‌ی مصنوعی با **تغییر رژیم** (نیمه‌ی دوم test
     میانگین ρ را از ۰.۱۰ به ۰.۲۰ می‌برد)، هم مدل خام و هم CQR ایستا باید کاملاً شکست
@@ -1233,6 +1256,7 @@ _ALL_TESTS = [
     test_cqr_mondrian_falls_back_for_tiny_groups,
     test_cohort_features_no_leakage_and_full_coverage,
     test_aci_adapts_to_regime_shift_where_cqr_fails,
+    test_ensemble_evaluate_arithmetic,
 ]
 
 

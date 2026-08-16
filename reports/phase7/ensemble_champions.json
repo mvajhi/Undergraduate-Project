@@ -1,0 +1,44 @@
+[
+  {
+    "combo":"lightgbm_quantile",
+    "pinball":0.0122670391,
+    "coverage":0.2041237113,
+    "gap":0.0041237113,
+    "pinball_vs_B3":-0.0010798102
+  },
+  {
+    "combo":"catboost_quantile",
+    "pinball":0.0124277041,
+    "coverage":0.2043814433,
+    "gap":0.0043814433,
+    "pinball_vs_B3":-0.0009191453
+  },
+  {
+    "combo":"qrf",
+    "pinball":0.0127358022,
+    "coverage":0.2087628866,
+    "gap":0.0087628866,
+    "pinball_vs_B3":-0.0006110471
+  },
+  {
+    "combo":"knn_quantile",
+    "pinball":0.0131062955,
+    "coverage":0.1979381443,
+    "gap":-0.0020618557,
+    "pinball_vs_B3":-0.0002405539
+  },
+  {
+    "combo":"میانگین هر ۴",
+    "pinball":0.0123995387,
+    "coverage":0.1989690722,
+    "gap":-0.0010309278,
+    "pinball_vs_B3":-0.0009473106
+  },
+  {
+    "combo":"میانگین ۳ برتر (lightgbm_quantile, catboost_quantile, qrf)",
+    "pinball":0.0122946752,
+    "coverage":0.199742268,
+    "gap":-0.000257732,
+    "pinball_vs_B3":-0.0010521741
+  }
+]
