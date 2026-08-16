@@ -542,6 +542,34 @@ def test_f10_knn_quantile_beats_or_near_b3_on_real_fold() -> tuple[bool, str]:
            f"شکل={ok_shape} · متناهی={ok_finite} · pinball knn={pb_knn:.5f} در برابر B3={pb_b3:.5f}")
 
 
+def test_cohort_features_no_leakage_and_full_coverage() -> tuple[bool, str]:
+    """اسپرینت B (بند ۵ سند تصمیم ۳۷): فیچرهای کوهورت باید (۱) روی هر سلول L1 بدون
+    NaN باشند (F53: داده‌ی فردی ابرمجموعه است) و (۲) از ستون از-قبل-leakage-safe
+    (`person_expanding_norecv_rate`) بسازند — این تست فقط پوشش/سلامت را می‌آزماید؛
+    ایمنی خودِ ستون پایه در `person_features.py` (فاز ۵) تثبیت شده."""
+    import os
+
+    from src.features.cohort_features import PERSON_FEATURES_PATH
+
+    if not os.path.exists(PERSON_FEATURES_PATH):
+        return True, "رد شد (person_features_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import pandas as pd
+
+    from src.features.build import FEATURES_A_PATH
+    from src.features.cohort_features import COHORT_FEATURE_COLS, build_cohort_features, merge_cohort_onto_l1
+
+    l1 = pd.read_parquet(FEATURES_A_PATH)
+    cohort = build_cohort_features()
+    merged, n_missing = merge_cohort_onto_l1(l1, cohort)
+
+    ok_no_nan = not merged[COHORT_FEATURE_COLS].isna().any().any()
+    ok_shape = len(merged) == len(l1)
+    ok_range = (merged["cohort_norecv_mean"] >= 0).all() and (merged["cohort_norecv_mean"] <= 1).all()
+    return (ok_no_nan and ok_shape and ok_range,
+           f"بدون NaN={ok_no_nan} · شکل حفظ‌شده={ok_shape} · بازه‌ی معتبر={ok_range} · گم‌شده‌ی خام={n_missing}")
+
+
 def test_cqr_fixes_stationary_miscalibration() -> tuple[bool, str]:
     """بند 7.22 (CQR): روی داده‌ی مصنوعی **ایستا** با مدل عمداً بدکالیبره (بایاس ثابت
     +۰.۰۵)، CQR باید پوشش را به‌طور چشمگیر به سمت τ اسمی اصلاح کند — تست صحت ریاضی
@@ -1153,6 +1181,7 @@ _ALL_TESTS = [
     test_f10_knn_quantile_beats_or_near_b3_on_real_fold,
     test_cqr_fixes_stationary_miscalibration,
     test_cqr_mondrian_falls_back_for_tiny_groups,
+    test_cohort_features_no_leakage_and_full_coverage,
 ]
 
 
