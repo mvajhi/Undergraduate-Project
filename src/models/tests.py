@@ -542,6 +542,66 @@ def test_f10_knn_quantile_beats_or_near_b3_on_real_fold() -> tuple[bool, str]:
            f"شکل={ok_shape} · متناهی={ok_finite} · pinball knn={pb_knn:.5f} در برابر B3={pb_b3:.5f}")
 
 
+def test_cqr_fixes_stationary_miscalibration() -> tuple[bool, str]:
+    """بند 7.22 (CQR): روی داده‌ی مصنوعی **ایستا** با مدل عمداً بدکالیبره (بایاس ثابت
+    +۰.۰۵)، CQR باید پوشش را به‌طور چشمگیر به سمت τ اسمی اصلاح کند — تست صحت ریاضی
+    `conformal.py`، مستقل از این‌که روی داده‌ی واقعی (ناایستا) کمک می‌کند یا نه."""
+    import numpy as np
+    import pandas as pd
+
+    from src.models import conformal
+
+    rng = np.random.default_rng(0)
+    n = 2000
+    dates = pd.date_range("2024-01-01", periods=n)
+    rho = np.clip(rng.normal(0.1, 0.05, n), 0, 1)
+    df = pd.DataFrame({"date_gregorian": dates, "rho": rho})
+
+    def bad_fit(train, test, tau, bias=0.05, **hp):
+        return np.full(len(test), train["rho"].median() + bias)
+
+    train, test = df.iloc[:1600], df.iloc[1600:]
+    tau = 0.20
+    pred_before = bad_fit(train, test, tau)
+    cov_before = (test["rho"].to_numpy() <= pred_before).mean()
+
+    pred_after, corr = conformal.cqr_predict(bad_fit, train, test, tau, {}, group_col=None)
+    cov_after = (test["rho"].to_numpy() <= pred_after).mean()
+
+    ok_improved = abs(cov_after - tau) < abs(cov_before - tau) * 0.5  # حداقل نصف شکاف بسته شود
+    ok_correction_sign = corr["_global"] < 0  # مدل overcover می‌کرد ⇒ تصحیح باید منفی باشد
+    return (ok_improved and ok_correction_sign,
+           f"پوشش قبل={cov_before:.4f} · بعد={cov_after:.4f} (هدف=۰.۲۰) · بهبود≥نصف={ok_improved} · "
+           f"علامت تصحیح={corr['_global']:.4f} (باید منفی)={ok_correction_sign}")
+
+
+def test_cqr_mondrian_falls_back_for_tiny_groups() -> tuple[bool, str]:
+    """بند 7.22.3 تله‌ی ۲: گروهی با کمتر از _MIN_GROUP_CALIB نمونه در کالیبراسیون باید
+    به تصحیح سراسری سقوط کند، نه این‌که با نمونه‌ی ناکافی خودش را کالیبره کند."""
+    import numpy as np
+    import pandas as pd
+
+    from src.models import conformal
+
+    rng = np.random.default_rng(1)
+    n = 500
+    dates = pd.date_range("2024-01-01", periods=n)
+    df = pd.DataFrame({
+        "date_gregorian": dates,
+        "rho": np.clip(rng.normal(0.1, 0.05, n), 0, 1),
+        "grp": ["common"] * (n - 3) + ["rare"] * 3,  # گروه «rare» فقط ۳ نمونه دارد
+    })
+
+    def bad_fit(train, test, tau, bias=0.05, **hp):
+        return np.full(len(test), train["rho"].median() + bias)
+
+    train, test = df.iloc[:400], df.iloc[400:]
+    _, corrections = conformal.cqr_predict(bad_fit, train, test, 0.20, {}, group_col="grp")
+    rare_key = next((k for k in corrections if "rare" in str(k)), None)
+    ok = rare_key is not None and abs(corrections[rare_key] - corrections["_global"]) < 1e-9
+    return ok, f"تصحیح گروه کم‌نمونه={corrections.get(rare_key)} · تصحیح سراسری={corrections['_global']} · برابر={ok}"
+
+
 def test_f02_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۳ عضو کوتاه‌فهرست‌شده‌ی F02 (اسپرینت C) باید algorithm غیرخالی و فضای
     هایپرپارامتر ثبت‌شده داشته باشند."""
@@ -1091,6 +1151,8 @@ _ALL_TESTS = [
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
     test_f09_lightgbm_lss_beta_on_real_data,
     test_f10_knn_quantile_beats_or_near_b3_on_real_fold,
+    test_cqr_fixes_stationary_miscalibration,
+    test_cqr_mondrian_falls_back_for_tiny_groups,
 ]
 
 
