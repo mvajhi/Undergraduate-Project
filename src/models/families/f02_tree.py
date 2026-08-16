@@ -78,14 +78,14 @@ def _raw_categorical_design(train: pd.DataFrame, test: pd.DataFrame, cols: list[
 def fit_predict_lightgbm_quantile(train: pd.DataFrame, test: pd.DataFrame, tau: float,
                                   num_leaves: int = 31, learning_rate: float = 0.05,
                                   min_child_samples: int = 20, feature_fraction: float = 1.0,
-                                  n_estimators: int = 300, **hp) -> np.ndarray:
+                                  n_estimators: int = 300, seed: int = 42, **hp) -> np.ndarray:
     import lightgbm as lgb
 
     Xtr, Xte = _raw_categorical_design(train, test, _feature_cols_s2())
     model = lgb.LGBMRegressor(objective="quantile", alpha=tau, num_leaves=num_leaves,
                               learning_rate=learning_rate, min_child_samples=min_child_samples,
                               feature_fraction=feature_fraction, n_estimators=n_estimators,
-                              verbosity=-1, random_state=42)
+                              verbosity=-1, random_state=seed)
     model.fit(Xtr, train["rho"])
     return np.clip(model.predict(Xte), 0.0, 1.0)
 
@@ -96,7 +96,8 @@ def fit_predict_lightgbm_quantile(train: pd.DataFrame, test: pd.DataFrame, tau: 
 
 def fit_predict_catboost_quantile(train: pd.DataFrame, test: pd.DataFrame, tau: float,
                                   depth: int = 6, learning_rate: float = 0.05,
-                                  l2_leaf_reg: float = 3.0, iterations: int = 300, **hp) -> np.ndarray:
+                                  l2_leaf_reg: float = 3.0, iterations: int = 300,
+                                  seed: int = 42, **hp) -> np.ndarray:
     from catboost import CatBoostRegressor
 
     cols = _feature_cols_s2()
@@ -109,7 +110,7 @@ def fit_predict_catboost_quantile(train: pd.DataFrame, test: pd.DataFrame, tau: 
     model = CatBoostRegressor(loss_function=f"Quantile:alpha={tau}", depth=depth,
                               learning_rate=learning_rate, l2_leaf_reg=l2_leaf_reg,
                               iterations=iterations, cat_features=cat_idx,
-                              verbose=False, random_seed=42, allow_writing_files=False)
+                              verbose=False, random_seed=seed, allow_writing_files=False)
     model.fit(Xtr, train["rho"])
     return np.clip(np.asarray(model.predict(Xte)), 0.0, 1.0)
 
@@ -120,13 +121,13 @@ def fit_predict_catboost_quantile(train: pd.DataFrame, test: pd.DataFrame, tau: 
 
 def fit_predict_qrf(train: pd.DataFrame, test: pd.DataFrame, tau: float,
                     n_estimators: int = 200, max_depth: int | None = None,
-                    min_samples_leaf: int = 5, **hp) -> np.ndarray:
+                    min_samples_leaf: int = 5, seed: int = 42, **hp) -> np.ndarray:
     from quantile_forest import RandomForestQuantileRegressor
 
     Xtr, Xte = common.design_matrix(train, test, _feature_cols_s2())
     model = RandomForestQuantileRegressor(n_estimators=n_estimators, max_depth=max_depth,
                                           min_samples_leaf=min_samples_leaf,
-                                          random_state=42, n_jobs=1)
+                                          random_state=seed, n_jobs=1)
     model.fit(Xtr, train["rho"])
     pred = model.predict(Xte, quantiles=[tau])
     return np.clip(np.asarray(pred).ravel(), 0.0, 1.0)

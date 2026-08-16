@@ -575,6 +575,35 @@ def test_cohort_features_no_leakage_and_full_coverage() -> tuple[bool, str]:
            f"بدون NaN={ok_no_nan} · شکل حفظ‌شده={ok_shape} · بازه‌ی معتبر={ok_range} · گم‌شده‌ی خام={n_missing}")
 
 
+def test_f02_seed_parameter_actually_changes_randomness() -> tuple[bool, str]:
+    """دروازه‌ی M4 (قاعده‌ی A7): بعد از افزودن پارامتر ``seed`` به مدل‌های F02 (که قبلاً
+    ``random_state=42`` هاردکد بود)، پیش‌بینی با seedهای مختلف باید واقعاً فرق کند —
+    وگرنه واریانس سه-seed کاذب صفر گزارش می‌شود."""
+    import numpy as np
+    import pandas as pd
+
+    from src.cv import DATE_COL, load_cv_folds
+    from src.features.build import FEATURES_A_PATH
+    from src.models.families.f02_tree import fit_predict_lightgbm_quantile
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    fold_meta, _ = load_cv_folds()
+    m1, m2 = fold_meta[0].masks(df[DATE_COL])
+    train, test = df.loc[m1], df.loc[m2]
+
+    # feature_fraction<1 لازم است تا seed واقعاً اثر بگذارد — با feature_fraction=1.0
+    # پیش‌فرض (بدون هیچ زیرنمونه‌گیری)، LightGBM مستقل از seed قطعی است
+    kw = dict(n_estimators=50, feature_fraction=0.7)
+    pred_42 = fit_predict_lightgbm_quantile(train, test, 0.2, seed=42, **kw)
+    pred_1337 = fit_predict_lightgbm_quantile(train, test, 0.2, seed=1337, **kw)
+    pred_42_again = fit_predict_lightgbm_quantile(train, test, 0.2, seed=42, **kw)
+
+    ok_differs = not np.allclose(pred_42, pred_1337)
+    ok_reproducible = np.allclose(pred_42, pred_42_again)
+    return (ok_differs and ok_reproducible,
+           f"seed متفاوت→پیش‌بینی متفاوت={ok_differs} · seed یکسان→تکرارپذیر={ok_reproducible}")
+
+
 def test_ensemble_evaluate_arithmetic() -> tuple[bool, str]:
     """اسپرینت D (بند 7.21.2): ``evaluate_ensembles`` باید میانگین ساده‌ی چند برآوردگر
     مستقل از همان τ را درست محاسبه کند — روی داده‌ی مصنوعی با مقادیر شناخته‌شده."""
@@ -1284,6 +1313,7 @@ _ALL_TESTS = [
     test_aci_adapts_to_regime_shift_where_cqr_fails,
     test_ensemble_evaluate_arithmetic,
     test_tau_sensitivity_render_report_flags_generalization,
+    test_f02_seed_parameter_actually_changes_randomness,
 ]
 
 
