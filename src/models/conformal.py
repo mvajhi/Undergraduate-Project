@@ -90,3 +90,66 @@ def oof_calibrated_predictions(fit_fn, folds: list, tau: float, hyperparams: dic
             "Res": te["Res"].to_numpy(), "is_tehran": te["is_tehran"].to_numpy(),
         }))
     return pd.concat(parts, ignore_index=True)
+
+
+# ---------------------------------------------------------------------------
+# ACI — Adaptive Conformal Inference (Gibbs & Candès 2021)، بند 7.22.1 عضو ۴
+# ---------------------------------------------------------------------------
+#
+# یافته‌ی ۲۰ (`doc/progress/07-*.md`): CQR ایستا روی هر ۴ قهرمان بدتر شد چون علامت
+# تصحیح بین foldها ناپایدار است — رژیم زمانی عوض می‌شود (تعطیلات/امتحانات/رمضان).
+# ACI دقیقاً برای همین طراحی شده: به‌جای یک تصحیح ثابت برآوردشده از یک بازه‌ی
+# کالیبراسیونِ گذشته، تصحیح را **روز به روز، آنلاین** به‌روزرسانی می‌کند — اگر پوشش
+# اخیر کمتر از τ بوده (خطای زیاد)، تصحیح بالا می‌رود؛ اگر بیشتر بوده، پایین می‌آید.
+# مدل زیرین فقط **یک‌بار** برازش می‌شود (روی proper-train)؛ آنچه آنلاین به‌روز
+# می‌شود فقط آفست است — هزینه‌ی محاسباتی عملاً برابر CQR است.
+
+#: نرخ یادگیری ACI — بند 7.22.1: بدون منبع اختصاصی پروژه، مقدار مرجع مقالات (γ≈۰.۰۵)
+ACI_GAMMA = 0.05
+
+
+def aci_predict(fit_fn, train: pd.DataFrame, test: pd.DataFrame, tau: float, hyperparams: dict,
+                date_col: str = "date_gregorian", gamma: float = ACI_GAMMA
+                ) -> tuple[np.ndarray, list[float]]:
+    """ACI — تصحیح اولیه از CQR (بند بالا)، سپس **روز به روز** به‌روزرسانی آنلاین:
+    ``correction += gamma * (tau - miscoverage_rate_روز)``. برمی‌گرداند: (پیش‌بینی
+    کالیبره‌شده، مسیر تصحیح در طول زمان — برای بازرسی/گزارش)."""
+    proper, calib = _time_split(train, date_col)
+    if len(calib) < _MIN_GROUP_CALIB or len(proper) < _MIN_GROUP_CALIB:
+        pred_test = np.asarray(fit_fn(train, test, tau, **hyperparams), dtype=float)
+        return np.clip(pred_test, 0.0, 1.0), [0.0]
+
+    pred_calib = np.asarray(fit_fn(proper, calib, tau, **hyperparams), dtype=float)
+    correction = float(np.quantile(calib["rho"].to_numpy() - pred_calib, tau))
+
+    # مدل فقط یک‌بار روی کل test برازش/پیش‌بینی می‌شود — آنلاین‌بودن فقط در تصحیح است
+    pred_test_base = np.asarray(fit_fn(proper, test, tau, **hyperparams), dtype=float)
+
+    out = np.empty(len(test), dtype=float)
+    test_dates = test[date_col].to_numpy()
+    actual = test["rho"].to_numpy()
+    path = [correction]
+    for day in pd.unique(test_dates):
+        mask = test_dates == day
+        pred_day = np.clip(pred_test_base[mask] + correction, 0.0, 1.0)
+        out[mask] = pred_day
+        # ⚠️ باید «نرخ پوشش» باشد (actual <= pred)، نه «نرخ نقض» — چون هدف P(actual<=pred)=τ
+        # است، نه ۱−τ. علامت اشتباه (نرخ نقض) باعث واگرایی نامحدود تصحیح می‌شد (رگرسیون تست).
+        coverage_rate = float((actual[mask] <= pred_day).mean())
+        correction += gamma * (tau - coverage_rate)
+        path.append(correction)
+    return out, path
+
+
+def oof_aci_predictions(fit_fn, folds: list, tau: float, hyperparams: dict,
+                        date_col: str = "date_gregorian", gamma: float = ACI_GAMMA) -> pd.DataFrame:
+    """ACI روی هر ۵ fold رسمی — تصحیح هر fold از صفر شروع می‌شود (بدون نشتی بین fold)."""
+    parts = []
+    for tr, te in folds:
+        pred_cal, _ = aci_predict(fit_fn, tr, te, tau, hyperparams, date_col=date_col, gamma=gamma)
+        parts.append(pd.DataFrame({
+            "actual": te["rho"].to_numpy(), "pred_q": pred_cal,
+            "RestaurantName": te["RestaurantName"].to_numpy(), "Meal": te["Meal"].to_numpy(),
+            "Res": te["Res"].to_numpy(), "is_tehran": te["is_tehran"].to_numpy(),
+        }))
+    return pd.concat(parts, ignore_index=True)

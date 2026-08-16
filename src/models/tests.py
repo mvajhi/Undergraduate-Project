@@ -575,6 +575,48 @@ def test_cohort_features_no_leakage_and_full_coverage() -> tuple[bool, str]:
            f"بدون NaN={ok_no_nan} · شکل حفظ‌شده={ok_shape} · بازه‌ی معتبر={ok_range} · گم‌شده‌ی خام={n_missing}")
 
 
+def test_aci_adapts_to_regime_shift_where_cqr_fails() -> tuple[bool, str]:
+    """بند 7.22.1 عضو ۴ (ACI): روی داده‌ی مصنوعی با **تغییر رژیم** (نیمه‌ی دوم test
+    میانگین ρ را از ۰.۱۰ به ۰.۲۰ می‌برد)، هم مدل خام و هم CQR ایستا باید کاملاً شکست
+    بخورند (پوشش≈۰ در نیمه‌ی جدید)، ولی ACI باید خودش را با پوشش تطبیق دهد — این
+    دقیقاً تفاوتی است که یافته‌ی ۲۰ (doc/progress) پیشنهاد ACI را به آن مستند کرد."""
+    import numpy as np
+    import pandas as pd
+
+    from src.models import conformal
+
+    rng = np.random.default_rng(0)
+    n_train, n_test = 1000, 400
+    dates_train = pd.date_range("2024-01-01", periods=n_train)
+    dates_test = pd.date_range(dates_train[-1] + pd.Timedelta(days=1), periods=n_test)
+    rho_train = np.clip(rng.normal(0.10, 0.03, n_train), 0, 1)
+    rho_test = np.concatenate([
+        np.clip(rng.normal(0.10, 0.03, n_test // 2), 0, 1),
+        np.clip(rng.normal(0.20, 0.03, n_test - n_test // 2), 0, 1),
+    ])
+    train = pd.DataFrame({"date_gregorian": dates_train, "rho": rho_train})
+    test = pd.DataFrame({"date_gregorian": dates_test, "rho": rho_test})
+    tau = 0.20
+
+    def fit_fn(tr, te, tau, **hp):
+        return np.full(len(te), tr["rho"].quantile(tau))
+
+    half = n_test // 2
+    actual_new_regime = test["rho"].to_numpy()[half:]
+
+    pred_cqr, _ = conformal.cqr_predict(fit_fn, train, test, tau, {})
+    cov_cqr_new = float((actual_new_regime <= pred_cqr[half:]).mean())
+
+    pred_aci, path = conformal.aci_predict(fit_fn, train, test, tau, {})
+    cov_aci_new = float((actual_new_regime <= pred_aci[half:]).mean())
+
+    ok_cqr_fails = cov_cqr_new < 0.05  # CQR باید تقریباً کاملاً شکست بخورد
+    ok_aci_adapts = abs(cov_aci_new - tau) < 0.05  # ACI باید نزدیک هدف برسد
+    return (ok_cqr_fails and ok_aci_adapts,
+           f"پوشش CQR در رژیم جدید={cov_cqr_new:.3f} (باید≈۰)={ok_cqr_fails} · "
+           f"پوشش ACI در رژیم جدید={cov_aci_new:.3f} (باید≈۰.۲۰)={ok_aci_adapts}")
+
+
 def test_cqr_fixes_stationary_miscalibration() -> tuple[bool, str]:
     """بند 7.22 (CQR): روی داده‌ی مصنوعی **ایستا** با مدل عمداً بدکالیبره (بایاس ثابت
     +۰.۰۵)، CQR باید پوشش را به‌طور چشمگیر به سمت τ اسمی اصلاح کند — تست صحت ریاضی
@@ -1190,6 +1232,7 @@ _ALL_TESTS = [
     test_cqr_fixes_stationary_miscalibration,
     test_cqr_mondrian_falls_back_for_tiny_groups,
     test_cohort_features_no_leakage_and_full_coverage,
+    test_aci_adapts_to_regime_shift_where_cqr_fails,
 ]
 
 

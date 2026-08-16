@@ -53,6 +53,13 @@ def evaluate_one(family: str, model_id: str, folds: list, tau: float) -> dict:
         rows[f"coverage_{label}"] = cov
         rows[f"gap_{label}"] = cov - tau
         rows[f"pinball_{label}"] = pb
+
+    oof_aci = conformal.oof_aci_predictions(fit_fn, folds, tau, hp)
+    cov_aci = float((oof_aci["actual"] <= oof_aci["pred_q"]).mean())
+    pb_aci = float(pinball_loss(oof_aci["actual"].to_numpy(), oof_aci["pred_q"].to_numpy(), tau).mean())
+    rows["coverage_aci"] = cov_aci
+    rows["gap_aci"] = cov_aci - tau
+    rows["pinball_aci"] = pb_aci
     return rows
 
 
@@ -71,24 +78,30 @@ def render_report(rows: list[dict], tau: float) -> str:
         lines.append(f"| `{r['model']}` | قبل (بدون کالیبراسیون) | {r['coverage_before']:.4f} | "
                     f"{r['gap_before']:+.4f} | {r['pinball_before']:.5f} |")
         for label, fa_name in (("cqr_global", "CQR سراسری"), ("mondrian_restaurant", "Mondrian(سلف)"),
-                               ("mondrian_meal", "Mondrian(وعده)"), ("mondrian_tehran", "Mondrian(تهران؟)")):
+                               ("mondrian_meal", "Mondrian(وعده)"), ("mondrian_tehran", "Mondrian(تهران؟)"),
+                               ("aci", "⭐ ACI (تطبیقی)")):
             lines.append(f"| `{r['model']}` | {fa_name} | {r[f'coverage_{label}']:.4f} | "
                         f"{r[f'gap_{label}']:+.4f} | {r[f'pinball_{label}']:.5f} |")
 
-    n_improved = sum(1 for r in rows if abs(r["gap_cqr_global"]) < abs(r["gap_before"]))
+    n_cqr_improved = sum(1 for r in rows if abs(r["gap_cqr_global"]) < abs(r["gap_before"]))
+    n_aci_improved = sum(1 for r in rows if abs(r["gap_aci"]) < abs(r["gap_before"]))
     lines += [
         "",
-        f"**نتیجه: CQR سراسری در {n_improved} از {len(rows)} مدل شکاف پوشش را بهبود داد.**",
+        f"**نتیجه: CQR سراسری در {n_cqr_improved} از {len(rows)} مدل شکاف پوشش را بهبود داد؛ "
+        f"ACI در {n_aci_improved} از {len(rows)}.**",
         "",
-        "⚠️ **یافته‌ی مهم (نه باگ — تست شد روی داده‌ی مصنوعی ایستا، `test_cqr_fixes_"
+        "⚠️ **CQR ایستا (نه باگ — تست شد روی داده‌ی مصنوعی ایستا، `test_cqr_fixes_"
         "stationary_miscalibration`، آن‌جا CQR پوشش را از ۰.۸۵۵ به ۰.۲۷۰ اصلاح کرد).** "
         "روی داده‌ی واقعی این پروژه، CQR ساده اغلب کمکی نمی‌کند یا بدتر هم می‌کند — علامت "
         "تصحیح بین foldها ناپایدار است (مثال lightgbm_quantile: fold۰=−۰.۰۱۲۹، "
-        "fold۳=+۰.۰۱۴۶). دلیل محتمل: میزان/جهت بدکالیبرگی در طول زمان ثابت نیست "
-        "(تعطیلات/امتحانات/رمضان رژیم را عوض می‌کنند)، پس فرض تبادل‌پذیری (exchangeability) "
-        "CQR بین بازه‌ی کالیبراسیون (انتهای train) و بازه‌ی آزمون (fold بعدی) نقض می‌شود. "
-        "**پیشنهاد بعدی (بند 7.22.1 عضو ۴): ACI (Adaptive Conformal Inference)** که دقیقاً "
-        "برای همین حالت (مقاوم به تغییر رژیم) طراحی شده — CQR ایستا نیست.",
+        "fold۳=+۰.۰۱۴۶) چون فرض تبادل‌پذیری بین بازه‌ی کالیبراسیون و آزمون به‌خاطر تغییر "
+        "رژیم (تعطیلات/امتحانات/رمضان) نقض می‌شود.",
+        "",
+        "⭐ **ACI (Adaptive Conformal Inference، Gibbs & Candès 2021، بند 7.22.1 عضو ۴)** "
+        "به‌جای تصحیح ثابت، روز به روز آنلاین به‌روزرسانی می‌شود — دقیقاً طراحی‌شده برای "
+        "تغییر رژیم. صحت روی داده‌ی مصنوعی با شوک رژیم تأیید شد (`test_aci_adapts_to_"
+        "regime_shift_where_cqr_fails`: در نیمه‌ی رژیم‌جدید، CQR پوشش=۰.۰۰۰ می‌دهد، ACI "
+        "پوشش=۰.۱۸۵ در برابر هدف ۰.۲۰۰).",
     ]
     return "\n".join(lines)
 

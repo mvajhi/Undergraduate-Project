@@ -16,7 +16,10 @@
     "pinball_mondrian_meal":0.0131046003,
     "coverage_mondrian_tehran":0.2690721649,
     "gap_mondrian_tehran":0.0690721649,
-    "pinball_mondrian_tehran":0.0132176051
+    "pinball_mondrian_tehran":0.0132176051,
+    "coverage_aci":0.2041237113,
+    "gap_aci":0.0041237113,
+    "pinball_aci":0.0122670391
   },
   {
     "model":"catboost_quantile",
@@ -35,7 +38,10 @@
     "pinball_mondrian_meal":0.0132694426,
     "coverage_mondrian_tehran":0.268814433,
     "gap_mondrian_tehran":0.068814433,
-    "pinball_mondrian_tehran":0.013329749
+    "pinball_mondrian_tehran":0.013329749,
+    "coverage_aci":0.2043814433,
+    "gap_aci":0.0043814433,
+    "pinball_aci":0.0124277041
   },
   {
     "model":"qrf",
@@ -54,7 +60,10 @@
     "pinball_mondrian_meal":0.0136894499,
     "coverage_mondrian_tehran":0.2762886598,
     "gap_mondrian_tehran":0.0762886598,
-    "pinball_mondrian_tehran":0.0137893397
+    "pinball_mondrian_tehran":0.0137893397,
+    "coverage_aci":0.2087628866,
+    "gap_aci":0.0087628866,
+    "pinball_aci":0.0127358022
   },
   {
     "model":"knn_quantile",
@@ -73,6 +82,9 @@
     "pinball_mondrian_meal":0.01467839,
     "coverage_mondrian_tehran":0.2780927835,
     "gap_mondrian_tehran":0.0780927835,
-    "pinball_mondrian_tehran":0.0147442817
+    "pinball_mondrian_tehran":0.0147442817,
+    "coverage_aci":0.1979381443,
+    "gap_aci":-0.0020618557,
+    "pinball_aci":0.0131062955
   }
 ]
