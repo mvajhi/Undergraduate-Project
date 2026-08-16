@@ -33,7 +33,8 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 #: خانواده → مسیر دات‌دار ماژول — برای بارگذاری ``MODELS``/``QUANTREG_MODEL_IDS`` در
 #: ``render_step13_calibration`` بدون وابستگی مستقیم به یک خانواده‌ی خاص.
-_FAMILY_MODULES = {"F01": "src.models.families.f01_linear", "F02": "src.models.families.f02_tree"}
+_FAMILY_MODULES = {"F01": "src.models.families.f01_linear", "F02": "src.models.families.f02_tree",
+                   "F11": "src.models.families.f11_decision"}
 
 #: بند 7.9.2 WBS — آزمون‌های پیش‌پرواز خ۱ که در فاز ۴/۶ **قبلاً** اجرا و در دفتر حقایق
 #: ثبت شده‌اند (نه اینجا دوباره محاسبه می‌شوند — فقط ارجاع/نگاشط به مدل مربوطه‌اند).

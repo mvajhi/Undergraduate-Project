@@ -1,0 +1,22 @@
+[
+  {
+    "model":"erm_newsvendor",
+    "reference":"B3",
+    "pinball_model":0.0135974524,
+    "pinball_reference":0.0133468493,
+    "delta_pinball":0.000250603,
+    "dm_stat":2.0690024202,
+    "p_value":0.0385458596,
+    "significant_at_0.05":false
+  },
+  {
+    "model":"erm_newsvendor",
+    "reference":"B6",
+    "pinball_model":0.0135974524,
+    "pinball_reference":0.0150209744,
+    "delta_pinball":-0.0014235221,
+    "dm_stat":-6.3006598531,
+    "p_value":0.0000000003,
+    "significant_at_0.05":true
+  }
+]

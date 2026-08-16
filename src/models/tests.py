@@ -431,6 +431,59 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
         SPACES.pop("test_s2_dummy", None)
 
 
+def test_f11_newsvendor_cost_matches_weighted_pinball_derivation() -> tuple[bool, str]:
+    """بند 7.20.3: هزینه‌ی نیوزوندور باید دقیقاً برابر Res·pinball باشد (اشتقاق ماژول
+    f11_decision) — این تست همان هویت ریاضی را روی داده‌ی مصنوعی می‌آزماید."""
+    import numpy as np
+
+    from src.baselines import pinball_loss
+    from src.models.families.f11_decision import newsvendor_cost
+
+    rng = np.random.default_rng(0)
+    n = 50
+    actual = rng.uniform(0, 0.3, n)
+    pred = rng.uniform(0, 0.3, n)
+    res = rng.uniform(10, 200, n)
+    tau = 0.20
+
+    cost = newsvendor_cost(actual, pred, res, tau)
+    expected = float((pinball_loss(actual, pred, tau) * res).sum())
+    ok = abs(cost - expected) < 1e-9
+    return ok, f"newsvendor_cost={cost:.4f} · Res·pinball مستقیم={expected:.4f} · برابر={ok}"
+
+
+def test_f11_res_weighted_fit_reduces_real_newsvendor_cost() -> tuple[bool, str]:
+    """یافته‌ی اصلی خ۱۱ (بند 7.20.3، `f11_decision.py`): برازش Res-وزن‌دار باید هزینه‌ی
+    واقعی نیوزوندور را نسبت به pinball خام کاهش دهد — روی یک fold واقعی."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import numpy as np
+    import pandas as pd
+
+    from src.cv import DATE_COL, load_cv_folds
+    from src.models.families.f01_linear import fit_predict_l1_quantile_regression
+    from src.models.families.f11_decision import fit_predict_erm_newsvendor, newsvendor_cost
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    folds, _ = load_cv_folds()
+    tr_mask, te_mask = folds[0].masks(df[DATE_COL])
+    train, test = df.loc[tr_mask], df.loc[te_mask]
+    tau = 0.20
+
+    pred_unweighted = fit_predict_l1_quantile_regression(train, test, tau, alpha=0.01)
+    pred_weighted = fit_predict_erm_newsvendor(train, test, tau, alpha=0.01)
+
+    actual = test["rho"].to_numpy()
+    res = test["Res"].to_numpy(float)
+    cost_unweighted = newsvendor_cost(actual, pred_unweighted, res, tau)
+    cost_weighted = newsvendor_cost(actual, pred_weighted, res, tau)
+    ok = cost_weighted < cost_unweighted
+    return ok, f"هزینه‌ی بدون‌وزن={cost_unweighted:.2f} · هزینه‌ی Res-وزن‌دار={cost_weighted:.2f} · کمتر={ok}"
+
+
 def test_f02_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۳ عضو کوتاه‌فهرست‌شده‌ی F02 (اسپرینت C) باید algorithm غیرخالی و فضای
     هایپرپارامتر ثبت‌شده داشته باشند."""
@@ -976,6 +1029,8 @@ _ALL_TESTS = [
     test_f02_all_specs_have_algorithm,
     test_f02_models_fit_predict_on_real_data,
     test_significance_run_significance_is_family_agnostic,
+    test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
+    test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
 ]
 
 
