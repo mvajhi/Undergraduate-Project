@@ -815,6 +815,56 @@ def test_f02_all_specs_have_algorithm() -> tuple[bool, str]:
     return ok, f"{len(specs)} مدل F02 ثبت‌شده · بدون algorithm: {empty or 'هیچ‌کدام'} · بدون فضا: {no_space or 'هیچ‌کدام'}"
 
 
+def test_f03_l3_series_no_gaps_and_calendar_never_nan() -> tuple[bool, str]:
+    """اسپرینت C (خ۳): ``build_l3_series`` باید ایندکس تاریخ روزانه‌ی کامل (بدون شکاف)
+    بدهد، رگرسور تقویمی هرگز NaN نداشته باشد (F35/F38)، و ``day_shock`` روی روزهای
+    بدون سرویس صراحتاً NaN باشد (نه صفر یا حذف‌شده)."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    from src.features.l3_series import build_l3_series, CALENDAR_EXOG
+
+    series = build_l3_series()
+    ok_meals = set(series) == {"lunch", "dinner"}
+    checks = {}
+    for meal, df in series.items():
+        no_gaps = (df["date_gregorian"].diff().dropna() == pd.Timedelta(days=1)).all()
+        cal_no_nan = df[CALENDAR_EXOG].isna().sum().sum() == 0
+        has_real_nan = df["day_shock"].isna().any()
+        checks[meal] = no_gaps and cal_no_nan and has_real_nan
+    return (ok_meals and all(checks.values()),
+           f"هر دو وعده حاضر={ok_meals} · " + " · ".join(f"{k}={v}" for k, v in checks.items()))
+
+
+def test_f03_models_fit_predict_on_real_fold() -> tuple[bool, str]:
+    """هر دو مدل خ۳ (sarimax_calendar/theta) باید روی یک fold واقعی خروجی متناهی بدهند
+    — ⚠️ برخلاف مدل‌های L1، خروجی نباید به [۰,۱] کلیپ شده باشد چون ``day_shock``
+    انحراف است نه نرخ (اگر کلیپ‌شدگی دیده شود یعنی قرارداد سطح L3 نقض شده)."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import numpy as np
+
+    import src.models.families.f03_timeseries as f03
+    from src.cv import load_cv_folds
+    from src.features.l3_series import build_l3_series
+
+    series = build_l3_series()
+    fold_meta, _ = load_cv_folds()
+    m1, m2 = fold_meta[0].masks(series["lunch"]["date_gregorian"])
+    train, test = series["lunch"].loc[m1], series["lunch"].loc[m2]
+
+    results = {}
+    for model_id, fn in f03.MODELS.items():
+        out = np.asarray(fn(train, test, 0.20), dtype=float)
+        results[model_id] = out.shape == (len(test),) and np.all(np.isfinite(out))
+    return all(results.values()), " · ".join(f"{k}={v}" for k, v in results.items())
+
+
 def test_f02_models_fit_predict_on_real_data() -> tuple[bool, str]:
     """هر سه مدل F02 (LightGBM/CatBoost/QRF) باید روی یک fold واقعی خروجی معتبر
     (شکل درست، بدون NaN/inf، داخل [0,1]) بدهند — دقیقاً همان آزمونی که R0 هر مدل را
@@ -1348,6 +1398,8 @@ _ALL_TESTS = [
     test_axis_screening_weighting_axis_end_to_end,
     test_f02_all_specs_have_algorithm,
     test_f02_models_fit_predict_on_real_data,
+    test_f03_l3_series_no_gaps_and_calendar_never_nan,
+    test_f03_models_fit_predict_on_real_fold,
     test_significance_run_significance_is_family_agnostic,
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
