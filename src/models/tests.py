@@ -627,6 +627,52 @@ def test_ensemble_evaluate_arithmetic() -> tuple[bool, str]:
            f"میانگین محاسبه‌شده درست={ok_mean_correct} · pinball متناهی={ok_pinball_finite}")
 
 
+def test_model_comparison_render_report_counts_significant_wins() -> tuple[bool, str]:
+    """دروازه‌ی M4 (بند 7.25.1): ``render_report`` باید فقط مدل‌هایی را «برد معنادار»
+    بشمارد که CI بوت‌استرپشان کاملاً منفی است، نه هر Δ منفی‌ای — روی داده‌ی مصنوعی."""
+    import pandas as pd
+
+    from src.models.model_comparison import render_report
+
+    df = pd.DataFrame([
+        {"model_id": "winner", "family": "F02", "pinball_rate": 0.010, "pinball_portions": 1.5,
+         "delta_vs_B3": -0.002, "delta_vs_B3_ci_lo": -0.003, "delta_vs_B3_ci_hi": -0.001,
+         "beats_B3_significant": True, "waste_reduction_pct": 0.7, "shortage_rate": 0.1,
+         "coverage": 0.2, "R2_rho": -0.05, "fit_seconds": 100.0, "n_raw": 1000, "n_eff": 100},
+        {"model_id": "near_miss", "family": "F01", "pinball_rate": 0.012, "pinball_portions": 1.8,
+         "delta_vs_B3": -0.0005, "delta_vs_B3_ci_lo": -0.002, "delta_vs_B3_ci_hi": 0.0005,
+         "beats_B3_significant": False, "waste_reduction_pct": 0.6, "shortage_rate": 0.12,
+         "coverage": 0.19, "R2_rho": -0.1, "fit_seconds": 50.0, "n_raw": 1000, "n_eff": 100},
+    ])
+    report = render_report(df, {"waste_reduction_pct": 0.6, "shortage_rate": 0.1, "coverage": 0.2},
+                           0.0135, 0.2)
+    ok_counts_one = "1 از 2 مدل" in report
+    summary_line = next((ln for ln in report.splitlines() if "بهتر بودند" in ln), "")
+    ok_names_winner = "winner" in summary_line and "near_miss" not in summary_line
+    return (ok_counts_one and ok_names_winner,
+           f"شمارش برد معنادار درست={ok_counts_one} · نام برنده در خلاصه={ok_names_winner}")
+
+
+def test_mandatory_cuts_render_report_flags_losing_segments() -> tuple[bool, str]:
+    """دروازه‌ی M4 (بند 7.25.2 قدم ۸): وقتی برنده‌ی کلی در یک برش می‌بازد،
+    ``render_report`` باید آن بخش را صریح فهرست کند، نه فقط شمارش کند."""
+    import pandas as pd
+
+    from src.models.mandatory_cuts import render_report
+
+    df = pd.DataFrame([
+        {"cut": "ناهار در برابر شام", "segment": "lunch", "n": 100,
+         "pinball_model": 0.010, "pinball_B3": 0.012, "delta": -0.002, "champion_wins": True},
+        {"cut": "ناهار در برابر شام", "segment": "dinner", "n": 80,
+         "pinball_model": 0.013, "pinball_B3": 0.011, "delta": 0.002, "champion_wins": False},
+    ])
+    report = render_report(df, 0.2)
+    ok_flags_count = "1 از 2 بخش" in report
+    ok_names_loser = "ناهار در برابر شام" in report and "dinner" in report
+    return (ok_flags_count and ok_names_loser,
+           f"شمارش بخش‌های بازنده درست={ok_flags_count} · بخش بازنده فهرست شد={ok_names_loser}")
+
+
 def test_tau_sensitivity_render_report_flags_generalization() -> tuple[bool, str]:
     """اسپرینت D (چک‌لیست خط ۱۶۰): ``render_report`` باید وقتی برتری نسبت به B3 در
     **همه‌ی** τها حفظ شد پیام «تعمیم می‌یابند» بدهد، و وقتی در یک τ از دست رفت آن τ را
@@ -1314,6 +1360,8 @@ _ALL_TESTS = [
     test_ensemble_evaluate_arithmetic,
     test_tau_sensitivity_render_report_flags_generalization,
     test_f02_seed_parameter_actually_changes_randomness,
+    test_model_comparison_render_report_counts_significant_wins,
+    test_mandatory_cuts_render_report_flags_losing_segments,
 ]
 
 
