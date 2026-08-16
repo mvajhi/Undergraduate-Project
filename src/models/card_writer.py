@@ -358,9 +358,16 @@ _COVERAGE_RE = re.compile(r"پوشش کلی: ([\d.]+)\*\* \(اسمی τ=[\d.]+, 
 _RATIO_RE = re.compile(r"نسبت pinball\(test\)/pinball\(train\) روی ۵ fold: ([\d.]+)\*\*")
 
 
-def render_step14_summary(model_id: str, family: str, card: cards.ModelCard) -> str:
+def render_step14_summary(model_id: str, family: str, card: cards.ModelCard,
+                          dm_significant_vs_b3: bool | None = None) -> str:
     """سنتز نهایی — از نتیجه‌ی S2 (بند ۸/۹) + مرجع B3 + آنچه گام‌های ۱۱/۱۳ **همین کارت**
-    (اگر پیش‌تر پر شده باشند) قبلاً محاسبه کرده‌اند می‌سازد؛ دوباره بازبرازش نمی‌کند."""
+    (اگر پیش‌تر پر شده باشند) قبلاً محاسبه کرده‌اند می‌سازد؛ دوباره بازبرازش نمی‌کند.
+
+    ``dm_significant_vs_b3``: نتیجه‌ی از پیش محاسبه‌شده‌ی آزمون Diebold-Mariano
+    (``src/models/significance.py::run_significance``) در برابر B3، اگر موجود باشد.
+    وقتی داده شود، **جایگزین** حدس بند 7.6.3 (پایداری fold) می‌شود — چون یافته‌ی ۱۵
+    (`doc/progress/07-*.md`) نشان داد پایداری پایین می‌تواند حتی برای بردهای واقعاً
+    معنادار هم رخ دهد (لایتجی‌بی‌ام: پایداری ۰/۵ ولی DM p<۰.۰۰۰۱)."""
     result = load_s2_result(model_id, family)
     if not np.isfinite(result.get("best_pinball", float("nan"))):
         return "_هنوز نتیجه‌ی S2 معتبری موجود نیست._"
@@ -389,7 +396,17 @@ def render_step14_summary(model_id: str, family: str, card: cards.ModelCard) -> 
 
     stable = result["stable_top10pct_folds"] >= 3  # آستانه‌ی بند 7.6.3
     cal_ok = not cov_m or abs(float(cov_m.group(2))) < 0.10
-    if beat_b3 and result["converged"] and cal_ok and stable:
+
+    if dm_significant_vs_b3 is not None:
+        lines.append(f"آزمون Diebold-Mariano در برابر B3 (بند ۶.۶، `reports/phase7/dm_test_{family}.md`): "
+                    f"{'✅ معنادار (p<۰.۰۵)' if dm_significant_vs_b3 else '❌ معنادار نیست — در حد نویز آماری'}.")
+        if beat_b3 and result["converged"] and cal_ok and dm_significant_vs_b3:
+            verdict, why = "✅ کاندید ورود به S3 (حساسیت τ + ترکیب)", "برنده‌ی B3 با DM-test معنادار + همگرایی + کالیبراسیون قابل‌قبول — پایداری fold (بند 7.6.3) اینجا رد نمی‌شود چون DM-test مستقیم‌تر و مطمئن‌تر است (یافته‌ی ۱۵)"
+        elif beat_b3 and dm_significant_vs_b3 and not (result["converged"] and cal_ok):
+            verdict, why = "⚠️ نیازمند بررسی بیشتر پیش از S3", "برد آماری معنادار است ولی همگرایی/کالیبراسیون هنوز برآورده نشده"
+        else:
+            verdict, why = "❌ برد رد شد", "آزمون Diebold-Mariano برد ادعاشده را تأیید نکرد — اختلاف در حد نویز آماری است (بند ۶.۶)"
+    elif beat_b3 and result["converged"] and cal_ok and stable:
         verdict, why = "✅ کاندید ورود به S3 (حساسیت τ + ترکیب)", "برنده‌ی B3 با همگرایی، پایداری و کالیبراسیون قابل‌قبول"
     elif beat_b3 and result["converged"] and cal_ok and not stable:
         verdict, why = ("⚠️ برد حاشیه‌ای — نیازمند تأیید آماری پیش از S3",
