@@ -838,6 +838,40 @@ def test_f03_l3_series_no_gaps_and_calendar_never_nan() -> tuple[bool, str]:
            f"هر دو وعده حاضر={ok_meals} · " + " · ".join(f"{k}={v}" for k, v in checks.items()))
 
 
+def test_f04_l4_panel_shape_and_dfm_output_bounded() -> tuple[bool, str]:
+    """اسپرینت C (خ۴): ``build_l4_panel`` باید ۴۱ ستون (سلف×وعده) با ایندکس تاریخ
+    روزانه‌ی کامل بدهد، و ``fit_predict_dfm`` روی یک fold واقعی خروجی متناهی و
+    داخل [۰,۱] بدهد (برخلاف خ۳، هدف اینجا خودِ نرخ است، نه انحراف)."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import warnings
+
+    import numpy as np
+
+    from src.cv import DATE_COL, load_cv_folds
+    from src.features.l4_series import build_l4_panel
+    from src.models.families.f04_multivariate import fit_predict_dfm
+
+    panel = build_l4_panel()
+    ok_shape = panel.shape[1] == 41
+    no_gaps = (panel.index.to_series().diff().dropna() == pd.Timedelta(days=1)).all()
+
+    fold_meta, _ = load_cv_folds()
+    dates = panel.reset_index()[DATE_COL]
+    m1, m2 = fold_meta[0].masks(dates)
+    train, test = panel.loc[m1], panel.loc[m2]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        pred = fit_predict_dfm(train, test, 0.20, k_factors=1)
+    ok_dfm = (pred.shape == test.shape and np.all(np.isfinite(pred.to_numpy()))
+             and pred.min().min() >= 0.0 and pred.max().max() <= 1.0)
+    return (ok_shape and no_gaps and ok_dfm,
+           f"۴۱ ستون={ok_shape} · بدون شکاف تاریخ={no_gaps} · DFM متناهی و در [۰,۱]={ok_dfm}")
+
+
 def test_f03_models_fit_predict_on_real_fold() -> tuple[bool, str]:
     """هر دو مدل خ۳ (sarimax_calendar/theta) باید روی یک fold واقعی خروجی متناهی بدهند
     — ⚠️ برخلاف مدل‌های L1، خروجی نباید به [۰,۱] کلیپ شده باشد چون ``day_shock``
@@ -1400,6 +1434,7 @@ _ALL_TESTS = [
     test_f02_models_fit_predict_on_real_data,
     test_f03_l3_series_no_gaps_and_calendar_never_nan,
     test_f03_models_fit_predict_on_real_fold,
+    test_f04_l4_panel_shape_and_dfm_output_bounded,
     test_significance_run_significance_is_family_agnostic,
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
