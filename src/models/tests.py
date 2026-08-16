@@ -362,13 +362,17 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
     import tempfile
     import time
 
-    from src.models import s2_runner
+    from src.models import s2_runner, tracking
 
     tmp_dir = Path(tempfile.mkdtemp())
     original_dir = s2_runner.OPTUNA_STUDIES_DIR
     original_phase7 = s2_runner.PHASE7_DIR
+    original_mlflow_uri = tracking.MLFLOW_TRACKING_URI
     s2_runner.OPTUNA_STUDIES_DIR = tmp_dir / "optuna_studies"
     s2_runner.PHASE7_DIR = tmp_dir / "phase7"
+    # ⚠️ بدون این، هر اجرای این تست run های دامی را در mlruns/ واقعی ثبت می‌کند —
+    # دقیقاً همان مشکلی که با ۹۶۸ run تستی (test_s2_dummy/test_slow_dummy) کشف شد
+    tracking.MLFLOW_TRACKING_URI = str(tmp_dir / "mlruns")
     try:
         import numpy as np
         import pandas as pd
@@ -426,6 +430,7 @@ def test_s2_study_persists_and_resumes() -> tuple[bool, str]:
     finally:
         s2_runner.OPTUNA_STUDIES_DIR = original_dir
         s2_runner.PHASE7_DIR = original_phase7
+        tracking.MLFLOW_TRACKING_URI = original_mlflow_uri
         shutil.rmtree(tmp_dir, ignore_errors=True)
         MODEL_REGISTRY.pop("test_s2_dummy", None)
         SPACES.pop("test_s2_dummy", None)
@@ -806,7 +811,7 @@ def test_s2_model_time_cap_stops_early() -> tuple[bool, str]:
 
     import numpy as np
 
-    from src.models import s2_runner
+    from src.models import s2_runner, tracking
     from src.models.registry import MODELS as MODEL_REGISTRY
     from src.models.registry import ModelSpec, register
     from src.models.spaces import SPACES, register_space
@@ -814,8 +819,10 @@ def test_s2_model_time_cap_stops_early() -> tuple[bool, str]:
     tmp_dir = Path(tempfile.mkdtemp())
     original_dir = s2_runner.OPTUNA_STUDIES_DIR
     original_cap = s2_runner.MODEL_TIME_CAP_SECONDS
+    original_mlflow_uri = tracking.MLFLOW_TRACKING_URI
     s2_runner.OPTUNA_STUDIES_DIR = tmp_dir / "optuna_studies"
     s2_runner.MODEL_TIME_CAP_SECONDS = 0.3  # هر trial مصنوعی ۰.۲ ثانیه می‌خوابد ⇒ ۱-۲ trial قبل از سقف
+    tracking.MLFLOW_TRACKING_URI = str(tmp_dir / "mlruns")  # بدون این mlruns/ واقعی آلوده می‌شود
     try:
         if "test_slow_dummy" not in MODEL_REGISTRY:
             register(ModelSpec(model_id="test_slow_dummy", family="F01", levels=("L1",),
@@ -848,6 +855,7 @@ def test_s2_model_time_cap_stops_early() -> tuple[bool, str]:
     finally:
         s2_runner.OPTUNA_STUDIES_DIR = original_dir
         s2_runner.MODEL_TIME_CAP_SECONDS = original_cap
+        tracking.MLFLOW_TRACKING_URI = original_mlflow_uri
         shutil.rmtree(tmp_dir, ignore_errors=True)
         MODEL_REGISTRY.pop("test_slow_dummy", None)
 
