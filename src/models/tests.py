@@ -838,6 +838,38 @@ def test_f03_l3_series_no_gaps_and_calendar_never_nan() -> tuple[bool, str]:
            f"هر دو وعده حاضر={ok_meals} · " + " · ".join(f"{k}={v}" for k, v in checks.items()))
 
 
+def test_f03_full_classical_roster_and_city_filter() -> tuple[bool, str]:
+    """درخواست صریح کاربر (۲۰۲۶-۰۸-۱۶): تمام مدل‌های کلاسیک خ۳ باید ثبت شده باشند
+    (AR/MA/ARMA/ARIMA/SARIMA/SARIMAX/auto_arima/ETS/Theta/STL/MSTL/Prophet = ۱۲ مدل؛
+    TBATS عمداً غایب — ناسازگاری فنی مستندشده در docstring ماژول)، و
+    ``build_l3_series(restaurant_filter=...)`` باید سری متفاوتی از حالت سراسری بدهد
+    (پایه‌ی آزمایش خوشه‌بندی شهر)."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import pandas as pd
+
+    import src.models.families.f03_timeseries as f03
+    from src.features.l3_series import build_l3_series
+
+    expected = {"ar", "ma", "arma", "arima", "sarima", "sarimax_calendar", "auto_arima",
+               "ets", "theta", "stl_arima", "mstl", "prophet"}
+    ok_roster = set(f03.MODELS) == expected and "tbats" not in f03.MODELS
+
+    fx = pd.read_parquet(FEATURES_A_PATH)
+    tehran = set(fx.loc[fx["is_tehran"], "RestaurantName"].unique())
+    national = build_l3_series()["lunch"]
+    tehran_only = build_l3_series(restaurant_filter=tehran)["lunch"]
+    ok_differs = not national["day_shock"].equals(tehran_only["day_shock"])
+    ok_same_dates = national["date_gregorian"].equals(tehran_only["date_gregorian"])
+
+    return (ok_roster and ok_differs and ok_same_dates,
+           f"۱۲ مدل ثبت‌شده (بدون tbats)={ok_roster} · فیلتر شهر سری را عوض می‌کند={ok_differs} "
+           f"· بازه‌ی تاریخ ثابت می‌ماند={ok_same_dates}")
+
+
 def test_f04_l4_panel_shape_and_dfm_output_bounded() -> tuple[bool, str]:
     """اسپرینت C (خ۴): ``build_l4_panel`` باید ۴۱ ستون (سلف×وعده) با ایندکس تاریخ
     روزانه‌ی کامل بدهد، و ``fit_predict_dfm`` روی یک fold واقعی خروجی متناهی و
@@ -1435,6 +1467,7 @@ _ALL_TESTS = [
     test_f03_l3_series_no_gaps_and_calendar_never_nan,
     test_f03_models_fit_predict_on_real_fold,
     test_f04_l4_panel_shape_and_dfm_output_bounded,
+    test_f03_full_classical_roster_and_city_filter,
     test_significance_run_significance_is_family_agnostic,
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,

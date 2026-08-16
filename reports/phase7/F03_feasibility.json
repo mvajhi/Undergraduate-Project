@@ -1,13 +1,83 @@
 [
   {
     "meal":"lunch",
+    "model_id":"ar",
+    "status":"✅",
+    "pinball":0.0082879998,
+    "pinball_zero":0.0121078783,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.1565392017
+  },
+  {
+    "meal":"lunch",
+    "model_id":"ma",
+    "status":"✅",
+    "pinball":0.0080008815,
+    "pinball_zero":0.0121078783,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.1881899834
+  },
+  {
+    "meal":"lunch",
+    "model_id":"arma",
+    "status":"✅",
+    "pinball":0.0083329274,
+    "pinball_zero":0.0121078783,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.1761293411
+  },
+  {
+    "meal":"lunch",
+    "model_id":"arima",
+    "status":"✅",
+    "pinball":0.0083329274,
+    "pinball_zero":0.0121078783,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.1655905247
+  },
+  {
+    "meal":"lunch",
+    "model_id":"sarima",
+    "status":"✅",
+    "pinball":0.0082827691,
+    "pinball_zero":0.0121078783,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.6301555634
+  },
+  {
+    "meal":"lunch",
     "model_id":"sarimax_calendar",
     "status":"✅",
     "pinball":0.0197211612,
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":1.1608867645
+    "seconds":1.1977210045
+  },
+  {
+    "meal":"lunch",
+    "model_id":"auto_arima",
+    "status":"✅",
+    "pinball":0.0079897399,
+    "pinball_zero":0.0121078783,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":7.9454545975
+  },
+  {
+    "meal":"lunch",
+    "model_id":"ets",
+    "status":"✅",
+    "pinball":0.0213186409,
+    "pinball_zero":0.0121078783,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.089868784
   },
   {
     "meal":"lunch",
@@ -17,7 +87,87 @@
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.05773139
+    "seconds":0.0391931534
+  },
+  {
+    "meal":"lunch",
+    "model_id":"stl_arima",
+    "status":"✅",
+    "pinball":0.0195253622,
+    "pinball_zero":0.0121078783,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.2581076622
+  },
+  {
+    "meal":"lunch",
+    "model_id":"mstl",
+    "status":"✅",
+    "pinball":0.0140458776,
+    "pinball_zero":0.0121078783,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.254686594
+  },
+  {
+    "meal":"lunch",
+    "model_id":"prophet",
+    "status":"✅",
+    "pinball":0.0126564788,
+    "pinball_zero":0.0121078783,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.7494168282
+  },
+  {
+    "meal":"dinner",
+    "model_id":"ar",
+    "status":"✅",
+    "pinball":0.0089593524,
+    "pinball_zero":0.0125513787,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.1451740265
+  },
+  {
+    "meal":"dinner",
+    "model_id":"ma",
+    "status":"✅",
+    "pinball":0.0088703022,
+    "pinball_zero":0.0125513787,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.2448749542
+  },
+  {
+    "meal":"dinner",
+    "model_id":"arma",
+    "status":"✅",
+    "pinball":0.0089399521,
+    "pinball_zero":0.0125513787,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.2299625874
+  },
+  {
+    "meal":"dinner",
+    "model_id":"arima",
+    "status":"✅",
+    "pinball":0.0089399521,
+    "pinball_zero":0.0125513787,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.2274143696
+  },
+  {
+    "meal":"dinner",
+    "model_id":"sarima",
+    "status":"✅",
+    "pinball":0.0084485255,
+    "pinball_zero":0.0125513787,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":0.8241460323
   },
   {
     "meal":"dinner",
@@ -27,7 +177,27 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":1.8296909332
+    "seconds":1.4754903316
+  },
+  {
+    "meal":"dinner",
+    "model_id":"auto_arima",
+    "status":"✅",
+    "pinball":0.0100965173,
+    "pinball_zero":0.0125513787,
+    "beats_zero":true,
+    "n_eval":65,
+    "seconds":54.1528768539
+  },
+  {
+    "meal":"dinner",
+    "model_id":"ets",
+    "status":"✅",
+    "pinball":0.0184683291,
+    "pinball_zero":0.0125513787,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.1685779095
   },
   {
     "meal":"dinner",
@@ -37,6 +207,36 @@
     "pinball_zero":0.0125513787,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.0511035919
+    "seconds":0.0634608269
+  },
+  {
+    "meal":"dinner",
+    "model_id":"stl_arima",
+    "status":"✅",
+    "pinball":0.0200922699,
+    "pinball_zero":0.0125513787,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.5363287926
+  },
+  {
+    "meal":"dinner",
+    "model_id":"mstl",
+    "status":"✅",
+    "pinball":0.0151139023,
+    "pinball_zero":0.0125513787,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.4609289169
+  },
+  {
+    "meal":"dinner",
+    "model_id":"prophet",
+    "status":"✅",
+    "pinball":0.0167036619,
+    "pinball_zero":0.0125513787,
+    "beats_zero":false,
+    "n_eval":65,
+    "seconds":0.6506175995
   }
 ]

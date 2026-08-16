@@ -33,17 +33,22 @@ CALENDAR_EXOG = ["is_holiday_any", "is_day_before_holiday", "is_exam_period",
 MEALS = ("lunch", "dinner")
 
 
-def build_l3_series() -> dict[str, pd.DataFrame]:
+def build_l3_series(restaurant_filter: set[str] | None = None) -> dict[str, pd.DataFrame]:
     """برمی‌گرداند ``{"lunch": df, "dinner": df}`` — هرکدام با ایندکس تاریخ روزانه‌ی
     کامل (بدون شکاف)، ستون‌های ``day_shock`` (هدف، NaN روی روزهای بدون سرویس)،
-    ``n_cells``، و رگرسور تقویمی (هرگز NaN)."""
+    ``n_cells``، و رگرسور تقویمی (هرگز NaN).
+
+    ``restaurant_filter`` (اختیاری): فقط این زیرمجموعه از سلف‌ها در محاسبه‌ی
+    ``day_shock`` وارد می‌شوند — برای آزمایش خوشه‌بندی (مثلاً فقط سلف‌های تهران، F12)."""
     df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    full_dates = pd.date_range(df[DATE_COL].min(), df[DATE_COL].max(), freq="D")
+    if restaurant_filter is not None:
+        df = df[df["RestaurantName"].isin(restaurant_filter)].reset_index(drop=True)
     cell = df.rename(columns={"rho": "rho_cell"})
     day = build_day_factor(cell)[[DATE_COL, "Meal", "day_shock", "n_cells"]]
 
     cal_raw = pd.read_csv(CALENDAR_PATH, parse_dates=[DATE_COL])
     calendar = cal_raw[[DATE_COL, *CALENDAR_EXOG]].drop_duplicates(subset=DATE_COL).set_index(DATE_COL)
-    full_dates = pd.date_range(df[DATE_COL].min(), df[DATE_COL].max(), freq="D")
     calendar = calendar.reindex(full_dates)
     if calendar[CALENDAR_EXOG].isna().any().any():
         raise ValueError("رگرسور تقویمی نباید NaN داشته باشد — مغایر با مستندسازی این ماژول")

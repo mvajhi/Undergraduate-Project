@@ -95,6 +95,71 @@ def render_report(df: pd.DataFrame, tau: float, k_factors: int) -> str:
     return "\n".join(lines)
 
 
+def run_city_cluster_comparison(tau: float = 0.2, k_factors: int = 1) -> pd.DataFrame:
+    """آزمایش هوشمند خوشه‌بندی (درخواست کاربر): آیا DFM محدود به سری‌های **تهران**
+    (۳۱ از ۴۱ سری، همگن‌تر) از DFM سراسری (۴۱ سری، آمیخته با ۵ شهر تک‌سلفی) بهتر است؟
+
+    شهر انتخاب شد نه خوشه‌ی F41، چون F12 (Cliff's δ=۰.۹۶۴) قوی‌ترین سیگنال گروه‌بندی
+    مستندشده‌ی کل پروژه است، و بررسی ستون‌ها نشان داد ۵ شهر غیرتهرانی هرکدام فقط **۱**
+    سلف دارند — یعنی DFM جداگانه برایشان اصلاً بی‌معناست (کمینه‌ی لازم ≥۲ سری). پس تنها
+    مقایسه‌ی معنادار: DFM(تهران-تنها) در برابر DFM(سراسری)، هر دو روی همان سلول‌های
+    تهران ارزیابی می‌شوند — نه یک grid روی همه‌ی شهرها.
+    """
+    from src.features.build import FEATURES_A_PATH
+    from src.features.l4_series import SEP
+
+    panel = build_l4_panel()
+    fx = pd.read_parquet(FEATURES_A_PATH)
+    tehran_restaurants = set(fx.loc[fx["is_tehran"], "RestaurantName"].unique())
+    tehran_cols = [c for c in panel.columns if c.split(SEP)[0] in tehran_restaurants]
+
+    folds = _official_panel_folds(panel)
+    rows = []
+    for i, (train, test) in enumerate(folds):
+        actual_tehran = test[tehran_cols].stack()
+        if actual_tehran.empty:
+            continue
+
+        result = {"fold": i, "n_tehran_series": len(tehran_cols)}
+        for label, train_sub, test_sub in [
+            ("پوششی (۴۱ سری)", train, test),
+            ("فقط-تهران (۳۱ سری)", train[tehran_cols], test[tehran_cols]),
+        ]:
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    pred = fit_predict_dfm(train_sub, test_sub, tau, k_factors=k_factors)
+                pred_tehran = pred[tehran_cols].stack().reindex(actual_tehran.index)
+                pb = float(pinball_loss(actual_tehran.to_numpy(), pred_tehran.to_numpy(), tau).mean())
+            except Exception:
+                pb = float("nan")
+            result[label] = pb
+        rows.append(result)
+    return pd.DataFrame(rows)
+
+
+def render_cluster_report(df: pd.DataFrame, tau: float) -> str:
+    cols = [c for c in df.columns if c not in ("fold", "n_tehran_series")]
+    lines = [
+        "# آزمایش خوشه‌بندی خ۴ — DFM سراسری در برابر DFM فقط-تهران",
+        "",
+        f"> درخواست کاربر: «روی مدل‌های خوب، خوشه‌بندی و مدل جداگانه تست کن، هوشمندانه نه "
+        "کامل». شهر (F12، Cliff's δ=۰.۹۶۴) انتخاب شد چون تنها سیگنال گروه‌بندی است که ≥۲ "
+        "سری در هر گروه تضمین می‌کند (۵ شهر دیگر هرکدام ۱ سلف دارند). هر دو مدل روی **همان "
+        f"سلول‌های تهران** ارزیابی می‌شوند — مقایسه‌ی منصفانه، τ={tau}.",
+        "",
+        "| fold | " + " | ".join(cols) + " |",
+        "|---|" + "---|" * len(cols),
+    ]
+    for _, r in df.iterrows():
+        vals = " | ".join(f"{r[c]:.5f}" if pd.notna(r[c]) else "—" for c in cols)
+        lines.append(f"| {int(r['fold'])} | {vals} |")
+
+    tehran_only_wins = int((df["فقط-تهران (۳۱ سری)"] < df["پوششی (۴۱ سری)"]).sum())
+    lines += ["", f"**DFM فقط-تهران در {tehran_only_wins} از {len(df)} fold از DFM سراسری بهتر بود.**"]
+    return "\n".join(lines)
+
+
 def main() -> None:
     from src.config import REPORTS_DIR, set_global_seed
 
@@ -106,7 +171,13 @@ def main() -> None:
     (out / "F04_feasibility.md").write_text(report + "\n")
     df.to_json(out / "F04_feasibility.json", orient="records", indent=2, force_ascii=False)
     print(report)
-    print(f"\nذخیره شد در {out / 'F04_feasibility.md'}")
+
+    df_cluster = run_city_cluster_comparison()
+    report_cluster = render_cluster_report(df_cluster, 0.2)
+    (out / "F04_city_cluster.md").write_text(report_cluster + "\n")
+    df_cluster.to_json(out / "F04_city_cluster.json", orient="records", indent=2, force_ascii=False)
+    print("\n" + report_cluster)
+    print(f"\nذخیره شد در {out / 'F04_feasibility.md'} و {out / 'F04_city_cluster.md'}")
 
 
 if __name__ == "__main__":

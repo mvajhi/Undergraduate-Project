@@ -24,3 +24,6 @@ group-lasso
 lightgbm
 catboost
 quantile-forest
+pmdarima
+prophet
+tbats
