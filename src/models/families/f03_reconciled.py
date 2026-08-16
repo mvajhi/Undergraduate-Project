@@ -27,6 +27,10 @@ import numpy as np
 import pandas as pd
 
 from src.features.aggregate_features import build_day_factor
+from src.models.registry import ModelSpec, register
+
+FAMILY = "F03"
+LEVEL = "L1"  # ⚠️ خروجی سلولی است (بالا)، برخلاف بقیه‌ی خ۳ که L3 دارند
 
 MA_ORDER = 2
 
@@ -103,3 +107,6 @@ def _forecast_in_sample_day_shock(cell_train: pd.DataFrame) -> pd.Series:
 
 
 MODELS = {"l3_reconciled_ma": fit_predict_l3_reconciled_ma}
+
+register(ModelSpec(model_id="l3_reconciled_ma", family=FAMILY, levels=(LEVEL,), quantile_route="Q3",
+                   algorithm="MA(2) روی day_shock + میانگین تاریخی سلف + یک آفست کوانتایل ترکیبی"))

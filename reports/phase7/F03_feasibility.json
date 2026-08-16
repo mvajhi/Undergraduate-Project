@@ -7,7 +7,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.1565392017
+    "seconds":0.2171392441
   },
   {
     "meal":"lunch",
@@ -17,7 +17,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.1881899834
+    "seconds":0.2642455101
   },
   {
     "meal":"lunch",
@@ -27,7 +27,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.1761293411
+    "seconds":0.2659604549
   },
   {
     "meal":"lunch",
@@ -37,7 +37,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.1655905247
+    "seconds":0.2678551674
   },
   {
     "meal":"lunch",
@@ -47,7 +47,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.6301555634
+    "seconds":1.1655356884
   },
   {
     "meal":"lunch",
@@ -57,7 +57,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":1.1977210045
+    "seconds":1.508654356
   },
   {
     "meal":"lunch",
@@ -67,7 +67,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":7.9454545975
+    "seconds":6.2478907108
   },
   {
     "meal":"lunch",
@@ -77,7 +77,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.089868784
+    "seconds":0.0635242462
   },
   {
     "meal":"lunch",
@@ -87,7 +87,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.0391931534
+    "seconds":0.0494220257
   },
   {
     "meal":"lunch",
@@ -97,7 +97,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.2581076622
+    "seconds":0.3266112804
   },
   {
     "meal":"lunch",
@@ -107,7 +107,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.254686594
+    "seconds":0.295396328
   },
   {
     "meal":"lunch",
@@ -117,7 +117,7 @@
     "pinball_zero":0.0121078783,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.7494168282
+    "seconds":0.6489937305
   },
   {
     "meal":"dinner",
@@ -127,7 +127,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.1451740265
+    "seconds":0.1894869804
   },
   {
     "meal":"dinner",
@@ -137,7 +137,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.2448749542
+    "seconds":0.3039813042
   },
   {
     "meal":"dinner",
@@ -147,7 +147,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.2299625874
+    "seconds":0.5824301243
   },
   {
     "meal":"dinner",
@@ -157,7 +157,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.2274143696
+    "seconds":0.3573586941
   },
   {
     "meal":"dinner",
@@ -167,7 +167,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":0.8241460323
+    "seconds":1.1686308384
   },
   {
     "meal":"dinner",
@@ -177,7 +177,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":1.4754903316
+    "seconds":1.52054739
   },
   {
     "meal":"dinner",
@@ -187,7 +187,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":true,
     "n_eval":65,
-    "seconds":54.1528768539
+    "seconds":62.3528461456
   },
   {
     "meal":"dinner",
@@ -197,7 +197,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.1685779095
+    "seconds":0.0714116096
   },
   {
     "meal":"dinner",
@@ -207,7 +207,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.0634608269
+    "seconds":0.0352246761
   },
   {
     "meal":"dinner",
@@ -217,7 +217,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.5363287926
+    "seconds":0.5118119717
   },
   {
     "meal":"dinner",
@@ -227,7 +227,7 @@
     "pinball_zero":0.0125513787,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.4609289169
+    "seconds":0.2381987572
   },
   {
     "meal":"dinner",
@@ -237,6 +237,6 @@
     "pinball_zero":0.0125513787,
     "beats_zero":false,
     "n_eval":65,
-    "seconds":0.6506175995
+    "seconds":0.5830974579
   }
 ]

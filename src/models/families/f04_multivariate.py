@@ -17,6 +17,11 @@
 import numpy as np
 import pandas as pd
 
+from src.models.registry import ModelSpec, register
+
+FAMILY = "F04"
+LEVEL = "L4"
+
 
 def fit_predict_dfm(train_panel: pd.DataFrame, test_panel: pd.DataFrame, tau: float,
                     k_factors: int = 1, factor_order: int = 1, **hp) -> pd.DataFrame:
@@ -44,3 +49,6 @@ def fit_predict_dfm(train_panel: pd.DataFrame, test_panel: pd.DataFrame, tau: fl
 
 
 MODELS = {"dfm": fit_predict_dfm}
+
+register(ModelSpec(model_id="dfm", family=FAMILY, levels=(LEVEL,), quantile_route="Q3",
+                   algorithm="statsmodels.DynamicFactorMQ (۱ عامل مشترک) + آفست کوانتایل تجربی"))

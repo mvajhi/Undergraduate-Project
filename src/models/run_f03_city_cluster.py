@@ -17,7 +17,8 @@ from src.baselines import pinball_loss
 from src.cv import load_cv_folds
 from src.features.build import FEATURES_A_PATH
 from src.features.l3_series import build_l3_series
-from src.models.families.f03_timeseries import fit_predict_ma
+from src.models.families.f03_timeseries import FAMILY, LEVEL, fit_predict_ma
+from src.models.tracking_l3l4 import log_l3_l4_run
 
 BEST_MODEL_ID = "ma"
 
@@ -87,6 +88,13 @@ def main() -> None:
     (out / "F03_city_cluster.md").write_text(report + "\n")
     df.to_json(out / "F03_city_cluster.json", orient="records", indent=2, force_ascii=False)
     print(report)
+
+    for label, variant in [("سراسری", "ma_national"), ("فقط-تهران", "ma_tehran_only")]:
+        log_l3_l4_run(
+            family=FAMILY, model_id=variant, level=LEVEL, feature_set="l3_day_shock_v1_city_cluster",
+            tau=0.2, metrics={"pinball_mean": float(df[label].mean(skipna=True))}, seconds=0.0,
+            extra_tags={"cluster_variant": label}, extra_params={"experiment_type": "city_cluster_comparison"})
+
     print(f"\nذخیره شد در {out / 'F03_city_cluster.md'}")
 
 

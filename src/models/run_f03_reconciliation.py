@@ -11,11 +11,12 @@
 import numpy as np
 import pandas as pd
 
-from src.baselines import b3_empirical_quantile, pinball_loss
+from src.baselines import b3_empirical_quantile, operational_metrics, pinball_loss
 from src.cv import DATE_COL, block_bootstrap_2d, effective_sample_size, load_cv_folds
 from src.features.build import FEATURES_A_PATH
 from src.models.axes import TUNING_TAU
-from src.models.families.f03_reconciled import fit_predict_l3_reconciled_ma
+from src.models.families.f03_reconciled import FAMILY, LEVEL, fit_predict_l3_reconciled_ma
+from src.models.tracking_l3l4 import log_l3_l4_run
 
 DAY_ICC = 0.225
 
@@ -32,7 +33,7 @@ def run(tau: float = TUNING_TAU, n_boot: int = 1000, seed: int = 42) -> dict:
     for tr, te in folds:
         pred = fit_predict_l3_reconciled_ma(tr, te, tau)
         b3_pred = np.asarray(b3_empirical_quantile(tr, te, tau), dtype=float)
-        part = te[[DATE_COL, "RestaurantName", "rho"]].copy()
+        part = te[[DATE_COL, "RestaurantName", "rho", "Res", "Recv"]].copy()
         part["pred_q"] = pred
         part["b3_pred_q"] = b3_pred
         parts.append(part)
@@ -51,9 +52,12 @@ def run(tau: float = TUNING_TAU, n_boot: int = 1000, seed: int = 42) -> dict:
     cluster_sizes = merged.groupby(DATE_COL, observed=True).size().to_numpy()
     n_eff = effective_sample_size(len(merged), cluster_sizes, icc=DAY_ICC)
 
+    # قرارداد L1 کامل رعایت شده — KPI استاندارد (نه فقط pinball) هم مثل بقیه‌ی مدل‌های L1
+    kpi = operational_metrics(merged, merged["pred_q"].to_numpy(), tau)
+
     return {"pinball_reconciled": pb, "pinball_B3": pb_b3, "pinball_lightgbm_quantile": 0.012107566940754636,
            "delta_vs_B3": delta, "delta_vs_B3_ci_lo": lo, "delta_vs_B3_ci_hi": hi,
-           "beats_B3_significant": bool(hi < 0), "n_raw": len(merged), "n_eff": n_eff}
+           "beats_B3_significant": bool(hi < 0), "n_raw": len(merged), "n_eff": n_eff, "kpi": kpi}
 
 
 def render_report(result: dict, tau: float) -> str:
@@ -91,8 +95,20 @@ def main() -> None:
     out = REPORTS_DIR / "phase7"
     out.mkdir(parents=True, exist_ok=True)
     (out / "F03_reconciliation.md").write_text(report + "\n")
+    kpi = result.pop("kpi")
     pd.Series(result).to_json(out / "F03_reconciliation.json", indent=2, force_ascii=False)
     print(report)
+
+    log_l3_l4_run(
+        family=FAMILY, model_id="l3_reconciled_ma", level=LEVEL, feature_set="l3_day_shock_v1_reconciled",
+        tau=TUNING_TAU,
+        metrics={**{k: v for k, v in kpi.items() if k != "n"},
+                "delta_vs_B3": result["delta_vs_B3"], "delta_vs_B3_ci_lo": result["delta_vs_B3_ci_lo"],
+                "delta_vs_B3_ci_hi": result["delta_vs_B3_ci_hi"],
+                "beats_B3_significant": float(result["beats_B3_significant"]),
+                "n_eff": result["n_eff"]},
+        seconds=0.0, extra_tags={"experiment_type": "l3_to_l1_reconciliation"})
+
     print(f"\nذخیره شد در {out / 'F03_reconciliation.md'}")
 
 

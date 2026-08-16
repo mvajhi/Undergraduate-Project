@@ -838,6 +838,40 @@ def test_f03_l3_series_no_gaps_and_calendar_never_nan() -> tuple[bool, str]:
            f"هر دو وعده حاضر={ok_meals} · " + " · ".join(f"{k}={v}" for k, v in checks.items()))
 
 
+def test_log_l3_l4_run_writes_isolated_mlflow_run() -> tuple[bool, str]:
+    """چرا این تست وجود دارد: خ۳/خ۴ اولین‌بار بی هیچ ثبت MLflow اجرا شده بودند (کاربر
+    پرسید چرا AR/MA در MLflow نیست) — این تست تضمین می‌کند ``log_l3_l4_run`` واقعاً یک
+    run با tag/param/metric درست می‌سازد، روی tracking URI ایزوله (نه mlruns/ واقعی)."""
+    import shutil
+    import tempfile
+    from pathlib import Path
+
+    from src.models import tracking
+
+    tmp_dir = Path(tempfile.mkdtemp())
+    original_uri = tracking.MLFLOW_TRACKING_URI
+    tracking.MLFLOW_TRACKING_URI = str(tmp_dir / "mlruns")
+    try:
+        from src.models.tracking_l3l4 import log_l3_l4_run
+
+        run_id = log_l3_l4_run(family="F03", model_id="ar", level="L3", feature_set="l3_day_shock_v1",
+                               tau=0.2, metrics={"pinball": 0.008, "beats_zero": 1.0}, seconds=1.5,
+                               extra_tags={"meal": "lunch"})
+
+        import mlflow
+        client = mlflow.tracking.MlflowClient(tracking_uri=tracking.MLFLOW_TRACKING_URI)
+        run = client.get_run(run_id)
+        ok_family = run.data.params.get("family") == "F03"
+        ok_level = run.data.params.get("level") == "L3"
+        ok_metric = abs(run.data.metrics.get("pinball", -1) - 0.008) < 1e-9
+        ok_tag = run.data.tags.get("meal") == "lunch"
+        return (ok_family and ok_level and ok_metric and ok_tag,
+               f"family={ok_family} · level={ok_level} · metric={ok_metric} · tag سفارشی={ok_tag}")
+    finally:
+        tracking.MLFLOW_TRACKING_URI = original_uri
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
 def test_f03_reconciled_ma_honors_l1_contract() -> tuple[bool, str]:
     """بند 7.24: ``fit_predict_l3_reconciled_ma`` باید قرارداد یکسان L1 را رعایت کند
     (شکل=len(test)، متناهی، داخل [۰,۱]) — برخلاف بقیه‌ی ماژول خ۳ که سطح L3 دارند،
@@ -1494,6 +1528,7 @@ _ALL_TESTS = [
     test_f04_l4_panel_shape_and_dfm_output_bounded,
     test_f03_full_classical_roster_and_city_filter,
     test_f03_reconciled_ma_honors_l1_contract,
+    test_log_l3_l4_run_writes_isolated_mlflow_run,
     test_significance_run_significance_is_family_agnostic,
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,

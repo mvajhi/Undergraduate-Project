@@ -16,7 +16,8 @@ import pandas as pd
 from src.baselines import pinball_loss
 from src.cv import DATE_COL, load_cv_folds
 from src.features.l4_series import build_l4_panel
-from src.models.families.f04_multivariate import fit_predict_dfm
+from src.models.families.f04_multivariate import FAMILY, LEVEL, fit_predict_dfm
+from src.models.tracking_l3l4 import log_l3_l4_run
 
 
 def _official_panel_folds(panel: pd.DataFrame) -> list[tuple[pd.DataFrame, pd.DataFrame]]:
@@ -172,11 +173,31 @@ def main() -> None:
     df.to_json(out / "F04_feasibility.json", orient="records", indent=2, force_ascii=False)
     print(report)
 
+    n_ok = int((df["status"] == "✅").sum())
+    log_l3_l4_run(
+        family=FAMILY, model_id="dfm", level=LEVEL, feature_set="l4_panel_v1", tau=0.2,
+        metrics={"pinball_mean": float(df["pinball_dfm"].mean(skipna=True)),
+                "pinball_naive_mean": float(df["pinball_naive"].mean()),
+                "n_folds_converged": n_ok, "n_folds_total": len(df),
+                "n_folds_beat_naive": int(df["beats_naive"].sum())},
+        seconds=float(df["seconds"].sum()),
+        extra_tags={"outcome": "pass" if n_ok == len(df) else "partial"},
+        extra_params={"k_factors": 1})
+
     df_cluster = run_city_cluster_comparison()
     report_cluster = render_cluster_report(df_cluster, 0.2)
     (out / "F04_city_cluster.md").write_text(report_cluster + "\n")
     df_cluster.to_json(out / "F04_city_cluster.json", orient="records", indent=2, force_ascii=False)
     print("\n" + report_cluster)
+
+    for label, model_variant in [("پوششی (۴۱ سری)", "dfm_pooled41"), ("فقط-تهران (۳۱ سری)", "dfm_tehran_only31")]:
+        log_l3_l4_run(
+            family=FAMILY, model_id=model_variant, level=LEVEL,
+            feature_set="l4_panel_v1_city_cluster", tau=0.2,
+            metrics={"pinball_mean_tehran_cells": float(df_cluster[label].mean(skipna=True))},
+            seconds=0.0, extra_tags={"cluster_variant": label},
+            extra_params={"k_factors": 1, "experiment_type": "city_cluster_comparison"})
+
     print(f"\nذخیره شد در {out / 'F04_feasibility.md'} و {out / 'F04_city_cluster.md'}")
 
 

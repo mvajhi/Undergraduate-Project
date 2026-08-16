@@ -17,6 +17,7 @@ import src.models.families.f03_timeseries as f03
 from src.baselines import pinball_loss
 from src.cv import load_cv_folds
 from src.features.l3_series import build_l3_series
+from src.models.tracking_l3l4 import log_l3_l4_run
 
 
 def _official_l3_folds(series: pd.DataFrame) -> list[tuple[pd.DataFrame, pd.DataFrame]]:
@@ -47,16 +48,26 @@ def run_feasibility(tau: float = 0.2) -> pd.DataFrame:
             if not preds:
                 rows.append({"meal": meal, "model_id": model_id, "status": "❌ شکست در همه‌ی fold‌ها",
                             "pinball": float("nan"), "pinball_zero": float("nan"), "n_eval": 0, "seconds": seconds})
+                log_l3_l4_run(family=f03.FAMILY, model_id=model_id, level=f03.LEVEL,
+                              feature_set="l3_day_shock_v1", tau=tau,
+                              metrics={"pinball": float("nan"), "n_eval": 0},
+                              seconds=seconds, extra_tags={"outcome": "failed", "meal": meal})
                 continue
             actual = np.concatenate(actuals)
             pred = np.concatenate(preds)
             pb = float(pinball_loss(actual, pred, tau).mean())
             pb_zero = float(pinball_loss(actual, np.zeros_like(actual), tau).mean())
+            beats_zero = pb < pb_zero
             rows.append({
                 "meal": meal, "model_id": model_id, "status": "✅" if n_fail == 0 else f"⚠️ {n_fail} fold شکست",
-                "pinball": pb, "pinball_zero": pb_zero, "beats_zero": pb < pb_zero,
+                "pinball": pb, "pinball_zero": pb_zero, "beats_zero": beats_zero,
                 "n_eval": len(actual), "seconds": seconds,
             })
+            log_l3_l4_run(
+                family=f03.FAMILY, model_id=model_id, level=f03.LEVEL, feature_set="l3_day_shock_v1", tau=tau,
+                metrics={"pinball": pb, "pinball_zero": pb_zero, "beats_zero": float(beats_zero),
+                        "n_eval": len(actual), "n_fold_fail": n_fail},
+                seconds=seconds, extra_tags={"outcome": "pass" if n_fail == 0 else "partial", "meal": meal})
     return pd.DataFrame(rows)
 
 

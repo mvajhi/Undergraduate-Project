@@ -8,7 +8,7 @@
     "pinball_dfm":0.0127998581,
     "pinball_naive":0.0128682032,
     "beats_naive":true,
-    "seconds":1.4502637386,
+    "seconds":2.2340254784,
     "n_eval":478
   },
   {
@@ -20,7 +20,7 @@
     "pinball_dfm":0.0152746033,
     "pinball_naive":0.0158264852,
     "beats_naive":true,
-    "seconds":6.0321633816,
+    "seconds":6.6857669353,
     "n_eval":472
   },
   {
@@ -32,7 +32,7 @@
     "pinball_dfm":0.0240171478,
     "pinball_naive":0.0274270933,
     "beats_naive":true,
-    "seconds":5.6098487377,
+    "seconds":2.7531306744,
     "n_eval":104
   },
   {
@@ -44,7 +44,7 @@
     "pinball_dfm":0.0134517285,
     "pinball_naive":0.0083329592,
     "beats_naive":false,
-    "seconds":8.9155879021,
+    "seconds":3.8060319424,
     "n_eval":541
   },
   {
@@ -56,7 +56,7 @@
     "pinball_dfm":0.0108137568,
     "pinball_naive":0.009228347,
     "beats_naive":false,
-    "seconds":14.7543678284,
+    "seconds":6.0681843758,
     "n_eval":488
   }
 ]
