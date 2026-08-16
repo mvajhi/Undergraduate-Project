@@ -598,6 +598,32 @@ def test_ensemble_evaluate_arithmetic() -> tuple[bool, str]:
            f"میانگین محاسبه‌شده درست={ok_mean_correct} · pinball متناهی={ok_pinball_finite}")
 
 
+def test_tau_sensitivity_render_report_flags_generalization() -> tuple[bool, str]:
+    """اسپرینت D (چک‌لیست خط ۱۶۰): ``render_report`` باید وقتی برتری نسبت به B3 در
+    **همه‌ی** τها حفظ شد پیام «تعمیم می‌یابند» بدهد، و وقتی در یک τ از دست رفت آن τ را
+    صریحاً در پیام فهرست کند — روی داده‌ی مصنوعی، بدون فراخوانی مدل واقعی."""
+    import pandas as pd
+
+    from src.models.tau_sensitivity import render_report
+
+    df_all_beat = pd.DataFrame([
+        {"tau": 0.02, "pinball": 0.002, "pinball_B3": 0.003, "delta_vs_B3": -0.001,
+         "beats_B3": True, "coverage": 0.03, "gap": 0.01},
+        {"tau": 0.20, "pinball": 0.012, "pinball_B3": 0.013, "delta_vs_B3": -0.001,
+         "beats_B3": True, "coverage": 0.21, "gap": 0.01},
+    ])
+    report_all_beat = render_report(df_all_beat, {"num_leaves": 19})
+    ok_generalizes = "تعمیم می‌یابند" in report_all_beat and "2 از 2" in report_all_beat
+
+    df_one_miss = df_all_beat.copy()
+    df_one_miss.loc[0, "beats_B3"] = False
+    report_one_miss = render_report(df_one_miss, {"num_leaves": 19})
+    ok_flags_miss = "برتری از دست رفت" in report_one_miss and "0.02" in report_one_miss
+
+    return (ok_generalizes and ok_flags_miss,
+           f"پیام تعمیم درست={ok_generalizes} · τ ازدست‌رفته فهرست شد={ok_flags_miss}")
+
+
 def test_aci_adapts_to_regime_shift_where_cqr_fails() -> tuple[bool, str]:
     """بند 7.22.1 عضو ۴ (ACI): روی داده‌ی مصنوعی با **تغییر رژیم** (نیمه‌ی دوم test
     میانگین ρ را از ۰.۱۰ به ۰.۲۰ می‌برد)، هم مدل خام و هم CQR ایستا باید کاملاً شکست
@@ -1257,6 +1283,7 @@ _ALL_TESTS = [
     test_cohort_features_no_leakage_and_full_coverage,
     test_aci_adapts_to_regime_shift_where_cqr_fails,
     test_ensemble_evaluate_arithmetic,
+    test_tau_sensitivity_render_report_flags_generalization,
 ]
 
 
