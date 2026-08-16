@@ -511,6 +511,37 @@ def test_f09_lightgbm_lss_beta_on_real_data() -> tuple[bool, str]:
            f"شکل={ok_shape} · متناهی={ok_finite} · داخل [0,1]={ok_range}")
 
 
+def test_f10_knn_quantile_beats_or_near_b3_on_real_fold() -> tuple[bool, str]:
+    """kNN-Quantile (خ۱۰) باید روی fold۰ واقعی pinball معتبر و در محدوده‌ی معقول نسبت
+    به B3 بدهد — تعمیم مستقیم B3 است، پس نباید خیلی بدتر شود."""
+    from src.features.build import FEATURES_A_PATH
+
+    if not FEATURES_A_PATH.exists():
+        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
+
+    import numpy as np
+    import pandas as pd
+
+    from src.baselines import b3_empirical_quantile, operational_metrics
+    from src.cv import DATE_COL, load_cv_folds
+    from src.models.families.f10_instance import fit_predict_knn_quantile
+
+    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
+    folds, _ = load_cv_folds()
+    tr_mask, te_mask = folds[0].masks(df[DATE_COL])
+    train, test = df.loc[tr_mask], df.loc[te_mask]
+    tau = 0.20
+
+    pred = fit_predict_knn_quantile(train, test, tau)
+    ok_shape = pred.shape == (len(test),)
+    ok_finite = np.all(np.isfinite(pred)) and pred.min() >= 0 and pred.max() <= 1
+    pb_knn = operational_metrics(test, pred, tau)["pinball"]
+    pb_b3 = operational_metrics(test, b3_empirical_quantile(train, test, tau), tau)["pinball"]
+    ok_reasonable = pb_knn < pb_b3 * 1.5  # نباید فاجعه‌بار بدتر باشد
+    return (ok_shape and ok_finite and ok_reasonable,
+           f"شکل={ok_shape} · متناهی={ok_finite} · pinball knn={pb_knn:.5f} در برابر B3={pb_b3:.5f}")
+
+
 def test_f02_all_specs_have_algorithm() -> tuple[bool, str]:
     """هر ۳ عضو کوتاه‌فهرست‌شده‌ی F02 (اسپرینت C) باید algorithm غیرخالی و فضای
     هایپرپارامتر ثبت‌شده داشته باشند."""
@@ -1059,6 +1090,7 @@ _ALL_TESTS = [
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
     test_f09_lightgbm_lss_beta_on_real_data,
+    test_f10_knn_quantile_beats_or_near_b3_on_real_fold,
 ]
 
 

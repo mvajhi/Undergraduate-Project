@@ -479,6 +479,34 @@
     "seconds": 0.8408386707305908,
     "status": "pass"
   },
+  "F10/L1/knn_quantile": {
+    "error": null,
+    "family": "F10",
+    "level": "L1",
+    "metrics": {
+      "MAE_portions": 8.903448275862068,
+      "MAE_rho": 0.059097114431334155,
+      "R2_rho": -0.2826197933726802,
+      "RMSE_portions": 14.589478179949356,
+      "RMSE_rho": 0.09169549708705994,
+      "coverage": 0.14022988505747128,
+      "coverage_gap": -0.059770114942528735,
+      "n": 870,
+      "pinball": 0.013945916040805296,
+      "pinball_portions": 1.9234649110576032,
+      "shortage_portions": 277.0,
+      "shortage_rate": 0.06206896551724138,
+      "surplus_portions": 7469.0,
+      "waste_reduction_pct": 0.5729071363220495
+    },
+    "mlflow_run_id": "b1ca7b4f48164e19ac0f98dcfb7f29ef",
+    "model_id": "knn_quantile",
+    "output_max": 0.1314081406598336,
+    "output_mean": 0.05489212014922198,
+    "output_min": 0.0,
+    "seconds": 0.405017614364624,
+    "status": "pass"
+  },
   "F11/L1/erm_newsvendor": {
     "error": null,
     "family": "F11",

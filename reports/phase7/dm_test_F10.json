@@ -1,0 +1,22 @@
+[
+  {
+    "model":"knn_quantile",
+    "reference":"B3",
+    "pinball_model":0.0129814846,
+    "pinball_reference":0.0133468493,
+    "delta_pinball":-0.0003653647,
+    "dm_stat":-3.3782719168,
+    "p_value":0.0007294291,
+    "significant_at_0.05":true
+  },
+  {
+    "model":"knn_quantile",
+    "reference":"B6",
+    "pinball_model":0.0129814846,
+    "pinball_reference":0.0150209744,
+    "delta_pinball":-0.0020394898,
+    "dm_stat":-8.2610932701,
+    "p_value":2.220446049e-16,
+    "significant_at_0.05":true
+  }
+]
