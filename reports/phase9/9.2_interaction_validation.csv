@@ -1,0 +1,5 @@
+engineered_col,base_pair,phase4_delta_aic,shap_importance_engineered_col,base_a_importance,base_b_importance
+dow_x_city,dow×city,20.7,0.00787578990392638,6.688026218776896e-05,0.0
+dow_x_type,dow×RestaurantType,56.2,0.0007833816164084037,6.688026218776896e-05,1.249659458966666e-05
+city_x_meal,city×Meal,19.4,0.00018317612174752147,0.0,0.0
+meal_x_type,Meal×RestaurantType,52.7,0.0,0.0,1.249659458966666e-05
