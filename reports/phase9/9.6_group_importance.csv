@@ -1,0 +1,4 @@
+group,n_features,sum_mean_abs_shap,share_pct,top_feature
+تاریخچه‌ی شخصی,11,1.1183446121658112,87.02532705825486,person_shrunk_norecv_rate
+جمعیتی,6,0.09401582120652804,7.315953866226924,college_freq
+بافتاری,2,0.07271903713305736,5.658719075518215,Meal
