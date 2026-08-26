@@ -27,3 +27,4 @@ quantile-forest
 pmdarima
 prophet
 tbats
+numpyro  # فقط برای بند ۸.۱ فاز ۸ — بازبرازش تکی bhm_varying_dispersion روی Test قفل‌شده (CPU)؛ برخلاف torch/gpytorch S1/S2 اینجا GPU لازم نیست

@@ -1,0 +1,33 @@
+{
+  "hyperparams": {
+    "prior_preset": "tight",
+    "target_accept": 0.8696087502258014,
+    "num_warmup": 500,
+    "num_samples": 600,
+    "num_chains": 2
+  },
+  "seeds": [
+    42,
+    1234
+  ],
+  "diagnostics": [
+    {
+      "max_r_hat": 1.0159186124801636,
+      "min_ess": 47.58547746042579,
+      "n_divergences": 0,
+      "divergence_rate": 0.0,
+      "passes_rhat": false,
+      "passes_ess": false,
+      "passes_divergence": true
+    },
+    {
+      "max_r_hat": 1.0147472620010376,
+      "min_ess": 90.75039923919927,
+      "n_divergences": 0,
+      "divergence_rate": 0.0,
+      "passes_rhat": false,
+      "passes_ess": false,
+      "passes_divergence": true
+    }
+  ]
+}
