@@ -1,0 +1,9 @@
+conditions,rho_hat,n_test_rows,cook_pct_of_reservation
+`cell_dow_expanding_rate` > 0.065 AND `log_res` > 2.441 AND `cell_dow_shrunk_rate` ≤ 0.112,0.0723398671419988,683,92.76601328580011
+`cell_dow_expanding_rate` > 0.065 AND `log_res` > 2.441 AND `cell_dow_shrunk_rate` > 0.112,0.10024459693811391,341,89.9755403061886
+`cell_dow_expanding_rate` ≤ 0.065 AND `cell_expanding_rate` > 0.040 AND `day_shock_lag1` ≤ 0.010,0.047351136593025235,259,95.26488634069747
+`cell_dow_expanding_rate` ≤ 0.065 AND `cell_expanding_rate` ≤ 0.040 AND `log_daily_total_res` > 8.786,0.016004848855156028,136,98.39951511448439
+`cell_dow_expanding_rate` ≤ 0.065 AND `cell_expanding_rate` > 0.040 AND `day_shock_lag1` > 0.010,0.07267426853456319,37,92.73257314654369
+`cell_dow_expanding_rate` ≤ 0.065 AND `cell_expanding_rate` ≤ 0.040 AND `log_daily_total_res` ≤ 8.786,0.03585444946187854,35,96.41455505381215
+`cell_dow_expanding_rate` > 0.065 AND `log_res` ≤ 2.441 AND `dow_sin3` > -0.391,0.0042402336848679535,18,99.57597663151321
+`cell_dow_expanding_rate` > 0.065 AND `log_res` ≤ 2.441 AND `dow_sin3` ≤ -0.391,0.019631317886193576,17,98.03686821138065
