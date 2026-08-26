@@ -1,0 +1,5 @@
+feature,model_direction,strata_agreeing,n_strata,agrees,per_stratum,spearman_vs_rho,p
+rho_cell_lag1,صعودی,4,4,True,Q1:صعودی · Q2:صعودی · Q3:صعودی · Q4:صعودی,0.5285060778454429,0.0
+day_shock_lag1,صعودی,4,4,True,Q1:صعودی · Q2:صعودی · Q3:صعودی · Q4:صعودی,0.2240368232734577,1.4516199245840037e-80
+cell_dow_expanding_rate,صعودی,4,4,True,Q1:صعودی · Q2:صعودی · Q3:صعودی · Q4:صعودی,0.5818584135584348,0.0
+res_vs_history,نزولی,3,4,True,Q1:صعودی · Q2:نزولی · Q3:نزولی · Q4:نزولی,-0.19184039355820395,4.3312798829209816e-63
