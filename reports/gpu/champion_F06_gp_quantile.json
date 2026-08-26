@@ -1,0 +1,82 @@
+{
+  "model_id": "gp_quantile",
+  "family": "F06",
+  "level": "L1",
+  "tau": 0.2,
+  "hyperparams": {
+    "kernel": "K5_full",
+    "n_iters": 104,
+    "learning_rate": 0.019315397754283637
+  },
+  "seeds": [
+    42,
+    1234
+  ],
+  "per_seed_pinball": {
+    "42": 0.015803069623775225,
+    "1234": 0.015784584284356556
+  },
+  "pinball_row_mean": 0.015784584284356556,
+  "pinball_fold_mean": 0.017927299762114234,
+  "metrics": {
+    "pinball": 0.017927299762114234,
+    "pinball_portions": 2.9222531690149585,
+    "MAE_rho": 0.07695937485239579,
+    "RMSE_rho": 0.11482834434212244,
+    "R2_rho": -0.4110934635869379,
+    "MAE_portions": 14.1771061282488,
+    "RMSE_portions": 22.927056605229687,
+    "coverage": 0.1351863610436967,
+    "coverage_gap": -0.06481363895630331,
+    "shortage_rate": 0.06382678979347767,
+    "shortage_portions": 819.0,
+    "surplus_portions": 51174.0,
+    "waste_reduction_pct": 0.38457348174392025
+  },
+  "coverage": 0.13994845360824743,
+  "coverage_gap": -0.060051546391752586,
+  "aci_coverage": 0.2,
+  "aci_coverage_gap": 0.0,
+  "aci_pinball": 0.015188770038240089,
+  "dm_vs_b3": {
+    "dm_stat": 15.304234773870364,
+    "p_value": 0.0,
+    "delta_pinball": 0.002437734949324805,
+    "significant_at_0.05": false
+  },
+  "baseline_b3_row": 0.013346849335031752,
+  "baseline_b3_fold": 0.015901173795910366,
+  "artifacts": [
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold0.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold0.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold0__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold1.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold1.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold1__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold2.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold2.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold2__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold3.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold3.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold3__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold4.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold4.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s1234__fold4__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold0.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold0.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold0__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold1.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold1.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold1__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold2.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold2.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold2__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold3.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold3.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold3__ard.csv",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold4.json",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold4.pt",
+    "models/gpu/F06/gp_quantile/gp_quantile__s42__fold4__ard.csv"
+  ],
+  "fit_seconds": 1022.0122029781342
+}

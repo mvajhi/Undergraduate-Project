@@ -1,0 +1,30 @@
+[
+  {
+    "res_quartile":"Q1(کم)",
+    "n":975,
+    "res_median":28.0,
+    "coverage":0.3241025641,
+    "gap":0.1241025641
+  },
+  {
+    "res_quartile":"Q2",
+    "n":971,
+    "res_median":96.0,
+    "coverage":0.2080329557,
+    "gap":0.0080329557
+  },
+  {
+    "res_quartile":"Q3",
+    "n":967,
+    "res_median":215.0,
+    "coverage":0.2099276112,
+    "gap":0.0099276112
+  },
+  {
+    "res_quartile":"Q4(زیاد)",
+    "n":967,
+    "res_median":568.0,
+    "coverage":0.1975180972,
+    "gap":-0.0024819028
+  }
+]

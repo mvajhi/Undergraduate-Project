@@ -1,0 +1,46 @@
+{
+  "model_id": "bhm_varying_dispersion",
+  "family": "F08",
+  "level": "L1",
+  "tau": 0.2,
+  "n_trials_done": 3,
+  "n_fail": 0,
+  "best_pinball": 0.014767475159216675,
+  "best_hyperparams": {
+    "prior_preset": "tight",
+    "target_accept": 0.8696087502258014,
+    "num_warmup": 500,
+    "num_samples": 600
+  },
+  "best_fold_pinballs": [
+    0.012810794171814755,
+    0.015655939744207766,
+    0.027062970851838192,
+    0.008993132278571521,
+    0.009314538749651134
+  ],
+  "history": [
+    [
+      0,
+      0.015754706011997792,
+      457.4150867462158
+    ],
+    [
+      1,
+      0.015698032947280685,
+      642.6509258747101
+    ],
+    [
+      2,
+      0.014767475159216675,
+      608.6341338157654
+    ]
+  ],
+  "seconds": 1708.881327867508,
+  "budget_minutes": 22,
+  "budget_exhausted": true,
+  "converged": true,
+  "stable_top10pct_folds": 4,
+  "baseline_b3": 0.015901173795910366,
+  "device": "cuda"
+}

@@ -112,4 +112,14 @@ python -m src.data.make_dataset_individual
 |---|---|---|---|---|
 | `data/processed/cv_folds.json` | 2026-08-14 | `bd08d6f7c801ee0611121e404774251de07a480ac1589b12eb7c64f8044b78d4` | git مستقیم (فایل کوچک، مثل `feature_sets_v1.json`) — بازتولید با `python -m src.cv` | ۵ fold walk-forward گسترشی، از ۱۴۲ تاریخ یکتای `features_A_v1.parquet` (`n_folds=5, min_train_days=60`). **منجمد است** — `src/cv.py::main()` اگر فایل موجود باشد بازنویسی نمی‌کند. |
 
+### هش snapshot داده‌ی هر سطح — `data_snapshot_hash` (بند 7.7.2)
+
+این دو هش، مقدار param اجباری `data_snapshot_hash` هر MLflow run فاز ۷ هستند و در سلول ۳ هر نوت‌بوک GPU (بند 7.8.2) به‌صورت `assert` بررسی می‌شوند — چون نوت‌بوک کولب داده را از Drive می‌خواند، نه از DVC، و بدون این assert هیچ اثباتی وجود ندارد که همان فایل مخزن آپلود شده است.
+
+| فایل | سطح داده | SHA-256 | مصرف‌کننده |
+|---|---|---|---|
+| `data/processed/features_A_v1.parquet` | L1 (سلول $(d,m,r,f)$، ۷٬۵۷۹ ردیف) | `68b4cb8517d292599b2f161f779758b9f3254d60302849f39d81650d0bd9fba0` | خ۱، خ۲، خ۶، خ۷-الف، خ۸، خ۹، خ۱۰، خ۱۱ |
+| `data/processed/person_features_v1.parquet` | L5 (رزرو فردی، ۲٬۰۴۹٬۳۲۲ ردیف) | `90097e5f3b7d4572ee94c9a1a09ae0d0ec65115c413445a4751e20c48ac35de0` | خ۷-ب (سطح فرد)، فیچرهای کوهورت اسپرینت B |
+| `data/processed/feature_sets_v1.json` | — (تعریف فیچرست‌ها) | `0c7d6a59a8e596681266d9a165ad2413cd09aed43fddfc4bc3ad9bf0a550cc3e` | همه |
+
 ⚠️ **هر run آموزش مدل فاز ۷ (هر خانواده، هر سطح داده) باید foldهایش را از همین فایل بخواند** (`src.cv.load_cv_folds()`) و `cv_folds_hash` بازگشتی را به‌عنوان param در MLflow ثبت کند — نه اینکه `WalkForwardSplitter` را مستقیم و دوباره صدا بزند. اگر داده یا پروتکل CV تغییر کرد و این فایل عمداً بازتولید شد، هش جدید باید هم اینجا و هم در تمام ارجاعات (`AGENTS.md`) به‌روزرسانی شود، و **تمام runهای قبلی با هش قدیمی از جدول مقایسه‌ی فاز ۷ حذف می‌شوند** (بند 7.7.3).

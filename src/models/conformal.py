@@ -108,11 +108,42 @@ def oof_calibrated_predictions(fit_fn, folds: list, tau: float, hyperparams: dic
 ACI_GAMMA = 0.05
 
 
+def aci_from_predictions(pred_calib: np.ndarray, actual_calib: np.ndarray,
+                         pred_test: np.ndarray, actual_test: np.ndarray,
+                         test_dates: np.ndarray, tau: float, gamma: float = ACI_GAMMA
+                         ) -> tuple[np.ndarray, list[float]]:
+    """هسته‌ی ACI روی پیش‌بینی‌های **از پیش محاسبه‌شده** — بدون هیچ برازشی.
+
+    ⚠️ **چرا جدا شد.** ``aci_predict`` پایین‌تر ``fit_fn`` را دو بار صدا می‌زند (یک‌بار
+    برای مجموعه‌ی کالیبراسیون، یک‌بار برای test) که برای مدل‌های سبک خ۱/خ۲ بی‌اهمیت
+    است ولی برای خانواده‌های GPU (شبکه‌ی عصبی روی ۲ میلیون رزرو، NUTS، GP) یعنی دو
+    برابر شدن کل بودجه‌ی محاسباتی. هارنس GPU یک‌بار روی ``proper`` برازش می‌کند و
+    هر دو پیش‌بینی را از همان مدل می‌گیرد، سپس این تابع را صدا می‌زند — ریاضیاتش
+    مو‌به‌مو همان است.
+    """
+    correction = float(np.quantile(np.asarray(actual_calib, dtype=float)
+                                   - np.asarray(pred_calib, dtype=float), tau))
+    pred_test = np.asarray(pred_test, dtype=float)
+    actual_test = np.asarray(actual_test, dtype=float)
+    out = np.empty(len(pred_test), dtype=float)
+    path = [correction]
+    for day in pd.unique(test_dates):
+        mask = test_dates == day
+        pred_day = np.clip(pred_test[mask] + correction, 0.0, 1.0)
+        out[mask] = pred_day
+        # ⚠️ باید «نرخ پوشش» باشد (actual <= pred)، نه «نرخ نقض» — چون هدف P(actual<=pred)=τ
+        # است، نه ۱−τ. علامت اشتباه (نرخ نقض) باعث واگرایی نامحدود تصحیح می‌شد (رگرسیون تست).
+        coverage_rate = float((actual_test[mask] <= pred_day).mean())
+        correction += gamma * (tau - coverage_rate)
+        path.append(correction)
+    return out, path
+
+
 def aci_predict(fit_fn, train: pd.DataFrame, test: pd.DataFrame, tau: float, hyperparams: dict,
                 date_col: str = "date_gregorian", gamma: float = ACI_GAMMA
                 ) -> tuple[np.ndarray, list[float]]:
     """ACI — تصحیح اولیه از CQR (بند بالا)، سپس **روز به روز** به‌روزرسانی آنلاین:
-    ``correction += gamma * (tau - miscoverage_rate_روز)``. برمی‌گرداند: (پیش‌بینی
+    ``correction += gamma * (tau - coverage_rate_روز)``. برمی‌گرداند: (پیش‌بینی
     کالیبره‌شده، مسیر تصحیح در طول زمان — برای بازرسی/گزارش)."""
     proper, calib = _time_split(train, date_col)
     if len(calib) < _MIN_GROUP_CALIB or len(proper) < _MIN_GROUP_CALIB:
@@ -120,25 +151,10 @@ def aci_predict(fit_fn, train: pd.DataFrame, test: pd.DataFrame, tau: float, hyp
         return np.clip(pred_test, 0.0, 1.0), [0.0]
 
     pred_calib = np.asarray(fit_fn(proper, calib, tau, **hyperparams), dtype=float)
-    correction = float(np.quantile(calib["rho"].to_numpy() - pred_calib, tau))
-
     # مدل فقط یک‌بار روی کل test برازش/پیش‌بینی می‌شود — آنلاین‌بودن فقط در تصحیح است
     pred_test_base = np.asarray(fit_fn(proper, test, tau, **hyperparams), dtype=float)
-
-    out = np.empty(len(test), dtype=float)
-    test_dates = test[date_col].to_numpy()
-    actual = test["rho"].to_numpy()
-    path = [correction]
-    for day in pd.unique(test_dates):
-        mask = test_dates == day
-        pred_day = np.clip(pred_test_base[mask] + correction, 0.0, 1.0)
-        out[mask] = pred_day
-        # ⚠️ باید «نرخ پوشش» باشد (actual <= pred)، نه «نرخ نقض» — چون هدف P(actual<=pred)=τ
-        # است، نه ۱−τ. علامت اشتباه (نرخ نقض) باعث واگرایی نامحدود تصحیح می‌شد (رگرسیون تست).
-        coverage_rate = float((actual[mask] <= pred_day).mean())
-        correction += gamma * (tau - coverage_rate)
-        path.append(correction)
-    return out, path
+    return aci_from_predictions(pred_calib, calib["rho"].to_numpy(), pred_test_base,
+                                test["rho"].to_numpy(), test[date_col].to_numpy(), tau, gamma)
 
 
 def oof_aci_predictions(fit_fn, folds: list, tau: float, hyperparams: dict,

@@ -1,0 +1,107 @@
+kernel_param,feature,lengthscale
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=ژئوفیزیک,0.26866775110409447
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=علوم اجتماعی,0.29999954889456587
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=بیوشیمی و بیوفیزیک,0.3458972332781877
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=علوم اجتماعی,0.3819263990727554
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=مطالعات جهان,0.5852106454681706
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=بیوشیمی و بیوفیزیک,0.6239978992090267
+covar_module.kernels.1.base_kernel.raw_lengthscale,is_ramadan,0.6931471805599453
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,is_ramadan,0.6931471805599453
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,is_day_before_holiday,0.7592693990096278
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=روانشناسی و علوم تربیتی,0.7988924696153716
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=کارآفرینی,0.9480879398574309
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=دامپزشکی تهران,0.9558128547616412
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=روانشناسی و علوم تربیتی,0.9979100722994084
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=ژئوفیزیک,1.0379461284949825
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=علوم و فناوری های میان رشته ای,1.0438226059612208
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,days_to_next_holiday,1.1147773112323278
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=علوم و فناوری های میان رشته ای,1.1175082089555046
+covar_module.kernels.1.base_kernel.raw_lengthscale,days_to_next_holiday,1.150415036328022
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=فیزیک,1.3751345413512917
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=الهیات و معارف اسلامی,1.417786628489521
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=کارآفرینی,1.4430944231963387
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=مطالعات جهان,1.4980725150838872
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=تربیت بدنی,1.552862540535785
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=اقتصاد,1.631897104226155
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=دامپزشکی تهران,1.6446983293932422
+covar_module.kernels.1.base_kernel.raw_lengthscale,rho_cell_lag1,1.681509448229946
+covar_module.kernels.1.base_kernel.raw_lengthscale,log_res,1.7385109623910393
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=زبانهای خارجه,1.7468800830870284
+covar_module.kernels.1.base_kernel.raw_lengthscale,is_exam_period,1.7686061298057045
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=زبانهای خارجه,1.7859688890195835
+covar_module.kernels.1.base_kernel.raw_lengthscale,day_shock_lag1,1.799430099338667
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=اقتصاد,1.8159474547576815
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=فنی 16 آذر,1.8209902552871622
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=مدیریت,1.8773072315442831
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=تربیت بدنی,1.8954669950620209
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=هنرهای زیبا,1.8999636146009893
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=هنرهای زیبا,1.914528665442471
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,rho_cell_lag1,1.9151988938278142
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=فاطمیه,1.9214087954041663
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,log_res,1.9253066387241187
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=ابوریحان,1.9312905995091898
+covar_module.kernels.1.base_kernel.raw_lengthscale,day_shock_roll_mean_7,1.9321936855754809
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=علوم,1.932703015453284
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=الهیات و معارف اسلامی,1.939969230338286
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=علوم,1.9478873993895847
+covar_module.kernels.1.base_kernel.raw_lengthscale,temp_min,1.9549880303547693
+covar_module.kernels.1.base_kernel.raw_lengthscale,week_of_semester,1.9702778568870034
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=مدیریت,1.9843165499865805
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=مهر,1.9884389621075051
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=مهر,1.9927492966403335
+covar_module.kernels.1.base_kernel.raw_lengthscale,rho_cell_lag7,1.994620774907119
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=فومن,1.995504799254231
+covar_module.kernels.1.base_kernel.raw_lengthscale,cell_shrunk_rate,2.0008763887169434
+covar_module.kernels.1.base_kernel.raw_lengthscale,cell_expanding_rate,2.001441454922209
+covar_module.kernels.1.base_kernel.raw_lengthscale,rho_roll_std_7,2.0052101268189966
+covar_module.kernels.1.base_kernel.raw_lengthscale,is_tehran,2.008164029789947
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=کاسپین,2.0189053570933995
+covar_module.kernels.1.base_kernel.raw_lengthscale,food_shrunk_rate,2.0234133372592455
+covar_module.kernels.1.base_kernel.raw_lengthscale,rho_roll_mean_7,2.023943050123765
+covar_module.kernels.1.base_kernel.raw_lengthscale,is_lunch,2.029108031669421
+covar_module.kernels.1.base_kernel.raw_lengthscale,is_day_before_holiday,2.0320487863036636
+covar_module.kernels.1.base_kernel.raw_lengthscale,cell_dow_shrunk_rate,2.0471345716687
+covar_module.kernels.1.base_kernel.raw_lengthscale,res_vs_history,2.0516958170218755
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,res_vs_history,2.060470932528202
+covar_module.kernels.1.base_kernel.raw_lengthscale,competitor_food_rate,2.066479338238274
+covar_module.kernels.1.base_kernel.raw_lengthscale,is_holiday_any,2.071868821751489
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=سطح شهر,2.0925902453479406
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=چمران,2.104132368631119
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,day_shock_roll_mean_7,2.1063955075473144
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,is_exam_period,2.106545462958883
+covar_module.kernels.1.base_kernel.raw_lengthscale,res_vs_dow_history,2.107507463217769
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=فارابی,2.1101360993480522
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=فنی 16 آذر,2.1283933086941254
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,temp_min,2.1352538486597115
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=کشاورزی,2.1399745877582412
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=فیزیک,2.1445501940795966
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,food_shrunk_rate,2.1542442480591912
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,day_shock_lag1,2.1703187070597196
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=ساختمان 71و72,2.190211696293847
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,res_vs_dow_history,2.192855684263018
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=فومن,2.19713359513785
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=ابوریحان,2.2062724018509043
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,cell_dow_shrunk_rate,2.2124492967827782
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=کاسپین,2.219987201536311
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,is_lunch,2.223662745206233
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,cell_shrunk_rate,2.230197680629248
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,cell_expanding_rate,2.236573913523428
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,rho_cell_lag7,2.242276487576604
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=ساختمان 6,2.2652309406018283
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=فنی امیرآباد,2.2679719786680037
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=کوی,2.2701187813295625
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=ساختمان 71و72,2.2740412302232795
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=چمران,2.2760514808829293
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,rho_roll_std_7,2.2773528507434464
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=ساختمان 6,2.2908309674506877
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=سطح شهر,2.291758181621175
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,rho_roll_mean_7,2.307326304721171
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,competitor_food_rate,2.315603407742717
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=فاطمیه,2.3192884939512712
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=کوی,2.32780639739727
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,is_tehran,2.348951937893605
+covar_module.kernels.1.base_kernel.raw_lengthscale,RestaurantName=فنی امیرآباد,2.350407136910674
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,week_of_semester,2.3624092494226145
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,is_holiday_any,2.403939400632645
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=کشاورزی,2.413858878698949
+covar_module.kernels.0.kernels.0.base_kernel.raw_lengthscale,RestaurantName=فارابی,2.424387878235828

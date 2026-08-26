@@ -1,0 +1,46 @@
+{
+  "model_id": "bhm_beta_binomial_crossed",
+  "family": "F08",
+  "level": "L1",
+  "tau": 0.2,
+  "n_trials_done": 3,
+  "n_fail": 0,
+  "best_pinball": 0.014803275024584946,
+  "best_hyperparams": {
+    "prior_preset": "tight",
+    "target_accept": 0.8696087502258014,
+    "num_warmup": 500,
+    "num_samples": 600
+  },
+  "best_fold_pinballs": [
+    0.012489888316741549,
+    0.015399026862220552,
+    0.027063089963381352,
+    0.009411371687157836,
+    0.009652998293423448
+  ],
+  "history": [
+    [
+      0,
+      0.015596399300783765,
+      485.2034606933594
+    ],
+    [
+      1,
+      0.015753120183040068,
+      651.7184026241302
+    ],
+    [
+      2,
+      0.014803275024584946,
+      643.917407989502
+    ]
+  ],
+  "seconds": 1781.023631811142,
+  "budget_minutes": 22,
+  "budget_exhausted": true,
+  "converged": true,
+  "stable_top10pct_folds": 2,
+  "baseline_b3": 0.015901173795910366,
+  "device": "cuda"
+}

@@ -1,0 +1,41 @@
+{
+  "model_id": "bhm_beta_binomial_restaurant",
+  "family": "F08",
+  "level": "L1",
+  "tau": 0.2,
+  "n_trials_done": 2,
+  "n_fail": 0,
+  "best_pinball": 0.01558504330262464,
+  "best_hyperparams": {
+    "prior_preset": "default",
+    "target_accept": 0.8403444310288725,
+    "num_warmup": 800,
+    "num_samples": 400
+  },
+  "best_fold_pinballs": [
+    0.012532714482139386,
+    0.01528859657439633,
+    0.0312903307226606,
+    0.009169694571465384,
+    0.00964388016246149
+  ],
+  "history": [
+    [
+      0,
+      0.015665491904253852,
+      351.02894496917725
+    ],
+    [
+      1,
+      0.01558504330262464,
+      499.4419059753418
+    ]
+  ],
+  "seconds": 850.6058206558228,
+  "budget_minutes": 12,
+  "budget_exhausted": true,
+  "converged": true,
+  "stable_top10pct_folds": 4,
+  "baseline_b3": 0.015901173795910366,
+  "device": "cuda"
+}

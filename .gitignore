@@ -17,3 +17,13 @@ data/interim/*
 
 # jupyter
 .jupyter/
+
+# اجرای GPU (بند 7.8 فاز ۷) — همه بازتولیدپذیر یا حجیم‌اند، نه منبع حقیقت:
+#   gpu_bundle.zip  = بسته‌ی آپلود، با `make gpu-bundle` دوباره ساخته می‌شود
+#   gpu_outputs/    = تکه‌های zip برگشتی از کولب (تا ۱۰۰ مگابایت هرکدام)
+#   mlruns_gpu/     = پس از ادغام در mlruns/ دیگر لازم نیست
+#   models/gpu/     = وزن مدل‌های سنگین؛ از راه همان zip تکه‌تکه توزیع می‌شوند
+gpu_bundle.zip
+gpu_outputs/
+mlruns_gpu/
+models/gpu/

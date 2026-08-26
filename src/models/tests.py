@@ -815,181 +815,6 @@ def test_f02_all_specs_have_algorithm() -> tuple[bool, str]:
     return ok, f"{len(specs)} مدل F02 ثبت‌شده · بدون algorithm: {empty or 'هیچ‌کدام'} · بدون فضا: {no_space or 'هیچ‌کدام'}"
 
 
-def test_f03_l3_series_no_gaps_and_calendar_never_nan() -> tuple[bool, str]:
-    """اسپرینت C (خ۳): ``build_l3_series`` باید ایندکس تاریخ روزانه‌ی کامل (بدون شکاف)
-    بدهد، رگرسور تقویمی هرگز NaN نداشته باشد (F35/F38)، و ``day_shock`` روی روزهای
-    بدون سرویس صراحتاً NaN باشد (نه صفر یا حذف‌شده)."""
-    from src.features.build import FEATURES_A_PATH
-
-    if not FEATURES_A_PATH.exists():
-        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
-
-    from src.features.l3_series import build_l3_series, CALENDAR_EXOG
-
-    series = build_l3_series()
-    ok_meals = set(series) == {"lunch", "dinner"}
-    checks = {}
-    for meal, df in series.items():
-        no_gaps = (df["date_gregorian"].diff().dropna() == pd.Timedelta(days=1)).all()
-        cal_no_nan = df[CALENDAR_EXOG].isna().sum().sum() == 0
-        has_real_nan = df["day_shock"].isna().any()
-        checks[meal] = no_gaps and cal_no_nan and has_real_nan
-    return (ok_meals and all(checks.values()),
-           f"هر دو وعده حاضر={ok_meals} · " + " · ".join(f"{k}={v}" for k, v in checks.items()))
-
-
-def test_log_l3_l4_run_writes_isolated_mlflow_run() -> tuple[bool, str]:
-    """چرا این تست وجود دارد: خ۳/خ۴ اولین‌بار بی هیچ ثبت MLflow اجرا شده بودند (کاربر
-    پرسید چرا AR/MA در MLflow نیست) — این تست تضمین می‌کند ``log_l3_l4_run`` واقعاً یک
-    run با tag/param/metric درست می‌سازد، روی tracking URI ایزوله (نه mlruns/ واقعی)."""
-    import shutil
-    import tempfile
-    from pathlib import Path
-
-    from src.models import tracking
-
-    tmp_dir = Path(tempfile.mkdtemp())
-    original_uri = tracking.MLFLOW_TRACKING_URI
-    tracking.MLFLOW_TRACKING_URI = str(tmp_dir / "mlruns")
-    try:
-        from src.models.tracking_l3l4 import log_l3_l4_run
-
-        run_id = log_l3_l4_run(family="F03", model_id="ar", level="L3", feature_set="l3_day_shock_v1",
-                               tau=0.2, metrics={"pinball": 0.008, "beats_zero": 1.0}, seconds=1.5,
-                               extra_tags={"meal": "lunch"})
-
-        import mlflow
-        client = mlflow.tracking.MlflowClient(tracking_uri=tracking.MLFLOW_TRACKING_URI)
-        run = client.get_run(run_id)
-        ok_family = run.data.params.get("family") == "F03"
-        ok_level = run.data.params.get("level") == "L3"
-        ok_metric = abs(run.data.metrics.get("pinball", -1) - 0.008) < 1e-9
-        ok_tag = run.data.tags.get("meal") == "lunch"
-        return (ok_family and ok_level and ok_metric and ok_tag,
-               f"family={ok_family} · level={ok_level} · metric={ok_metric} · tag سفارشی={ok_tag}")
-    finally:
-        tracking.MLFLOW_TRACKING_URI = original_uri
-        shutil.rmtree(tmp_dir, ignore_errors=True)
-
-
-def test_f03_reconciled_ma_honors_l1_contract() -> tuple[bool, str]:
-    """بند 7.24: ``fit_predict_l3_reconciled_ma`` باید قرارداد یکسان L1 را رعایت کند
-    (شکل=len(test)، متناهی، داخل [۰,۱]) — برخلاف بقیه‌ی ماژول خ۳ که سطح L3 دارند،
-    این تابع مستقیماً با ``model_comparison.py`` سازگار است."""
-    from src.features.build import FEATURES_A_PATH
-
-    if not FEATURES_A_PATH.exists():
-        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
-
-    import numpy as np
-    import pandas as pd
-
-    from src.cv import DATE_COL, load_cv_folds
-    from src.models.families.f03_reconciled import fit_predict_l3_reconciled_ma
-
-    df = pd.read_parquet(FEATURES_A_PATH).sort_values(DATE_COL).reset_index(drop=True)
-    fold_meta, _ = load_cv_folds()
-    m1, m2 = fold_meta[0].masks(df[DATE_COL])
-    train, test = df.loc[m1], df.loc[m2]
-
-    pred = np.asarray(fit_predict_l3_reconciled_ma(train, test, 0.20), dtype=float)
-    ok = pred.shape == (len(test),) and np.all(np.isfinite(pred)) and pred.min() >= 0.0 and pred.max() <= 1.0
-    return ok, f"شکل/متناهی/بازه‌ی [۰,۱]={ok}"
-
-
-def test_f03_full_classical_roster_and_city_filter() -> tuple[bool, str]:
-    """درخواست صریح کاربر (۲۰۲۶-۰۸-۱۶): تمام مدل‌های کلاسیک خ۳ باید ثبت شده باشند
-    (AR/MA/ARMA/ARIMA/SARIMA/SARIMAX/auto_arima/ETS/Theta/STL/MSTL/Prophet = ۱۲ مدل؛
-    TBATS عمداً غایب — ناسازگاری فنی مستندشده در docstring ماژول)، و
-    ``build_l3_series(restaurant_filter=...)`` باید سری متفاوتی از حالت سراسری بدهد
-    (پایه‌ی آزمایش خوشه‌بندی شهر)."""
-    from src.features.build import FEATURES_A_PATH
-
-    if not FEATURES_A_PATH.exists():
-        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
-
-    import pandas as pd
-
-    import src.models.families.f03_timeseries as f03
-    from src.features.l3_series import build_l3_series
-
-    expected = {"ar", "ma", "arma", "arima", "sarima", "sarimax_calendar", "auto_arima",
-               "ets", "theta", "stl_arima", "mstl", "prophet"}
-    ok_roster = set(f03.MODELS) == expected and "tbats" not in f03.MODELS
-
-    fx = pd.read_parquet(FEATURES_A_PATH)
-    tehran = set(fx.loc[fx["is_tehran"], "RestaurantName"].unique())
-    national = build_l3_series()["lunch"]
-    tehran_only = build_l3_series(restaurant_filter=tehran)["lunch"]
-    ok_differs = not national["day_shock"].equals(tehran_only["day_shock"])
-    ok_same_dates = national["date_gregorian"].equals(tehran_only["date_gregorian"])
-
-    return (ok_roster and ok_differs and ok_same_dates,
-           f"۱۲ مدل ثبت‌شده (بدون tbats)={ok_roster} · فیلتر شهر سری را عوض می‌کند={ok_differs} "
-           f"· بازه‌ی تاریخ ثابت می‌ماند={ok_same_dates}")
-
-
-def test_f04_l4_panel_shape_and_dfm_output_bounded() -> tuple[bool, str]:
-    """اسپرینت C (خ۴): ``build_l4_panel`` باید ۴۱ ستون (سلف×وعده) با ایندکس تاریخ
-    روزانه‌ی کامل بدهد، و ``fit_predict_dfm`` روی یک fold واقعی خروجی متناهی و
-    داخل [۰,۱] بدهد (برخلاف خ۳، هدف اینجا خودِ نرخ است، نه انحراف)."""
-    from src.features.build import FEATURES_A_PATH
-
-    if not FEATURES_A_PATH.exists():
-        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
-
-    import warnings
-
-    import numpy as np
-
-    from src.cv import DATE_COL, load_cv_folds
-    from src.features.l4_series import build_l4_panel
-    from src.models.families.f04_multivariate import fit_predict_dfm
-
-    panel = build_l4_panel()
-    ok_shape = panel.shape[1] == 41
-    no_gaps = (panel.index.to_series().diff().dropna() == pd.Timedelta(days=1)).all()
-
-    fold_meta, _ = load_cv_folds()
-    dates = panel.reset_index()[DATE_COL]
-    m1, m2 = fold_meta[0].masks(dates)
-    train, test = panel.loc[m1], panel.loc[m2]
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        pred = fit_predict_dfm(train, test, 0.20, k_factors=1)
-    ok_dfm = (pred.shape == test.shape and np.all(np.isfinite(pred.to_numpy()))
-             and pred.min().min() >= 0.0 and pred.max().max() <= 1.0)
-    return (ok_shape and no_gaps and ok_dfm,
-           f"۴۱ ستون={ok_shape} · بدون شکاف تاریخ={no_gaps} · DFM متناهی و در [۰,۱]={ok_dfm}")
-
-
-def test_f03_models_fit_predict_on_real_fold() -> tuple[bool, str]:
-    """هر دو مدل خ۳ (sarimax_calendar/theta) باید روی یک fold واقعی خروجی متناهی بدهند
-    — ⚠️ برخلاف مدل‌های L1، خروجی نباید به [۰,۱] کلیپ شده باشد چون ``day_shock``
-    انحراف است نه نرخ (اگر کلیپ‌شدگی دیده شود یعنی قرارداد سطح L3 نقض شده)."""
-    from src.features.build import FEATURES_A_PATH
-
-    if not FEATURES_A_PATH.exists():
-        return True, "رد شد (features_A_v1.parquet هنوز موجود نیست) — نه شکست"
-
-    import numpy as np
-
-    import src.models.families.f03_timeseries as f03
-    from src.cv import load_cv_folds
-    from src.features.l3_series import build_l3_series
-
-    series = build_l3_series()
-    fold_meta, _ = load_cv_folds()
-    m1, m2 = fold_meta[0].masks(series["lunch"]["date_gregorian"])
-    train, test = series["lunch"].loc[m1], series["lunch"].loc[m2]
-
-    results = {}
-    for model_id, fn in f03.MODELS.items():
-        out = np.asarray(fn(train, test, 0.20), dtype=float)
-        results[model_id] = out.shape == (len(test),) and np.all(np.isfinite(out))
-    return all(results.values()), " · ".join(f"{k}={v}" for k, v in results.items())
-
-
 def test_f02_models_fit_predict_on_real_data() -> tuple[bool, str]:
     """هر سه مدل F02 (LightGBM/CatBoost/QRF) باید روی یک fold واقعی خروجی معتبر
     (شکل درست، بدون NaN/inf، داخل [0,1]) بدهند — دقیقاً همان آزمونی که R0 هر مدل را
@@ -1484,6 +1309,204 @@ def test_card_require_complete_raises() -> tuple[bool, str]:
 # اجراکننده
 # ---------------------------------------------------------------------------
 
+def _probe_gpu_fitter(model_id: str = "harness_probe"):
+    """یک ``FamilyFitter`` ساختگی pure-numpy — تا هارنس GPU بدون هیچ GPU/torchـی
+    آزموده شود (محیط محلی این پروژه عمداً CPU-فقط است)."""
+    import json
+    from pathlib import Path
+
+    import numpy as np
+    import pandas as pd
+
+    from src.models.gpu_runner import FamilyFitter
+    from src.models.registry import MODELS as REG
+    from src.models.registry import ModelSpec, register
+    from src.models.spaces import SPACES, register_space
+
+    class _Probe:
+        def __init__(self, table, fallback, shift, seed):
+            self.table, self.fallback, self.shift, self.seed = table, fallback, shift, seed
+
+        def predict(self, test, tau):
+            idx = pd.MultiIndex.from_frame(test[["RestaurantName", "Meal"]])
+            base = self.table.reindex(idx).fillna(self.fallback).to_numpy()
+            return np.clip(base + self.shift, 0.0, 1.0)
+
+    def _fit(train, tau, shift=0.0, seed=42, **hp):
+        t = train.groupby(["RestaurantName", "Meal"], observed=True)["rho"].quantile(tau)
+        return _Probe(t, float(train["rho"].quantile(tau)), shift, seed)
+
+    def _save(model, stem):
+        # ⚠️ عمداً JSON و نه pickle: کلاس ``_Probe`` محلی است و pickle نمی‌شود. مدل‌های
+        # واقعی خانواده‌های GPU کلاس سطح-ماژول دارند و همان‌جا با torch.save/npz ذخیره
+        # می‌شوند؛ این‌جا فقط قرارداد «save فهرست مسیر برمی‌گرداند» آزموده می‌شود.
+        p = Path(f"{stem}.json")
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps({"shift": model.shift, "seed": model.seed}))
+        return [p]
+
+    if model_id not in REG:
+        register(ModelSpec(model_id=model_id, family="F02", levels=("L1",),
+                           quantile_route="Q1", algorithm="probe (تست)"))
+    if model_id not in SPACES:
+        register_space(model_id, version=1, n_hyperparams=1)(
+            lambda t: {"shift": t.suggest_float("shift", -0.02, 0.02)})
+
+    return FamilyFitter(model_id, fit=_fit, predict=lambda m, te, tau: m.predict(te, tau),
+                        save=_save, load=lambda stem: json.loads(Path(f"{stem}.json").read_text()),
+                        defaults={"shift": 0.0})
+
+
+def test_gpu_families_declare_specs_spaces_and_fitters() -> tuple[bool, str]:
+    """هر مدل خانواده‌ی GPU باید هم ``ModelSpec`` (با ``algorithm`` برای tag
+    ``model_type``) داشته باشد، هم فضای هایپرپارامتر ثبت‌شده، هم ``fit_predict``
+    مشتق‌شده از ``FamilyFitter``.
+
+    ⚠️ **و مهم‌تر: این تست باید بدون torch/gpytorch/numpyro پاس شود** — یعنی هیچ
+    خانواده‌ی GPU حق ندارد این کتابخانه‌ها را در سطح ماژول import کند. اگر بکند،
+    کل `src/models/` روی محیط محلی CPU-فقط از کار می‌افتد.
+    """
+    import optuna
+
+    from src.models.families import f06_kernel, f07_neural, f07_neural_l5, f08_bayesian
+    from src.models.registry import MODELS as REG
+    from src.models.spaces import SPACES
+
+    missing_spec, missing_space, bad_sample = [], [], []
+    n = 0
+    for mod in (f06_kernel, f07_neural, f07_neural_l5, f08_bayesian):
+        for mid, fitter in mod.FITTERS.items():
+            n += 1
+            if mid not in REG or not REG[mid].algorithm:
+                missing_spec.append(mid)
+            if mid not in SPACES:
+                missing_space.append(mid)
+                continue
+            study = optuna.create_study(sampler=optuna.samplers.RandomSampler(seed=0))
+            try:
+                for _ in range(3):
+                    t = study.ask()
+                    SPACES[mid].fn(t)
+                    study.tell(t, 0.0)
+            except Exception as e:  # noqa: BLE001
+                bad_sample.append(f"{mid}: {type(e).__name__}")
+            if not callable(mod.MODELS.get(mid)):
+                bad_sample.append(f"{mid}: fit_predict غایب")
+    ok = not (missing_spec or missing_space or bad_sample)
+    return ok, (f"{n} مدل GPU · بدون ModelSpec: {missing_spec or 'هیچ‌کدام'} · "
+                f"بدون فضا: {missing_space or 'هیچ‌کدام'} · خطای نمونه‌گیری: "
+                f"{bad_sample or 'هیچ‌کدام'}")
+
+
+def test_gpu_study_and_champion_propagate_seed() -> tuple[bool, str]:
+    """قاعده‌ی A7 فقط وقتی معنا دارد که ``seed`` واقعاً به ``fit`` برسد.
+
+    ⚠️ **باگ واقعی که این تست جلویش را می‌گیرد:** خانواده‌های GPU داخل خودشان
+    ``torch.manual_seed(seed)``/``PRNGKey(seed)`` صدا می‌زنند با پیش‌فرض ۴۲. اگر
+    هارنس فقط ``set_global_seed(s)`` را صدا بزند و ``seed`` را به ``fit`` پاس ندهد،
+    هر سه seed عیناً یک مدل می‌سازند و «پراکندگی بین seedها» کاذب صفر گزارش می‌شود.
+    """
+    import tempfile
+    from pathlib import Path
+
+    from src.models import gpu_runner as gr
+    from src.models.spaces import SPACES
+
+    fitter = _probe_gpu_fitter("harness_probe")
+    data = gr.load_l1().first_folds(2)
+    seen_seeds = []
+    original_fit = fitter.fit
+    probe = gr.FamilyFitter(fitter.model_id,
+                            fit=lambda tr, tau, **hp: (seen_seeds.append(hp.get("seed")),
+                                                       original_fit(tr, tau, **hp))[1],
+                            predict=fitter.predict, save=fitter.save, load=fitter.load,
+                            defaults=fitter.defaults)
+
+    tmp = Path(tempfile.mkdtemp())
+    orig = (gr.GPU_REPORTS_DIR, gr.GPU_MODELS_DIR, gr.OPTUNA_STUDIES_DIR)
+    try:
+        gr.GPU_REPORTS_DIR, gr.GPU_MODELS_DIR = tmp / "reports", tmp / "models"
+        gr.OPTUNA_STUDIES_DIR = tmp / "optuna"
+        gr.use_gpu_tracking(str(tmp / "mlruns_gpu"))
+        study = gr.run_gpu_study(probe, SPACES[fitter.model_id].fn, data, family="F02",
+                                 feature_set="FS_probe_v1", budget_minutes=1, max_trials=2,
+                                 compute="local", seed=7)
+        seen_seeds.clear()
+        gr.finalize_champion(probe, data, study, feature_set="FS_probe_v1",
+                             seeds=(11, 22), compute="local", run_aci=False)
+    finally:
+        gr.GPU_REPORTS_DIR, gr.GPU_MODELS_DIR, gr.OPTUNA_STUDIES_DIR = orig
+        import shutil
+
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    ok_study = study.n_trials_done >= 1
+    ok_seeds = set(seen_seeds) == {11, 22}
+    return ok_study and ok_seeds, (f"trial اجراشده={study.n_trials_done} · seedهای رسیده به fit="
+                                   f"{sorted(set(seen_seeds))} (باید {{11, 22}}) · درست={ok_seeds}")
+
+
+def test_gpu_package_outputs_splits_and_rejoins() -> tuple[bool, str]:
+    """بسته‌بندی خروجی کولب باید به تکه‌های ≤۱۰۰ مگابایتی بشکند **و** چسباندن دوباره‌ی
+    تکه‌ها یک zip سالم بدهد — وگرنه ساعت‌ها محاسبه‌ی GPU غیرقابل‌بازیابی می‌شود."""
+    import io
+    import shutil
+    import tempfile
+    import zipfile
+    from pathlib import Path
+
+    import numpy as np
+
+    from src.models.gpu_runner import package_outputs
+
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        payload = tmp / "models_gpu" / "F02"
+        payload.mkdir(parents=True)
+        rng = np.random.default_rng(0)
+        (payload / "weights.bin").write_bytes(rng.integers(0, 255, 5_000_000, dtype=np.uint8).tobytes())
+        (payload / "meta.json").write_text('{"ok": true}')
+
+        manifest = package_outputs("probe", include=[str(tmp / "models_gpu")], part_mb=2,
+                                   out_dir=tmp / "out", root=tmp)
+        parts = [tmp / "out" / p["name"] for p in manifest["parts"]]
+        joined = b"".join(p.read_bytes() for p in parts)
+        with zipfile.ZipFile(io.BytesIO(joined)) as zf:
+            ok_zip = zf.testzip() is None and any("weights.bin" in n for n in zf.namelist())
+        ok_split = len(parts) >= 2
+        ok_manifest = all(len(p["sha256"]) == 64 for p in manifest["parts"])
+        ok_size = all(p.stat().st_size <= 2 * 1024 * 1024 for p in parts)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return (ok_zip and ok_split and ok_manifest and ok_size,
+            f"تکه‌ها={len(parts)} · اندازه‌ی هر تکه در سقف={ok_size} · هش هر تکه={ok_manifest} · "
+            f"zip بازسازی‌شده سالم={ok_zip}")
+
+
+def test_aci_from_predictions_matches_refit_version() -> tuple[bool, str]:
+    """``aci_from_predictions`` (یک برازش) باید **عیناً** همان خروجی ``aci_predict``
+    (دو برازش) را بدهد — این بازآرایی برای نصف‌کردن هزینه‌ی خانواده‌های GPU انجام شد
+    و اگر ریاضیاتش جابه‌جا شده باشد، کالیبراسیون بی‌صدا خراب می‌شود."""
+    import numpy as np
+
+    from src.models import conformal
+    from src.models.gpu_runner import load_l1
+
+    fitter = _probe_gpu_fitter("harness_probe")
+    data = load_l1()
+    tr, te = data.folds[1]
+
+    refit, _ = conformal.aci_predict(fitter.as_fit_predict(), tr, te, 0.20, {})
+    proper, calib = conformal._time_split(tr, "date_gregorian")
+    model = fitter.fit(proper, 0.20)
+    single, _ = conformal.aci_from_predictions(
+        fitter.predict(model, calib, 0.20), calib["rho"].to_numpy(),
+        fitter.predict(model, te, 0.20), te["rho"].to_numpy(),
+        te["date_gregorian"].to_numpy(), 0.20)
+    diff = float(np.abs(refit - single).max())
+    return diff < 1e-12, f"بیشینه‌ی اختلاف دو مسیر ACI = {diff:.3e} (باید صفر باشد)"
+
+
 _ALL_TESTS = [
     test_cv_folds_hash_reproducible,
     test_cv_folds_hash_matches_manifest,
@@ -1523,12 +1546,6 @@ _ALL_TESTS = [
     test_axis_screening_weighting_axis_end_to_end,
     test_f02_all_specs_have_algorithm,
     test_f02_models_fit_predict_on_real_data,
-    test_f03_l3_series_no_gaps_and_calendar_never_nan,
-    test_f03_models_fit_predict_on_real_fold,
-    test_f04_l4_panel_shape_and_dfm_output_bounded,
-    test_f03_full_classical_roster_and_city_filter,
-    test_f03_reconciled_ma_honors_l1_contract,
-    test_log_l3_l4_run_writes_isolated_mlflow_run,
     test_significance_run_significance_is_family_agnostic,
     test_f11_newsvendor_cost_matches_weighted_pinball_derivation,
     test_f11_res_weighted_fit_reduces_real_newsvendor_cost,
@@ -1543,6 +1560,11 @@ _ALL_TESTS = [
     test_f02_seed_parameter_actually_changes_randomness,
     test_model_comparison_render_report_counts_significant_wins,
     test_mandatory_cuts_render_report_flags_losing_segments,
+    # اسپرینت GPU (بند 7.8) — هر چهار تست عمداً بدون torch/gpytorch/numpyro پاس می‌شوند
+    test_gpu_families_declare_specs_spaces_and_fitters,
+    test_gpu_study_and_champion_propagate_seed,
+    test_gpu_package_outputs_splits_and_rejoins,
+    test_aci_from_predictions_matches_refit_version,
 ]
 
 

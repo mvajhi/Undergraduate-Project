@@ -1,0 +1,34 @@
+{
+  "model_id": "gp_heteroscedastic",
+  "family": "F06",
+  "level": "L1",
+  "tau": 0.2,
+  "n_trials_done": 1,
+  "n_fail": 0,
+  "best_pinball": 0.0216075731339506,
+  "best_hyperparams": {
+    "n_iters": 122,
+    "learning_rate": 0.1667521176194013
+  },
+  "best_fold_pinballs": [
+    0.020304508614756005,
+    0.024989318993413112,
+    0.03244116367773333,
+    0.014647551210740557,
+    0.015655323173109997
+  ],
+  "history": [
+    [
+      0,
+      0.0216075731339506,
+      1288.8017237186432
+    ]
+  ],
+  "seconds": 1288.8455121517181,
+  "budget_minutes": 18,
+  "budget_exhausted": true,
+  "converged": true,
+  "stable_top10pct_folds": 5,
+  "baseline_b3": 0.015901173795910366,
+  "device": "cuda"
+}

@@ -1,0 +1,4 @@
+پیشین,prior_sigma,prior_beta,pinball,پوشش,max_R_hat,divergences
+tight,0.5,1.0,0.01251,0.1862,1.0153,0
+default,1.0,2.5,0.0125,0.192,1.0218,0
+wide,2.0,5.0,0.01261,0.1931,1.0188,0

@@ -1,0 +1,83 @@
+{
+  "model_id": "bhm_varying_dispersion",
+  "family": "F08",
+  "level": "L1",
+  "tau": 0.2,
+  "hyperparams": {
+    "prior_preset": "tight",
+    "target_accept": 0.8696087502258014,
+    "num_warmup": 500,
+    "num_samples": 600
+  },
+  "seeds": [
+    42,
+    1234
+  ],
+  "per_seed_pinball": {
+    "42": 0.012349681795836063,
+    "1234": 0.01221145507361955
+  },
+  "pinball_row_mean": 0.01221145507361955,
+  "pinball_fold_mean": 0.014695416335876265,
+  "metrics": {
+    "pinball": 0.014695416335876265,
+    "pinball_portions": 2.240536525362004,
+    "MAE_rho": 0.06816693448074555,
+    "RMSE_rho": 0.11246743121978227,
+    "R2_rho": -0.32476762530025194,
+    "MAE_portions": 10.493930542613764,
+    "RMSE_portions": 17.800672471312613,
+    "coverage": 0.1775734360884989,
+    "coverage_gap": -0.022426563911501097,
+    "shortage_rate": 0.07765814496022917,
+    "shortage_portions": 1049.0,
+    "surplus_portions": 32668.0,
+    "waste_reduction_pct": 0.5705124556287353
+  },
+  "coverage": 0.19175257731958764,
+  "coverage_gap": -0.00824742268041237,
+  "aci_coverage": 0.20335051546391752,
+  "aci_coverage_gap": 0.003350515463917514,
+  "aci_pinball": 0.012523882833688585,
+  "dm_vs_b3": {
+    "dm_stat": -6.628816486384082,
+    "p_value": 3.3838931656759996e-11,
+    "delta_pinball": -0.0011353942614122023,
+    "significant_at_0.05": true
+  },
+  "baseline_b3_row": 0.013346849335031752,
+  "baseline_b3_fold": 0.015901173795910366,
+  "artifacts": [
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold0.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold0.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold0__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold1.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold1.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold1__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold2.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold2.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold2__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold3.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold3.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold3__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold4.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold4.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s1234__fold4__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold0.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold0.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold0__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold1.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold1.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold1__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold2.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold2.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold2__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold3.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold3.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold3__prep.pkl",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold4.json",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold4.npz",
+    "models/gpu/F08/bhm_varying_dispersion/bhm_varying_dispersion__s42__fold4__prep.pkl"
+  ],
+  "fit_seconds": 1764.0825400352478
+}

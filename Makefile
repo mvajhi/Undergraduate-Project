@@ -1,4 +1,4 @@
-.PHONY: setup lock data-pull mlflow-ui
+.PHONY: setup lock data-pull mlflow-ui gpu-bundle
 
 setup:
 	python3 -m venv .venv
@@ -13,3 +13,6 @@ data-pull:
 
 mlflow-ui:
 	MLFLOW_ALLOW_FILE_STORE=true .venv/bin/mlflow ui --backend-store-uri mlruns
+
+gpu-bundle:
+	.venv/bin/python -m src.models.gpu_bundle
