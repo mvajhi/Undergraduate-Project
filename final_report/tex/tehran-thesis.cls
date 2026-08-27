@@ -572,7 +572,7 @@ inner xsep=-1.3cm,inner ysep=0.4cm]
 		{\normalsize \bf \@latinuniversity \\}
 		{\normalsize \bf \@latincollege \\}
 		{\large\bfseries\@latinfaculty \\}
-		{\large\bfseries\@latindepartment \\}
+		{\large\bfseries\@latindepartment}
 		\end{onehalfspacing}
 	\end{center}
 \end{minipage}
