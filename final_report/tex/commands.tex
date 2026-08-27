@@ -157,7 +157,13 @@ colorlinks,linkcolor=blue,citecolor=blue,final]{hyperref}
 % دستوری برای تغییر نام کلمه «اثبات» به «برهان»
 \renewcommand\proofname{\textbf{برهان}}
 % دستوری برای تغییر نام کلمه «کتاب‌نامه» به «مراجع»
+% این خط به‌تنهایی کافی نیست: xepersian.sty خودش \bibname را در \AtBeginDocument به
+% «کتاب‌نامه» برمی‌گرداند و آن هوک همیشه بعد از این خط (که هنگام بارگذاری فایل، نه در
+% \AtBeginDocument، اجرا می‌شود) فعلی‌سازی می‌شود، پس آخرین‌بار برنده است. راه‌حل: همین
+% تغییر را هم در \AtBeginDocument خودمان بگذاریم — چون بعد از xepersian در main.tex
+% \input شده، هوک ما در صف \AtBeginDocument دیرتر ثبت و اجرا می‌شود و برنده می‌ماند.
 \renewcommand{\bibname}{مراجع}
+\AtBeginDocument{\renewcommand{\bibname}{مراجع}}
 % دستوری برای تعریف واژه‌نامه انگلیسی به فارسی
 \newcommand\persiangloss[2]{#1\dotfill\lr{#2}\\}
 % دستوری برای تعریف واژه‌نامه فارسی به انگلیسی 
@@ -270,6 +276,16 @@ colorlinks,linkcolor=blue,citecolor=blue,final]{hyperref}
 \setlength\cftpartnumwidth{\mylenprt}
 \setlength\cftchapnumwidth{\mylenchp}	
 
+% ⚠️ عمداً به کد اصلی قالب برگردانده شد — توضیح در final_report/AGENTS.md، بخش
+% «مراجع: چرا شماره‌دار نیست». خلاصه: بازتعریف خام \thebibliography (چه با این نسخه‌ی
+% اصلی، چه با تلاش‌های اصلاحی این جلسه) با پیاده‌سازی تگ‌دار محیط‌ها در نسخه‌ی مدرن
+% هسته‌ی LaTeX2e این TeXLive ناسازگار است و با ارجاع واقعی خطای فاتال می‌دهد
+% («\begin{thebibliography}...ended by \end{thebibitemlist}»). چون رفعش نیازمند
+% دستکاری عمیق هسته بود (فراتر از رفع باگ یک قالب vendored)، فصل مراجع را با
+% مکانیزم پیش‌فرض \bibliography (کار می‌کند، امتحان‌شده) بدون دست‌زدن به
+% \thebibliography رها کردیم — یعنی بدون شماره‌ی «فصل ۶:» و با نام پیش‌فرض
+% «کتاب‌نامه» (نه «مراجع» — رفعش هم به همین دلیل با \AtBeginDocument پایین‌تر
+% انجام شده، نه اینجا).
 \makeatletter
 {\def\thebibliography#1{\chapter*{\refname\@mkboth
    {\uppercase{\refname}}{\uppercase{\refname}}}\list
