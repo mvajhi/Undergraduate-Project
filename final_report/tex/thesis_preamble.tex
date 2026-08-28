@@ -14,6 +14,10 @@
 % شروع درج فهرست‌ها
 \newpage\cleardoublepage
 \pagenumbering{harfi} % آ، ب، ...
+% فهرست‌های زیر عمداً تک‌فاصله‌اند — \doublespacing سراسری commands.tex (برای بدنه‌ی
+% متن) بدون این override روی ردیف‌های فهرست مطالب/تصاویر/جداول هم اعمال می‌شد و فاصله‌ی
+% هر ردیف را به‌اندازه‌ی یک پاراگراف بدنه می‌کرد.
+\begin{singlespace}
 \tableofcontents \clearpage
 % بررسی حالت پیش‌نویس برای بقیه فهرست‌ها
 \ifoptiondraft{
@@ -23,3 +27,4 @@
     \listoftables  \clearpage
     \printacronyms
 } % end ifoptiondraft
+\end{singlespace}
