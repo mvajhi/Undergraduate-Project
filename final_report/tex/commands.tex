@@ -191,7 +191,10 @@ colorlinks,linkcolor=blue,citecolor=blue,final]{hyperref}
 \theoremstyle{definition}
 \newtheorem{example}[definition]{مثال}
 
-%\renewcommand{\theequation}{\thechapter-\arabic{equation}}
+% رابطه‌ها شماره‌گذاری **سراسری** دارند («رابطه (۱)»، «رابطه (۲)» …)، نه فصلی —
+% قرارداد نگارش در final_report/AGENTS.md. کلاس از book ارث می‌برد و book شمارنده‌ی
+% equation را با هر فصل صفر می‌کند و «۴-۲» می‌سازد؛ خط زیر همین را خنثی می‌کند.
+\counterwithout{equation}{chapter}
 %\def\bibname{مراجع}
 \numberwithin{algorithm}{chapter}
 \def\listalgorithmname{فهرست الگوریتم‌ها}
