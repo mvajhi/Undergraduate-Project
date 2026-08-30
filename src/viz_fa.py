@@ -68,12 +68,11 @@ def setup() -> None:
         except Exception:
             pass
 
-    # Use 'sans-serif' family so matplotlib falls back to DejaVu Sans for missing glyphs (like Greek rho)
-    plt.rcParams["font.family"] = "sans-serif"
-    current_sans = list(plt.rcParams.get("font.sans-serif", []))
-    if font_name in current_sans:
-        current_sans.remove(font_name)
-    plt.rcParams["font.sans-serif"] = [font_name] + current_sans
+    # font.family must be an explicit list (not the "sans-serif" generic alias) for
+    # matplotlib's per-glyph runtime fallback to kick in — the alias form only resolves
+    # to a single installed font and silently drops glyphs missing from it (e.g. Greek
+    # rho, which Vazirmatn lacks), rendering ".notdef" tofu instead of falling back.
+    plt.rcParams["font.family"] = [font_name, "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
 
     if not _is_patched:
