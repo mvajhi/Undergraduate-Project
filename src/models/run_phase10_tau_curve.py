@@ -14,6 +14,8 @@
 اجرا: ``python -m src.models.run_phase10_tau_curve``
 """
 
+from pathlib import Path
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -24,7 +26,9 @@ from src.config import REPORTS_DIR, set_global_seed
 from src.models.run_phase10_annual_savings import oof_predictions
 
 OUT_DIR = REPORTS_DIR / "phase10"
-FIG_PATH = "final_report/img/tau_tradeoff.png"
+# final_report/img/tau_tradeoff.png symlink به این است — reports/figures/ منبع حقیقت
+# تصاویر گزارش است (tools/report_figures/README.md).
+FIG_PATH = str(REPORTS_DIR / "figures" / "phase10" / "10.7_tau_tradeoff_fa.png")
 TAU_GRID = [0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
 OPERATING_TAU = 0.20
 
@@ -77,6 +81,7 @@ def plot(d: pd.DataFrame) -> None:
     ax3.set_xlabel("نسبت هزینه‌ی کمبود به هزینه‌ی مازاد", labelpad=8)
 
     fig.tight_layout()
+    Path(FIG_PATH).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIG_PATH, dpi=200)
     print(f"شکل: {FIG_PATH}")
 

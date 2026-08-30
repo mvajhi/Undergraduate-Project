@@ -48,5 +48,7 @@ ax.text(0.66, 0.735, "خیر", fontsize=8, color="0.35", ha="center")
 ax.text(0.5, 0.005, "عدد هر برگ: درصدی از رزرو که باید پخته شود", fontsize=8.5,
         ha="center", color="0.3")
 fig.tight_layout()
-fig.savefig("final_report/img/surrogate_tree.png", dpi=220, bbox_inches="tight")
+# final_report/img/surrogate_tree.png symlink به این است — reports/figures/ منبع
+# حقیقت تصاویر گزارش است (tools/report_figures/README.md).
+fig.savefig("reports/figures/phase9/9.5_surrogate_tree_fa.png", dpi=220, bbox_inches="tight")
 print("saved")

@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from src import viz_fa  # noqa: F401  — فونت فارسی و patch متن
 
-OUT = "final_report/img"
+# final_report/img/reliability.png و .../perm_importance.png symlink به این دو هستند —
+# reports/figures/ منبع حقیقت تصاویر گزارش است (tools/report_figures/README.md).
+OUT_RELIABILITY = "reports/figures/phase8/8.8_reliability_fa.png"
+OUT_PERM_IMPORTANCE = "reports/figures/phase9/9.1_perm_importance_fa.png"
 
 # ---- شکل کالیبراسیون (بند ۴-۴-۳) ----
 d = pd.read_csv("reports/phase8/8.8_reliability_table.csv")
@@ -19,7 +22,7 @@ ax.set_ylabel("پوشش تجربی")
 ax.set_xlim(0, 1); ax.set_ylim(0, 1)
 ax.legend(loc="lower right", fontsize=9, framealpha=0.9)
 ax.grid(alpha=0.25)
-fig.tight_layout(); fig.savefig(f"{OUT}/reliability.png", dpi=200); plt.close(fig)
+fig.tight_layout(); fig.savefig(OUT_RELIABILITY, dpi=200); plt.close(fig)
 
 # ---- شکل اهمیت ویژگی (بند ۴-۵-۲) ----
 f = pd.read_csv("reports/phase9/9.1_feature_importance.csv", index_col=0)
@@ -31,5 +34,5 @@ ax.set_yticks(range(len(f)))
 ax.set_yticklabels(f.index, fontsize=9)
 ax.set_xlabel(r"افزایش زیان Pinball پس از به‌هم‌ریختن ویژگی")
 ax.grid(axis="x", alpha=0.25)
-fig.tight_layout(); fig.savefig(f"{OUT}/perm_importance.png", dpi=200); plt.close(fig)
+fig.tight_layout(); fig.savefig(OUT_PERM_IMPORTANCE, dpi=200); plt.close(fig)
 print("saved")
