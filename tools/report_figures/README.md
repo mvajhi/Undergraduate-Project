@@ -6,20 +6,19 @@
 داخل گزارش هم خودکار به‌روز می‌شود — نیازی به کپی دستی نیست.
 
 ```bash
-PYTHONPATH=. .venv/bin/python tools/report_figures/make_figs.py            # reliability.png, perm_importance.png
-PYTHONPATH=. .venv/bin/python tools/report_figures/make_surrogate_tree.py  # surrogate_tree.png (شکل ۴-۴)
-PYTHONPATH=. .venv/bin/python tools/report_figures/make_residual_figs.py   # residual_hist.png, resid_acf.png (شکل ۴-۳)
+PYTHONPATH=. .venv/bin/python tools/report_figures/make_figs.py            # perm_importance.png (+ 8.8_reliability_fa.png، دیگر در گزارش نمی‌آید)
+PYTHONPATH=. .venv/bin/python tools/report_figures/make_surrogate_tree.py  # surrogate_tree.png (شکل ۴-۳)
+PYTHONPATH=. .venv/bin/python tools/report_figures/make_residual_figs.py   # residual_hist.png, resid_acf.png (پانل‌های آ و ب شکل ۴-۱)
 PYTHONPATH=. .venv/bin/python -m src.models.run_phase10_tau_curve          # tau_tradeoff.png (بند ۱۰.۷)
 ```
 
-`resid_vs_res.png` (شکل ۴-۲) اسکریپت جدا ندارد — کپی/تبدیلی لازم نداشت، پس مستقیم
+`resid_vs_res.png` (پانل ج شکل ۴-۱) اسکریپت جدا ندارد — کپی/تبدیلی لازم نداشت، پس مستقیم
 symlink به خروجی `src/models/run_phase8_residuals.py` است.
 
 ## نگاشت symlink → مبدأ
 
 | `final_report/img/` | `reports/figures/` |
 |---|---|
-| `reliability.png` | `phase8/8.8_reliability_fa.png` |
 | `perm_importance.png` | `phase9/9.1_perm_importance_fa.png` |
 | `surrogate_tree.png` | `phase9/9.5_surrogate_tree_fa.png` |
 | `residual_hist.png` | `phase8/8.2_residual_hist_fa.png` |

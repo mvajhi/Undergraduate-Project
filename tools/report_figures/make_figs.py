@@ -3,9 +3,11 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy.stats import t
 from src import viz_fa  # noqa: F401  — فونت فارسی و patch متن
 
-# final_report/img/reliability.png و .../perm_importance.png symlink به این دو هستند —
+# final_report/img/perm_importance.png symlink به دومی است (شکل کالیبراسیون از فصل ۴
+# حذف شد ولی فایلش به‌عنوان شاهد بند ۸.۸ اینجا تولید می‌شود) —
 # reports/figures/ منبع حقیقت تصاویر گزارش است (tools/report_figures/README.md).
 OUT_RELIABILITY = "reports/figures/phase8/8.8_reliability_fa.png"
 OUT_PERM_IMPORTANCE = "reports/figures/phase9/9.1_perm_importance_fa.png"
@@ -27,8 +29,13 @@ fig.tight_layout(); fig.savefig(OUT_RELIABILITY, dpi=200); plt.close(fig)
 # ---- شکل اهمیت ویژگی (بند ۴-۵-۲) ----
 f = pd.read_csv("reports/phase9/9.1_feature_importance.csv", index_col=0)
 f = f.sort_values("perm_importance_mean", ascending=False).head(8).iloc[::-1]
+# خط خطا = بازه‌ی اطمینان ۹۵٪ میانگین روی N_REPEATS تکرار جای‌گشت، نه خودِ انحراف معیار:
+# np.std در بند ۹.۱ با ddof=0 حساب شده، پس اول به انحراف معیار نمونه‌ای تبدیل می‌شود.
+N_REPEATS = 10
+sd_sample = f["perm_importance_std"] * (N_REPEATS / (N_REPEATS - 1)) ** 0.5
+ci95 = t.ppf(0.975, N_REPEATS - 1) * sd_sample / N_REPEATS**0.5
 fig, ax = plt.subplots(figsize=(6.4, 3.8))
-ax.barh(range(len(f)), f["perm_importance_mean"], xerr=f["perm_importance_std"],
+ax.barh(range(len(f)), f["perm_importance_mean"], xerr=ci95,
         color="#c8794a", ecolor="0.25", capsize=2.5, height=0.68)
 ax.set_yticks(range(len(f)))
 ax.set_yticklabels(f.index, fontsize=9)
