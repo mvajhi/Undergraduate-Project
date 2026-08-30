@@ -44,7 +44,7 @@ def oof_predictions(tau: float) -> pd.DataFrame:
     parts = []
     for tr, te in folds:
         pred = np.clip(np.asarray(fn(tr, te, tau, **result["best_hyperparams"]), dtype=float), 0.0, 1.0)
-        part = te[[DATE_COL, "RestaurantName", "Res", "Recv"]].copy()
+        part = te[[DATE_COL, "Meal", "RestaurantName", "Res", "Recv"]].copy()
         part["pred_q"] = pred
         parts.append(part)
     oof = pd.concat(parts, ignore_index=True)
@@ -72,11 +72,18 @@ def annualize(oof: pd.DataFrame, n_boot: int = 1000, seed: int = 42) -> dict:
     # مدیر سلف) و کسر تقاضای برآورده‌نشده = مکمل Fill Rate / سطح خدمت نوع دوم (بند ۶-۳
     # doc/model-evaluation-metrics.md).
     daily_shortage = oof.groupby(DATE_COL)["shortage_portions"].sum()
+    # میانگین روزانه ناهار و شام را با هم جمع می‌کند و برای مدیر سلف گمراه‌کننده است:
+    # تصمیم پخت وعده‌به‌وعده گرفته می‌شود. تجمیع (روز، وعده) روی مجموع همه‌ی سلف‌ها،
+    # واحدی است که واقعاً با یک تصمیم پخت متناظر است.
+    meal_shortage = oof.groupby([DATE_COL, "Meal"])["shortage_portions"].sum()
     unmet_rate = float(oof["shortage_portions"].sum() / oof["Recv"].sum())
     return {
         "shortage_rate": float(oof["shortage"].mean()),
         "shortage_portions_per_day": float(daily_shortage.mean()),
         "worst_day_shortage_portions": float(daily_shortage.max()),
+        "shortage_portions_per_meal": float(meal_shortage.mean()),
+        "median_shortage_portions_per_meal": float(meal_shortage.median()),
+        "worst_meal_shortage_portions": float(meal_shortage.max()),
         "mean_shortage_depth": float(oof.loc[oof["shortage"], "shortage_portions"].mean()),
         "unmet_demand_rate": unmet_rate,
         "fill_rate": 1.0 - unmet_rate,
@@ -169,11 +176,16 @@ def main() -> None:
         f"- **صرفه‌جویی ریالی سالانه: {op['annual_toman']/1e9:.2f} میلیارد تومان "
         f"[CI ۹۵٪: {op['annual_toman_lo']/1e9:.2f}, {op['annual_toman_hi']/1e9:.2f}]** "
         f"(با {COST_PER_PORTION_TOMAN:,} تومان به‌ازای هر پرس)",
-        f"- هزینه‌ی طرف مقابل: نرخ کمبود {op['shortage_rate']:.1%} سلول‌ها، معادل "
-        f"{op['shortage_portions_per_day']:.0f} پرس کمبود در یک روز سرو (بدترین روز: "
-        f"{op['worst_day_shortage_portions']:.0f} پرس؛ عمق میانگین هر سلول کمبوددار: "
-        f"{op['mean_shortage_depth']:.1f} پرس) و کسر تقاضای برآورده‌نشده‌ی "
-        f"{op['unmet_demand_rate']:.2%} (Fill Rate = {op['fill_rate']:.2%})",
+        f"- هزینه‌ی طرف مقابل، در سه مقیاس: عمق میانگین هر سلول کمبوددار "
+        f"{op['mean_shortage_depth']:.1f} پرس؛ مجموع کمبود همه‌ی سلف‌ها **در یک وعده** "
+        f"به‌طور میانگین {op['shortage_portions_per_meal']:.0f} پرس، میانه "
+        f"{op['median_shortage_portions_per_meal']:.0f} پرس، بیشینه‌ی کل دوره "
+        f"{op['worst_meal_shortage_portions']:.0f} پرس؛ و در کل دوره کسر تقاضای "
+        f"برآورده‌نشده‌ی {op['unmet_demand_rate']:.2%} (Fill Rate = {op['fill_rate']:.2%}). "
+        f"نرخ کمبود {op['shortage_rate']:.1%} سلول‌ها فقط *رخداد* را می‌شمارد. "
+        f"⚠️ تجمیع روزانه ({op['shortage_portions_per_day']:.0f} پرس در یک روز سرو، "
+        f"بدترین روز {op['worst_day_shortage_portions']:.0f} پرس) ناهار و شام را با هم "
+        f"جمع می‌کند و با واحد تصمیم پخت متناظر نیست — در گزارش نهایی سطح وعده نقل شود",
         "",
         "## عبارت صادقانه (طبق الگوی دقیق بند ۱۰.۴ WBS)",
         "",
