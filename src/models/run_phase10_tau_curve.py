@@ -68,6 +68,14 @@ def plot(d: pd.DataFrame) -> None:
     ax2.tick_params(axis="y", labelcolor="#b8443c")
     ax.grid(alpha=0.25)
     ax.legend(handles=[l1, l2, l3], loc="lower right", fontsize=9, framealpha=0.92)
+
+    # محور بالا: نسبت هزینه‌ی کمبود به مازاد که هر τ از آن می‌آید — τ* = C_o/(C_u+C_o)
+    ax3 = ax.twiny()
+    ax3.set_xlim(ax.get_xlim())
+    ax3.set_xticks(list(d["tau"]))
+    ax3.set_xticklabels([f"{(1 - t) / t:.3g}×" for t in d["tau"]], fontsize=9)
+    ax3.set_xlabel("نسبت هزینه‌ی کمبود به هزینه‌ی مازاد", labelpad=8)
+
     fig.tight_layout()
     fig.savefig(FIG_PATH, dpi=200)
     print(f"شکل: {FIG_PATH}")
