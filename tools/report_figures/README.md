@@ -11,6 +11,7 @@ PYTHONPATH=. .venv/bin/python tools/report_figures/make_surrogate_tree.py  # sur
 PYTHONPATH=. .venv/bin/python tools/report_figures/make_residual_figs.py   # residual_hist.png, resid_acf.png (پانل‌های آ و ب شکل ۴-۱)
 PYTHONPATH=. .venv/bin/python -m src.models.run_phase10_tau_curve          # tau_tradeoff.png (بند ۱۰.۷)
 PYTHONPATH=. .venv/bin/python tools/report_figures/make_featureset_fig.py   # feature_sets.png (شکل ۳-۱)
+PYTHONPATH=. .venv/bin/python tools/report_figures/make_tau_marginal_fig.py # tau_marginal.png (شکل ۳-۲)
 ```
 
 `resid_vs_res.png` (پانل ج شکل ۴-۱) اسکریپت جدا ندارد — کپی/تبدیلی لازم نداشت، پس مستقیم
@@ -27,6 +28,7 @@ symlink به خروجی `src/models/run_phase8_residuals.py` است.
 | `tau_tradeoff.png` | `phase10/10.7_tau_tradeoff_fa.png` |
 | `resid_vs_res.png` | `phase8/8.2_resid_vs_res.png` |
 | `feature_sets.png` | `5.12_feature_sets_fa.png` |
+| `tau_marginal.png` | `6.10_tau_marginal_fa.png` |
 
 پسوند `_fa` یعنی «نسخه‌ی گزارش‌آماده»: بدون عنوان تکراری با کپشن، با برچسب فارسی/mathtext
 سالم — نسخه‌ی خام هم‌بند (مثلاً `phase9/9.1_feature_importance.csv` یا
