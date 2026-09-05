@@ -534,17 +534,18 @@ $50\%$ نوسان دارد. پس تعهد $\tau = 0.20$ میانگینی در س
 \label{sec:4-5-1}
 
 توزیع باقیمانده‌ها نرمال نیست و دُم راست سنگینی دارد (چولگی $+4.2$)، ولی سری روزانه‌ی
-آن‌ها خودهمبستگی معناداری ندارد ($p = 0.69$)؛ نمودارهای (آ) و (ب) شکل \ref{fig:resid} این دو ادعا
-را کنار هم می‌گذارند. پس آنچه مدل جا می‌گذارد الگوی زمانی کشف‌نشده نیست، بلکه شوک‌های
-موردی است. نمودار (ج) نشان می‌دهد این شوک‌ها کجا متمرکزند: پراکندگی خطا در
+آن‌ها خودهمبستگی معناداری ندارد ($p = 0.69$)؛ بخش‌های \subref{sfig:resid-hist} و
+\subref{sfig:resid-acf} شکل \ref{fig:resid} این دو ادعا را کنار هم می‌گذارند. پس آنچه مدل
+جا می‌گذارد الگوی زمانی کشف‌نشده نیست، بلکه شوک‌های موردی است. بخش
+\subref{sfig:resid-vs-res} همان شکل نشان می‌دهد این شوک‌ها کجا متمرکزند: پراکندگی خطا در
 سلول‌های کم‌رزرو تا بیش از $0.6$ می‌رسد و با بزرگ‌شدن حجم رزرو به نواری باریک حول صفر
 جمع می‌شود.
 
 \begin{figure}[!ht]
 \centering
-\subfloat[توزیع باقیمانده]{\includegraphics[width=0.46\textwidth]{residual_hist.png}}\hfill
-\subfloat[تابع خودهمبستگی سری روزانه]{\includegraphics[width=0.46\textwidth]{resid_acf.png}}\\[1mm]
-\subfloat[باقیمانده در برابر حجم رزرو]{\includegraphics[width=0.46\textwidth]{resid_vs_res.png}}
+\subfloat[توزیع باقیمانده\label{sfig:resid-hist}]{\includegraphics[width=0.46\textwidth]{residual_hist.png}}\hfill
+\subfloat[تابع خودهمبستگی سری روزانه\label{sfig:resid-acf}]{\includegraphics[width=0.46\textwidth]{resid_acf.png}}\\[1mm]
+\subfloat[باقیمانده در برابر حجم رزرو\label{sfig:resid-vs-res}]{\includegraphics[width=0.46\textwidth]{resid_vs_res.png}}
 \caption[تحلیل باقیمانده‌های مدل روی پنجره‌ی قفل‌شده]{%
 تحلیل باقیمانده‌های مدل روی پنجره‌ی قفل‌شده. نمودار (آ) توزیع باقیمانده‌ها را نشان
 می‌دهد. در نمودار (ب)، خط‌چین باند اطمینان ۹۵٪ خودهمبستگی سری روزانه را نشان می‌دهد و
