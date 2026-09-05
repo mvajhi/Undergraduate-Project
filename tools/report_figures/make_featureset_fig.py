@@ -32,7 +32,7 @@ LABELS = {
     "FS_lag": "وقفه‌ای",
     "FS_day": "عامل روز",
     "FS_full_A": "کامل تجمیعی",
-    "FS_bridge": "کامل + کوهورت",
+    "FS_bridge": "کامل + ترکیب",
 }
 
 
@@ -71,7 +71,7 @@ def main() -> None:
 
     ax.set_xticks(range(len(keys)))
     ax.set_xticklabels([fa(f"{LABELS[k]}\n({counts[k]})") for k in keys], fontsize=9)
-    ax.set_ylabel(fa("ضریب تعیین خارج‌نمونه"))
+    ax.set_ylabel("Out-of-sample $R^2$")
     ax.set_xlabel(fa("مجموعه‌ی ویژگی (تعداد ویژگی)"))
     ax.set_ylim(0, max(y) * 1.22)
     ax.spines[["top", "right"]].set_visible(False)
