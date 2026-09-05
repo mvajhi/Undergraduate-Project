@@ -158,6 +158,26 @@ def strip_title(name: str) -> Path:
     return out
 
 
+def crop_right_panel(name: str, out_name: str) -> Path:
+    """پنل راست یک شکل دوپنلی را جدا می‌کند: برش روی پهن‌ترین ستون سفید میانی."""
+    from PIL import Image
+
+    src = OUT_DIR / f"{name}.png"
+    img = Image.open(src).convert("RGB")
+    ink = np.asarray(img).min(axis=2) < 245
+    blank = ~ink.any(axis=0)
+    mid = slice(int(img.width * 0.3), int(img.width * 0.7))
+    cols = np.flatnonzero(blank[mid]) + mid.start
+    runs = np.split(cols, np.flatnonzero(np.diff(cols) > 1) + 1)
+    gutter = max(runs, key=len)
+    left = int(gutter[0])
+
+    out = OUT_DIR / f"{out_name}.png"
+    img.crop((left, 0, img.width, img.height)).save(out)
+    print(f"saved {out} — از ستون {left} از {img.width}")
+    return out
+
+
 def fig_lorenz() -> Path:
     """منحنی لورنتس تمرکز عدم‌دریافت در افراد (بازسازی‌شده: نسخه‌ی خام نویسه‌ی گمشده دارد)."""
     f = pd.read_parquet(PERSON_FEATURES, columns=["PersonId", "dont_receive"])
@@ -198,6 +218,7 @@ def main() -> None:
     fig_lorenz()
     for name in TITLE_STRIP:
         strip_title(name)
+    crop_right_panel("report_10_dorm_resident_fa", "report_10_dorm_faculty_fa")
 
 
 if __name__ == "__main__":

@@ -34,7 +34,7 @@ symlink به خروجی `src/models/run_phase8_residuals.py` است.
 | `pre_holiday.png` | `report_07_pre_holiday_fa.png` |
 | `acf_by_meal.png` | `report_08_acf_by_meal_fa.png` |
 | `daily_series.png` | `report_09_daily_series_volume_fa.png` |
-| `dorm_resident.png` | `report_10_dorm_resident_fa.png` |
+| `dorm_faculty.png` | `report_10_dorm_faculty_fa.png` (پنل راست) |
 | `lorenz.png` | `report_12_lorenz_fa.png` |
 | `day_shock.png` | `report_14_day_shock_fa.png` |
 
@@ -62,7 +62,8 @@ symlink به خروجی `src/models/run_phase8_residuals.py` است.
 ۲. **بازسازی** — `report_12` (منحنی لورنتس). نسخه‌ی خام در برچسب‌هایش نویسه‌ی «⇒» دارد که
    در Vazirmatn مربع خالی چاپ می‌شود؛ نسخه‌ی گزارش با متن فارسی بازنویسی شده. ضریب جینی
    خروجی (۰.۵۶۲) با `data_facts_register` (F47) تطبیق داده شده است.
-۳. **برش نوار عنوان** — شش شکل دیگر. `strip_title()` نوار عنوان بالای PNG را می‌برد و
+۳. **برش نوار عنوان** — شش شکل دیگر؛ از یکی‌شان (`report_10`) فقط پنل راست با
+   `crop_right_panel()` جدا شده تا در شکل سه‌پنلی بند ۳-۳-۳ بنشیند. `strip_title()` نوار عنوان بالای PNG را می‌برد و
    عنوان پنل‌ها را نگه می‌دارد؛ هیچ عددی بازمحاسبه نمی‌شود. مرز برش از پروفایل سطرهای
    دارای جوهر پیدا می‌شود، پس اگر نسخه‌ی خام بازتولید شود همچنان کار می‌کند.
 
