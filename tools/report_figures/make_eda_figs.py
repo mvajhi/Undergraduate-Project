@@ -28,6 +28,7 @@ from src.viz_fa import fa
 
 DATA = Path("data/processed/dataset_v2.csv")
 CALENDAR = Path("data/external/calendar_tehran.csv")
+PERSON_FEATURES = Path("data/processed/person_features_v1.parquet")
 OUT_DIR = Path("reports/figures")
 
 BLUE, RED, ORANGE, PURPLE = "#4C72B0", "#C44E52", "#DD8452", "#8172B2"
@@ -114,11 +115,89 @@ def fig_day_shock(day: pd.DataFrame) -> Path:
     return out
 
 
+# ---------------------------------------------------------------------------
+# نسخه‌ی گزارش‌آماده‌ی نمودارهای کاوش داده
+#
+# این نمودارها در فاز ۴ ساخته شده‌اند و اعدادشان بازتولید نمی‌شود؛ تنها کاری که
+# اینجا انجام می‌شود حذف نوار عنوان بالای شکل است، چون عنوان آن نمودارها یک
+# جمله‌ی خبری کامل بود که در گزارش با کپشن لاتک تکرار می‌شد. عنوان هر پنل (که
+# برچسب است نه تکرار کپشن) دست‌نخورده می‌ماند.
+# ---------------------------------------------------------------------------
+
+# نمودارهایی که فقط نوار عنوانشان برداشته می‌شود
+TITLE_STRIP = [
+    "report_02_city_effect",
+    "report_03_aqi_spurious",
+    "report_07_pre_holiday",
+    "report_08_acf_by_meal",
+    "report_09_daily_series_volume",
+    "report_10_dorm_resident",
+]
+
+
+def strip_title(name: str) -> Path:
+    """نوار عنوان بالای شکل را می‌برد و عنوان پنل‌ها را نگه می‌دارد."""
+    from PIL import Image
+
+    src = OUT_DIR / f"{name}.png"
+    img = Image.open(src).convert("RGB")
+    ink = np.asarray(img).min(axis=2) < 245
+    rows = np.flatnonzero(ink.any(axis=1))
+    bands = np.split(rows, np.flatnonzero(np.diff(rows) > 2) + 1)
+
+    if len(bands[0]) > 60:
+        # عنوان به بدنه چسبیده: نخستین سطر «پهن» همان چارچوب محور است
+        wide = np.flatnonzero(ink.sum(axis=1) > 0.6 * img.width)
+        top = int(wide[wide > bands[0][0] + 15][0])
+    else:
+        top = (int(bands[0][-1]) + int(bands[1][0])) // 2
+
+    out = OUT_DIR / f"{name}_fa.png"
+    img.crop((0, max(top, 0), img.width, img.height)).save(out)
+    print(f"saved {out} — از سطر {max(top, 0)} به بعد")
+    return out
+
+
+def fig_lorenz() -> Path:
+    """منحنی لورنتس تمرکز عدم‌دریافت در افراد (بازسازی‌شده: نسخه‌ی خام نویسه‌ی گمشده دارد)."""
+    f = pd.read_parquet(PERSON_FEATURES, columns=["PersonId", "dont_receive"])
+    per = f.groupby("PersonId")["dont_receive"].sum().sort_values().values
+    cum = np.concatenate([[0.0], np.cumsum(per) / per.sum()]) * 100
+    frac = np.linspace(0, 100, len(cum))
+    gini = 1 - 2 * np.trapezoid(cum / 100, frac / 100)
+
+    fig, ax = plt.subplots(figsize=(6.6, 4.4))
+    ax.plot([0, 100], [0, 100], "k--", lw=1.2, label=fa("توزیع کاملاً برابر"))
+    ax.plot(frac, cum, color=RED, lw=2.2)
+    ax.fill_between(frac, cum, frac, color=RED, alpha=0.12)
+    for q in (80, 90):
+        share = np.interp(q, frac, cum)
+        ax.axvline(q, color="gray", ls=":", lw=0.9)
+        ax.annotate(fa(f"{100 - q}٪ بدترین‌ها: {100 - share:.0f}٪ کل عدم‌دریافت"),
+                    xy=(q, share), xytext=(q - 46, share + 12), fontsize=9,
+                    arrowprops=dict(arrowstyle="->", color="gray", lw=0.9))
+    ax.set_xlabel(fa("درصد تجمعی دانشجویان (از کم‌مصرف‌ترین)"))
+    ax.set_ylabel(fa("درصد تجمعی موارد عدم‌دریافت"))
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 100)
+    ax.legend(loc="upper left")
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    out = OUT_DIR / "report_12_lorenz_fa.png"
+    fig.savefig(out, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"saved {out} — gini={gini:.3f}")
+    return out
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(DATA, parse_dates=["date_gregorian"])
     fig_target(df)
     fig_day_shock(build_day_shock(df))
+    fig_lorenz()
+    for name in TITLE_STRIP:
+        strip_title(name)
 
 
 if __name__ == "__main__":

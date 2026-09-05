@@ -11,7 +11,7 @@ PYTHONPATH=. .venv/bin/python tools/report_figures/make_surrogate_tree.py  # sur
 PYTHONPATH=. .venv/bin/python tools/report_figures/make_residual_figs.py   # residual_hist.png, resid_acf.png (پانل‌های آ و ب شکل ۴-۱)
 PYTHONPATH=. .venv/bin/python -m src.models.run_phase10_tau_curve          # tau_tradeoff.png (بند ۱۰.۷)
 PYTHONPATH=. .venv/bin/python tools/report_figures/make_featureset_fig.py   # feature_sets.png (شکل ۳-۱)
-PYTHONPATH=. .venv/bin/python tools/report_figures/make_eda_figs.py        # target_distribution.png, day_shock.png (شکل‌های ۳-۲ و ۳-۳)
+PYTHONPATH=. .venv/bin/python tools/report_figures/make_eda_figs.py        # نُه شکل بند ۳-۳-۳ (شکل‌های ۳-۲ تا ۳-۱۰)
 ```
 
 `resid_vs_res.png` (پانل ج شکل ۴-۱) اسکریپت جدا ندارد — کپی/تبدیلی لازم نداشت، پس مستقیم
@@ -29,6 +29,13 @@ symlink به خروجی `src/models/run_phase8_residuals.py` است.
 | `resid_vs_res.png` | `phase8/8.2_resid_vs_res.png` |
 | `feature_sets.png` | `5.12_feature_sets_fa.png` |
 | `target_distribution.png` | `report_01_target_distribution_fa.png` |
+| `city_effect.png` | `report_02_city_effect_fa.png` |
+| `aqi_spurious.png` | `report_03_aqi_spurious_fa.png` |
+| `pre_holiday.png` | `report_07_pre_holiday_fa.png` |
+| `acf_by_meal.png` | `report_08_acf_by_meal_fa.png` |
+| `daily_series.png` | `report_09_daily_series_volume_fa.png` |
+| `dorm_resident.png` | `report_10_dorm_resident_fa.png` |
+| `lorenz.png` | `report_12_lorenz_fa.png` |
 | `day_shock.png` | `report_14_day_shock_fa.png` |
 
 پسوند `_fa` یعنی «نسخه‌ی گزارش‌آماده»: بدون عنوان تکراری با کپشن، با برچسب فارسی/mathtext
@@ -44,6 +51,20 @@ symlink به خروجی `src/models/run_phase8_residuals.py` است.
    بدنه‌ی گزارش حذف شده.
 ۳. گاهی شکل چندپنلی است و پنلی را نشان می‌دهد که متن گزارش صریحاً ردش می‌کند
    (`9.1_feature_importance.png`: پنل چپ همان اهمیت درختی سوگیردار است).
+
+### نمودارهای کاوش داده (بند ۳-۳-۳)
+
+نُه شکل این بند سه جور ساخته می‌شوند و همه‌شان از `make_eda_figs.py` بیرون می‌آیند:
+
+۱. **بازتولید از داده** — `report_01` (توزیع هدف) و `report_14` (شوک روزانه). شوک دقیقاً
+   طبق رابطه‌ی (۱) گزارش محاسبه می‌شود؛ محور تاریخِ شکل شمسی است و شکاف روزهای بدون سرو
+   با خط وصل نمی‌شود (برخلاف نسخه‌ی خام EDA).
+۲. **بازسازی** — `report_12` (منحنی لورنتس). نسخه‌ی خام در برچسب‌هایش نویسه‌ی «⇒» دارد که
+   در Vazirmatn مربع خالی چاپ می‌شود؛ نسخه‌ی گزارش با متن فارسی بازنویسی شده. ضریب جینی
+   خروجی (۰.۵۶۲) با `data_facts_register` (F47) تطبیق داده شده است.
+۳. **برش نوار عنوان** — شش شکل دیگر. `strip_title()` نوار عنوان بالای PNG را می‌برد و
+   عنوان پنل‌ها را نگه می‌دارد؛ هیچ عددی بازمحاسبه نمی‌شود. مرز برش از پروفایل سطرهای
+   دارای جوهر پیدا می‌شود، پس اگر نسخه‌ی خام بازتولید شود همچنان کار می‌کند.
 
 اعداد این اسکریپت‌ها ساخته نمی‌شوند، فقط از `reports/` خوانده می‌شوند؛ ساختار درخت
 جانشین از `reports/phase9/9.5_surrogate_tree.txt` دستی منتقل شده چون مدلش ذخیره نشده.
