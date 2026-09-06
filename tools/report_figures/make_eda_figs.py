@@ -132,6 +132,7 @@ TITLE_STRIP = [
     "report_08_acf_by_meal",
     "report_09_daily_series_volume",
     "report_10_dorm_resident",
+    "round4/r4_2_return_curve",
 ]
 
 
