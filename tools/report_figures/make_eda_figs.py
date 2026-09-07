@@ -191,12 +191,61 @@ def fig_lorenz() -> Path:
     return out
 
 
+def fig_lorenz_eb() -> Path:
+    """همان شکل `report_12_lorenz_fa` ولی با مرتب‌سازی بر پایه‌ی **نرخ کوچک‌سازی‌شده**.
+
+    تفاوت تنها در معیار رتبه‌بندی افراد است، نه در کمیت انباشته: محور عمودی همچنان
+    درصد تجمعی **موارد واقعی عدم‌دریافت** است. نسخه‌ی اصلی افراد را با تعداد خام
+    عدم‌دریافتشان مرتب می‌کند — یعنی رتبه‌بندی «اوراکل» که از قبل جواب را می‌داند. این
+    نسخه آن‌ها را با تخمینی مرتب می‌کند که در لحظه‌ی تصمیم واقعاً در دست است، پس منحنی
+    پایین‌تر می‌افتد و عدد دهک از ۳۸٪ به ~۲۴٪ می‌رسد.
+
+    پیشین بتا-دوجمله‌ای با درست‌نمایی بیشینه برازش می‌شود (همان تابع دور ۵،
+    `src.eda_lib.runners.r5a_worst_decile.fit_beta_binomial`) تا عدد با F73 یکی بماند.
+    """
+    from src.eda_lib.runners.r5a_worst_decile import fit_beta_binomial
+
+    f = pd.read_parquet(PERSON_FEATURES, columns=["PersonId", "dont_receive"])
+    per = f.groupby("PersonId")["dont_receive"].agg(n="size", k="sum")
+    a, b = fit_beta_binomial(per["k"].to_numpy(float), per["n"].to_numpy(float))
+    per["eb"] = (per["k"] + a) / (per["n"] + a + b)
+
+    ordered = per.sort_values("eb")["k"].to_numpy(float)
+    cum = np.concatenate([[0.0], np.cumsum(ordered) / ordered.sum()]) * 100
+    frac = np.linspace(0, 100, len(cum))
+
+    fig, ax = plt.subplots(figsize=(6.6, 4.4))
+    ax.plot([0, 100], [0, 100], "k--", lw=1.2, label=fa("توزیع کاملاً برابر"))
+    ax.plot(frac, cum, color=RED, lw=2.2)
+    ax.fill_between(frac, cum, frac, color=RED, alpha=0.12)
+    for q in (80, 90):
+        share = np.interp(q, frac, cum)
+        ax.axvline(q, color="gray", ls=":", lw=0.9)
+        ax.annotate(fa(f"{100 - q}٪ بدترین‌ها: {100 - share:.0f}٪ کل عدم‌دریافت"),
+                    xy=(q, share), xytext=(q - 46, share + 12), fontsize=9,
+                    arrowprops=dict(arrowstyle="->", color="gray", lw=0.9))
+    ax.set_xlabel(fa("درصد تجمعی دانشجویان (از کم‌ریسک‌ترین بر پایه‌ی نرخ کوچک‌سازی‌شده)"))
+    ax.set_ylabel(fa("درصد تجمعی موارد عدم‌دریافت"))
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 100)
+    ax.legend(loc="upper left")
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    out = OUT_DIR / "report_12_lorenz_eb_fa.png"
+    fig.savefig(out, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"saved {out} — prior alpha={a:.3f} beta={b:.3f} "
+          f"top10%={100 - np.interp(90, frac, cum):.1f}%")
+    return out
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(DATA, parse_dates=["date_gregorian"])
     fig_target(df)
     fig_day_shock(build_day_shock(df))
     fig_lorenz()
+    fig_lorenz_eb()
     for name in TITLE_STRIP:
         strip_title(name)
 
