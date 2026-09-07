@@ -248,6 +248,57 @@ def fig_lorenz_targeting() -> Path:
     return out
 
 
+def fig_enrichment() -> Path:
+    """نسبت حضور دسته‌های جمعیتی در بدترین دهک — یک پنل با محور مشترک.
+
+    نسخه‌ی کاوشی این تحلیل چهار پنل جدا با چهار مقیاس متفاوت داشت، و همان باعث می‌شد
+    جنسیت (دامنه‌ی ۰٫۹۵ تا ۱٫۱۰) به‌اندازه‌ی دوره (دامنه‌ی ۰٫۷ تا ۱٫۷) چشمگیر به‌نظر
+    برسد — یعنی عکسِ چیزی که داده می‌گوید. اینجا همه روی یک محور می‌نشینند تا اندازه‌ها
+    واقعاً قابل‌مقایسه باشند و دسته‌هایی که روی خط ۱ می‌افتند خودشان را لو بدهند.
+    """
+    from src.eda_lib.runners.r5a_worst_decile import enrichment_table
+
+    per = pd.read_parquet("data/interim/r5_person_level.parquet")
+    picks = [
+        ("edu_group", "دوره", ["شبانه/نوبت دوم", "روزانه"]),
+        ("DegreeName", "مقطع", ["دکتری عمومی", "کارشناسی ارشد ناپیوسته", "کارشناسی پیوسته"]),
+        ("CollegeName", "دانشکده", None),
+        ("is_dorm_resident", "سکونت", None),
+        ("Gender", "جنسیت", None),
+    ]
+    rows = []
+    for col, group, keep in picks:
+        tb = enrichment_table(per, "worst_eb", col)
+        if col == "CollegeName":
+            tb = pd.concat([tb.head(1), tb.tail(1)])
+        elif col == "is_dorm_resident":
+            tb["دسته"] = tb["دسته"].map({"True": "ساکن خوابگاه", "False": "غیرساکن"})
+        if keep:
+            tb = tb[tb["دسته"].isin(keep)]
+        for _, r in tb.iterrows():
+            rows.append((f"{r['دسته']}", group, r["غنی‌شدگی"], r["CI پایین"], r["CI بالا"]))
+    d = pd.DataFrame(rows, columns=["cat", "group", "e", "lo", "hi"]).sort_values("e")
+
+    fig, ax = plt.subplots(figsize=(7.4, 5.6))
+    y = np.arange(len(d))
+    hit = ~((d["lo"] < 1) & (d["hi"] > 1))          # بازه شامل ۱ نیست ⇒ تمایز واقعی
+    colors = [RED if h else "#9aa0a6" for h in hit]
+    ax.hlines(y, d["lo"], d["hi"], colors=colors, linewidth=1.7)
+    ax.scatter(d["e"], y, color=colors, s=34, zorder=3)
+    ax.axvline(1.0, color="black", ls="--", lw=1.1)
+    ax.set_yticks(y)
+    ax.set_yticklabels([fa(f"{c}  ({g})") for c, g in zip(d["cat"], d["group"])], fontsize=9)
+    ax.set_xlabel(fa("نسبت حضور در بدترین دهک (۱ = سهم منصفانه)"))
+    ax.grid(axis="x", alpha=0.3)
+    ax.set_ylim(-0.7, len(d) - 0.3)
+    fig.tight_layout()
+    out = OUT_DIR / "report_13_enrichment_fa.png"
+    fig.savefig(out, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"saved {out} — {int(hit.sum())} از {len(d)} دسته بازه‌شان شامل ۱ نیست")
+    return out
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(DATA, parse_dates=["date_gregorian"])
@@ -255,6 +306,7 @@ def main() -> None:
     fig_day_shock(build_day_shock(df))
     fig_lorenz()
     fig_lorenz_targeting()
+    fig_enrichment()
     for name in TITLE_STRIP:
         strip_title(name)
 

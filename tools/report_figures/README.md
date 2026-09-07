@@ -35,6 +35,7 @@ symlink به خروجی `src/models/run_phase8_residuals.py` است.
 | `acf_by_meal.png` | `report_08_acf_by_meal_fa.png` |
 | `daily_series.png` | `report_09_daily_series_volume_fa.png` |
 | `dorm_resident.png` | `report_10_dorm_resident_fa.png` |
+| `enrichment.png` | `report_13_enrichment_fa.png` |
 | `lorenz.png` | `report_12b_lorenz_targeting_fa.png` (دومنحنی‌ای؛ نسخه‌ی تک‌منحنی `report_12_lorenz_fa.png` شاهد F47 می‌ماند) |
 | `day_shock.png` | `report_14_day_shock_fa.png` |
 | `return_curve.png` | `round4/r4_2_return_curve_fa.png` |
