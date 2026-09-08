@@ -23,7 +23,7 @@ from src.models.card_writer import load_s2_result
 from src.models.run_phase8_holdout_eval import load_holdout
 
 OUT_DIR = REPORTS_DIR / "phase10"
-COST_PER_PORTION_TOMAN = 120_000
+COST_PER_PORTION_TOMAN = 375_000
 #: شبکه‌ی نظری چگالی‌تر از TAU_GRID عملیاتی — فقط برای جدول τ*_ρ (بدون نیاز به بازبرازش)
 THEORETICAL_CU_OVER_CO = [1, 1.5, 2, 3, 4, 5, 6.667, 9, 19, 49, 99]
 
