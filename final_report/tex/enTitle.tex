@@ -22,6 +22,41 @@ Dining Halls Using Time Series Models}
 \latinthesisdate{September 2026}
 \latinkeywords{Food Demand Forecasting, Machine Learning, No-show Rate, Asymmetric
 Loss, Time Series, Food Waste Reduction}
+% ترجمه‌ی چکیده‌ی فارسی در tex/faTitle.tex — اعداد هر دو باید هم‌زمان به‌روز شوند.
 \en-abstract{
-% TODO — چکیده‌ی انگلیسی، ترجمه‌ی چکیده‌ی فارسی؛ در فاز نگارش تکمیل می‌شود.
+At the University of Tehran dining halls, the amount of food cooked for each meal is
+set from the number of registered reservations, yet catering-system data covering Azar
+1402 to Khordad 1403 (November 2023 to June 2024) shows that 8.05\% of reservations are
+never collected: more than 162,000 portions in five months, close to 19 billion tomans.
+Cooking less reduces this waste but raises the risk of a shortage, and the two errors do
+not carry the same cost.
+
+This study estimates the no-show rate ahead of each meal and converts it into a cooking
+quantity. Instead of estimating the conditional mean, the problem is formulated as
+estimating the $\tau$-th quantile of the conditional distribution of that rate at the
+(day, meal, dining hall, food type) level, so that the asymmetry between shortage and
+surplus costs enters the objective function itself. Predictions are issued at 15:00 for the next day's lunch and at
+23:00 for the next day's dinner, and no feature that is not yet available at that moment
+enters the model. The raw data consist of 2,564,919 individual reservations, which
+after cleaning were aggregated into 7,579 cells over 142 serving days and 30 dining
+halls; one hundred features were built on this basis and thirteen model families were
+screened.
+
+The twenty-five surviving models were evaluated with the Pinball loss at $\tau = 0.20$
+on five expanding time folds and one locked holdout window, against eight baselines.
+Only five models significantly beat the strongest baseline, a simple lookup table over
+dining hall and day of week, and the best of them reduced the loss by about nine
+percent. On the locked window, which spans Ramadan and the days of mourning after
+the presidential helicopter crash, the ranking changed and only the Bayesian
+hierarchical model retained a significant edge.
+
+The quantile level $\tau$ is left to dining hall management as a policy lever that sets
+the accepted level of risk. At the operating point
+$\tau = 0.20$, waste falls by about 71\% relative to cooking the full reservation
+count, at the cost of an average shortfall of 31 portions per day across the whole
+university, which is 0.28\% of total demand; the three policy scenarios examined yield
+annual savings between 11.6 and 19.8 billion tomans. These figures are conditional on
+explicit cost assumptions, have not been tested in a live setting, and do not generalize
+to the summer or examination periods.
 }
+

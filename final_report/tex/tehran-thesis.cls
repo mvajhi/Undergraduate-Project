@@ -63,7 +63,8 @@
 \def\secondlatinadvisor#1{\gdef\@secondlatinadvisor{#1}}
 \def\latinname#1{\gdef\@latinname{#1}}
 \def\latinsurname#1{\gdef\@latinsurname{#1}}
-\def\en-abstract#1{\gdef\@en-abstract{#1}}
+% \long افزوده شد تا مثل \fa-abstract (خط ۴۴) چکیده‌ی چندپاراگرافی را بپذیرد
+\long\def\en-abstract#1{\gdef\@en-abstract{#1}}
 \def\latinkeywords#1{\gdef\@latinkeywords{#1}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newif\if@bscthesis
@@ -524,7 +525,11 @@ inner xsep=-1.3cm,inner ysep=0.4cm]
 	\section*{چکیده}
 	% \addcontentsline{toc}{section}{چکیده}
 	\@fa-abstract
-	\par\noindent
+	% \paragraph یک \@secpenalty منفی پیش از خود می‌گذارد و همین باعث می‌شد بلوک
+	% «واژگان کلیدی» از چکیده جدا و تنها به صفحه‌ی بعد پرتاب شود، حتی وقتی یک‌سوم
+	% صفحه‌ی چکیده خالی بود. \@nobreaktrue آن جریمه (و فاصله‌ی پیش از آن) را حذف
+	% می‌کند، پس همان فاصله دستی و با \nobreak گذاشته می‌شود.
+	\par\nobreak\vspace{3.25ex}\nobreak\@nobreaktrue
 	\paragraph{واژگان کلیدی}
 	\@keywords
 }
@@ -539,8 +544,8 @@ inner xsep=-1.3cm,inner ysep=0.4cm]
 \section*{Abstract}
 % \addcontentsline{toc}{section}{چکیده}
 \@en-abstract
-\par
-\noindent
+% همان اصلاح صفحه‌ی چکیده‌ی فارسی — توضیح آنجاست.
+\par\nobreak\vspace{3.25ex}\nobreak\@nobreaktrue
 \paragraph{Keywords}
 \@latinkeywords
 }
