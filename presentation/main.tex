@@ -21,19 +21,48 @@
 % رنگ تیره‌ی متروپلیس با تودو زردرنگ بهتر جفت می‌شود؛ اختیاری، حذفش مشکلی ندارد
 \setbeamercolor{alerted text}{fg=Maroon}
 
+% آرم دانشگاه تهران روی فوتر هر اسلاید — همان لینک‌های img/logo.png و img/eng-logo.png
+% به final_report/img/*.png (خودِ لوگوهای رسمی، نه کپی) وصل‌اند
+\setbeamertemplate{frame footer}{\includegraphics[height=.32cm]{img/logo.png}}
+
+% قالب پیش‌فرض متروپلیس برای titlegraphic یک جعبه‌ی صفرارتفاع است (برای یک لوگوی تک‌خطی
+% طراحی شده) که با بلوک سه‌خطی+دو‌لوگوی ما روی عنوان می‌افتد — همان جعبه با ارتفاع واقعی
+% جایگزین می‌شود تا \vfill بعدی از زیر آن شروع شود، نه از زیر یک جعبه‌ی صفرارتفاع خیالی
+\setbeamertemplate{title graphic}{\inserttitlegraphic\par\vspace{.6em}}
+
+% دو آرم روی صفحه‌ی عنوان — عیناً چیدمان coverPage در
+% final_report/tex/tehran-thesis.cls (خط ۱۰۶ به بعد): eng-logo (پردیس فنی) و logo
+% (دانشگاه تهران) دو طرف بلوک متن، داخل \begin{latin} تا ترتیب چپ‌به‌راست حفظ شود
+\titlegraphic{%
+  \begin{latin}
+  \noindent
+  \begin{minipage}[c]{0.22\textwidth}
+    \centering\includegraphics[height=1.7cm]{img/eng-logo.png}
+  \end{minipage}%
+  \begin{minipage}[c]{0.56\textwidth}
+    \centering
+    \begin{persian}
+    {\footnotesize\bfseries دانشگاه تهران\\[2pt]
+    پردیس دانشکده‌های فنی\\[2pt]
+    دانشکده مهندسی برق و کامپیوتر}
+    \end{persian}
+  \end{minipage}%
+  \begin{minipage}[c]{0.22\textwidth}
+    \centering\includegraphics[height=1.7cm]{img/logo.png}
+  \end{minipage}
+  \end{latin}
+}
+
 \title{بهینه‌سازی پیش‌بینی میزان پخت غذا در سلف دانشگاه تهران با استفاده از مدل‌های سری زمانی}
 \subtitle{ارائه به استاد راهنما — نسخه‌ی فنی}
 \author{مهدی وجهی}
-\institute{دانشگاه تهران — پردیس دانشکده‌های فنی — دانشکده مهندسی برق و کامپیوتر\\
-استاد راهنما: دکتر بابک نجار اعرابی}
+\institute{استاد راهنما: دکتر بابک نجار اعرابی}
 % TODO تاریخ واقعی جلسه را جایگزین کنید (تاریخ پایان‌نامه در tehran-thesis: شهریور ۱۴۰۵)
 \date{شهریور ۱۴۰۵}
 
 \begin{document}
 
-\begin{frame}
-  \titlepage
-\end{frame}
+\maketitle
 
 \begin{frame}{فهرست مطالب}
   \tableofcontents
