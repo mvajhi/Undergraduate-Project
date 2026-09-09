@@ -13,7 +13,13 @@
 % TYPESETTING ELEMENTS
 
 % style of section presented in the table of contents
-\setbeamertemplate{section in toc}{$\blacktriangleright$~\inserttocsection}
+% با xepersian، رنگ‌گذاری خودکار پویای «section in toc / shaded» (که بین سکشن جاری و
+% بقیه تمایز رنگی ایجاد می‌کند) از کار می‌افتد چون بستهٔ داخلی xepersian هنگام تایپ‌ست
+% کردن عنوان‌های انگلیسی سکشن رنگ محیطی را ریست می‌کند و \color ساده اثر نمی‌کند —
+% \textcolor (که رنگ را با گروه محلی خودش اعمال می‌کند) از این ریست جان سالم به در می‌برد،
+% پس هر دو حالت اینجا صریحاً با \textcolor تنظیم شده‌اند
+\setbeamertemplate{section in toc}{\textcolor{white}{$\blacktriangleright$~\inserttocsection}}
+\setbeamertemplate{section in toc shaded}{\textcolor{white!40!sintefblue}{$\blacktriangleright$~\inserttocsection}}
 
 % style of subsection presented in the table of contents
 \setbeamertemplate{subsection in toc}{}
