@@ -1,0 +1,134 @@
+% بسته‌ها، فونت، رنگ و دستورهای تازه
+\usepackage{amsfonts, amsmath, oldgerm, lmodern}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{bm}
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=1.18}
+% usefonttheme{serif} قالب اصلی حذف شد: xepersian خودش بسته‌ی beamerfontthemeserif
+% را از قبل با گزینه‌ی دیگری بار می‌کند و این خط با آن clash می‌داد (خطای کامپایل).
+% فونت متن با \settextfont در main.tex تعیین می‌شود، به این خط نیازی نبود.
+
+% TYPESETTING ELEMENTS
+
+% شکل نمایش هر بخش در فهرست مطالب
+\setbeamertemplate{section in toc}{$\blacktriangleright$~\inserttocsection}
+
+% شکل نمایش هر زیربخش در فهرست مطالب — خالی (فقط سطح بخش نمایش داده می‌شود)
+\setbeamertemplate{subsection in toc}{}
+
+% زیرعنوان خودکار هر اسلاید: شماره + نام بخش جاری
+\makeatletter
+    \pretocmd\beamer@checkframetitle{\framesubtitle{\thesection \, \secname}}
+\makeatother
+
+% از شماره‌گذاری دوباره‌ی اسلایدهای شکسته‌شده به چند صفحه جلوگیری می‌کند
+\setbeamertemplate{frametitle continuation}{}
+
+% ابتدای هر بخش: یک اسلاید فهرست مطالب با بخش جاری برجسته — لوگوی گوشه هم موقتاً
+% خاموش می‌شود چون روی پس‌زمینه‌ی آبی رنگش با آرم یکی می‌شود (هر دو آبی‌فیروزه‌ای دانشگاه)
+\AtBeginSection[]
+{
+    \begingroup
+    \setbeamertemplate{footline}{}
+    \setbeamertemplate{headline}{}
+    \themecolor{blue}
+    \begin{frame}{\strtoc}
+        \tableofcontents[currentsection]
+    \end{frame}
+    \endgroup
+}
+
+% ابتدای هر زیربخش (در این ارائه استفاده نشده، ولی برای تکمیل قالب نگه داشته شد)
+\AtBeginSubsection[]
+{
+    \begin{frame}{\,}{\thesection \, \secname}
+        \centering\textsl{\textbf{\textcolor{sintefblue}{
+            \large \strsubsec
+            \vskip15pt
+            \LARGE \subsecname
+        }}}
+    \end{frame}
+}
+
+% تنظیمات بلوک کد
+\definecolor{codegreen}{RGB}{101,218,120}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    commentstyle=\color{airforceblue},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    xleftmargin=10pt,
+    xrightmargin=10pt,
+}
+
+\lstset{style=mystyle}
+
+% دستورهای تازه
+
+% لینک رنگی
+\newcommand{\hrefcol}[2]{\textcolor{airforceblue}{\href{#1}{#2}}}
+\newcommand{\hlinkcol}[1]{\hrefcol{#1}{#1}}
+
+% پاراگراف وسط‌چین با عرض محدود
+\newcommand{\centerstate}[1]{
+    \centering
+    \begin{columns}
+        \begin{column}{0.8\textwidth}
+            #1
+        \end{column}
+    \end{columns}
+}
+
+% متن پررنگ/مورب رنگی
+\newcommand{\ctextbf}[1]{\textbf{\textcolor{sintefblue}{#1}}}
+\newcommand{\btextbf}[1]{\textbf{\textcolor{airforceblue}{#1}}}
+\newcommand{\ctextsl}[1]{\textsl{\textcolor{sintefblue}{#1}}}
+\newcommand{\btextsl}[1]{\textsl{\textcolor{airforceblue}{#1}}}
+\newcommand{\cemph}[1]{\emph{\textcolor{sintefblue}{#1}}}
+\newcommand{\bemph}[1]{\emph{\textcolor{airforceblue}{#1}}}
+
+% اسلاید تک‌جمله‌ای تمام‌صفحه (برای یک ادعای محوری/گذار بین بخش‌ها)
+\newcommand{\aboutpage}[2]{
+    \begingroup
+    \setbeamertemplate{footline}{}
+    \setbeamertemplate{headline}{}
+    \themecolor{blue}
+    \begin{frame}[c]{#1}{\,}
+        \centering
+        \begin{minipage}{\textwidth}
+            \usebeamercolor[fg]{normal text}
+            \centering
+            \Large \textsl{\normalsize #2}
+        \end{minipage}
+    \end{frame}
+    \endgroup
+}
+
+% اسلاید مراجع (در این ارائه استفاده نشده، برای تکمیل قالب نگه داشته شد)
+\newcommand{\bibliographpage}{
+    \section{مراجع}
+    \begingroup
+    \themecolor{blue}
+    \begin{frame}[allowframebreaks]{مراجع}{\,}
+        \tiny
+        \printbibliography[heading=none]
+    \end{frame}
+\endgroup
+}

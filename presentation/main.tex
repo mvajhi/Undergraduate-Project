@@ -2,56 +2,23 @@
 % ارائه‌ی بیمر برای جلسه با استاد راهنما — نسخه‌ی فنی (روش‌شناسی و اعتبارسنجی‌محور)
 % مطابق بند ۱۱.۵ doc/progress/11-مستندسازی-و-ارائه.md («نسخه‌ی فنی: استاد/داور»)
 %
+% قالب: فارسی‌سازی beamerthemesintef (اصلش https://github.com/hoseinshetaie/UT_LaTeX_Present_Temp
+% ← که خودش SINTEF است، بدون تغییر برندینگ؛ جزئیات تغییرها بالای beamerthemesintef.sty)
+%
 % کامپایل: ./build.sh   (یا مستقیم: xelatex -synctex=1 -interaction=nonstopmode main)
-% هر jsectionj اسکلت است؛ محتوای TODO باید طبق شاهد ارجاع‌شده در doc/ نوشته شود —
+% هر بخش اسکلت است؛ محتوای TODO باید طبق شاهد ارجاع‌شده در doc/ نوشته شود —
 % هیچ عددی را بدون منبع اینجا اضافه نکنید (قاعده‌ی همان final_report/AGENTS.md).
 
-\documentclass[xcolor={dvipsnames}]{beamer}
+\documentclass{sintefbeamer}
 
-\usetheme{metropolis}
+\usepackage{booktabs}
 \setlength{\marginparwidth}{2cm}
 \usepackage{todonotes}
 
-\usepackage{booktabs}
 \usepackage[extrafootnotefeatures, displaymathdigits=persian]{xepersian}
 \settextfont[Path=./font/, BoldFont=Vazirmatn-Bold.ttf]{Vazirmatn-Regular.ttf}
 \setlatintextfont[Path=./font/, BoldFont=Vazirmatn-Bold.ttf]{Vazirmatn-Regular.ttf}
 \setdigitfont[Path=./font/]{Vazirmatn-Regular.ttf}
-
-% رنگ تیره‌ی متروپلیس با تودو زردرنگ بهتر جفت می‌شود؛ اختیاری، حذفش مشکلی ندارد
-\setbeamercolor{alerted text}{fg=Maroon}
-
-% آرم دانشگاه تهران روی فوتر هر اسلاید — همان لینک‌های img/logo.png و img/eng-logo.png
-% به final_report/img/*.png (خودِ لوگوهای رسمی، نه کپی) وصل‌اند
-\setbeamertemplate{frame footer}{\includegraphics[height=.32cm]{img/logo.png}}
-
-% قالب پیش‌فرض متروپلیس برای titlegraphic یک جعبه‌ی صفرارتفاع است (برای یک لوگوی تک‌خطی
-% طراحی شده) که با بلوک سه‌خطی+دو‌لوگوی ما روی عنوان می‌افتد — همان جعبه با ارتفاع واقعی
-% جایگزین می‌شود تا \vfill بعدی از زیر آن شروع شود، نه از زیر یک جعبه‌ی صفرارتفاع خیالی
-\setbeamertemplate{title graphic}{\inserttitlegraphic\par\vspace{.6em}}
-
-% دو آرم روی صفحه‌ی عنوان — عیناً چیدمان coverPage در
-% final_report/tex/tehran-thesis.cls (خط ۱۰۶ به بعد): eng-logo (پردیس فنی) و logo
-% (دانشگاه تهران) دو طرف بلوک متن، داخل \begin{latin} تا ترتیب چپ‌به‌راست حفظ شود
-\titlegraphic{%
-  \begin{latin}
-  \noindent
-  \begin{minipage}[c]{0.22\textwidth}
-    \centering\includegraphics[height=1.7cm]{img/eng-logo.png}
-  \end{minipage}%
-  \begin{minipage}[c]{0.56\textwidth}
-    \centering
-    \begin{persian}
-    {\footnotesize\bfseries دانشگاه تهران\\[2pt]
-    پردیس دانشکده‌های فنی\\[2pt]
-    دانشکده مهندسی برق و کامپیوتر}
-    \end{persian}
-  \end{minipage}%
-  \begin{minipage}[c]{0.22\textwidth}
-    \centering\includegraphics[height=1.7cm]{img/logo.png}
-  \end{minipage}
-  \end{latin}
-}
 
 \title{بهینه‌سازی پیش‌بینی میزان پخت غذا در سلف دانشگاه تهران با استفاده از مدل‌های سری زمانی}
 \subtitle{ارائه به استاد راهنما — نسخه‌ی فنی}
@@ -63,10 +30,6 @@
 \begin{document}
 
 \maketitle
-
-\begin{frame}{فهرست مطالب}
-  \tableofcontents
-\end{frame}
 
 %----------------------------------------------------------------------------------------------
 \section{مسئله و انگیزه}
@@ -142,7 +105,7 @@
 \begin{frame}{ویژگی‌ها: چند نمونه از شش فیچرست}
   \begin{figure}
     \centering
-    \includegraphics[width=0.85\textwidth]{img/feature_sets.png}
+    \includegraphics[width=0.85\textwidth,height=.6\paperheight,keepaspectratio]{img/feature_sets.png}
   \end{figure}
   % کپشن گزاره‌ای، نه توصیفی — طبق قاعده‌ی final_report/AGENTS.md
   \todo[inline, color=yellow!40]{TODO: یک جمله‌ی گزاره‌ای برای این شکل بنویسید
@@ -175,7 +138,7 @@
 \begin{frame}{تفسیرپذیری}
   \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{img/perm_importance.png}
+    \includegraphics[width=0.8\textwidth,height=.55\paperheight,keepaspectratio]{img/perm_importance.png}
   \end{figure}
   \todo[inline, color=yellow!40]{TODO: جمله‌ی گزاره‌ای — سلف/روزهفته×شهر/حجم غالب‌اند،
     لگ‌های تاریخی ناچیز. منبع: final\_report/tex/chapter4.tex بند ۴-۵-۲.}
@@ -188,7 +151,7 @@
 \begin{frame}{$\tau$ به‌عنوان اهرم سیاستی}
   \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{img/tau_tradeoff.png}
+    \includegraphics[width=0.8\textwidth,height=.5\paperheight,keepaspectratio]{img/tau_tradeoff.png}
   \end{figure}
   \begin{itemize}
     \item در $\tau = 0.20$: کاهش هدررفت حدود $71\%$ نسبت به پخت کامل رزرو
@@ -212,8 +175,6 @@
     (مثلاً پایلوت روی چند سلف پرحجم پیش از استقرار کامل).}
 \end{frame}
 
-\begin{frame}[standout]
-  پرسش و پیشنهاد؟
-\end{frame}
+\backmatter
 
 \end{document}
