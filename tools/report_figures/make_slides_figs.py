@@ -474,60 +474,46 @@ def fig_14b_model_families() -> None:
 
 
 # ---------------------------------------------------------------------------
-# اسلاید ۱۵-الف — مدل برتر به زبان ساده (جنگل درخت‌های اصلاح‌کننده)
+# اسلاید ۲۳ — پنج مدلی که واقعاً بردند (رتبه‌بندی با pinball نرخ)
 # ---------------------------------------------------------------------------
 
-def fig_23_champion_model() -> None:
-    fig, ax = plt.subplots(figsize=(9.6, 4.4))
+def fig_23_top_models_table() -> None:
+    # منبع: reports/phase7/model_comparison.md (τ=۰.۲۰، ۵ fold رسمی)
+    rows = [
+        ("lightgbm_quantile", "خ۲ درختی/بوستینگ", 0.01211, -0.00124),
+        ("bhm_varying_dispersion", "خ۸ بیزی سلسله‌مراتبی", 0.01221, -0.00114),
+        ("catboost_quantile", "خ۲ درختی/بوستینگ", 0.01224, -0.00111),
+        ("qrf", "خ۲ جنگل کوانتایلی", 0.01233, -0.00101),
+        ("mlp_entity_embedding", "خ۷ شبکه‌ی عصبی", 0.01274, -0.00061),
+    ]
+    b3 = 0.01335
+    n = len(rows)
+    y = np.arange(n)
+    colors = [GREEN if i == 0 else BLUE for i in range(n)]
 
-    # جعبه‌ی ورودی
-    ax.add_patch(FancyBboxPatch((0.0, 0.9), 1.9, 1.0,
-                                 boxstyle="round,pad=0.02,rounding_size=0.06",
-                                 facecolor=GRAY, edgecolor="white"))
-    ax.text(0.95, 1.55, "ورودی‌ها", ha="center", va="center", fontsize=12.5,
-            color="white", fontweight="bold")
-    ax.text(0.95, 1.18, "۶۲ ویژگی: سلف، تقویم،\nرزرو، نرخ‌های اخیر", ha="center", va="center",
-            fontsize=9, color="white")
+    fig, ax = plt.subplots(figsize=(10.2, 4.3))
+    for i, (name, fam, v, d) in enumerate(rows):
+        # میله از خط پایه‌ی B3 تا نرخ مدل — طولش دقیقاً همان Δ است
+        ax.barh(i, v - b3, left=b3, height=0.55, color=colors[i], zorder=3)
+        ax.text(v + 0.00006, i, f"{v:.5f}", va="center", ha="left", fontsize=10,
+                fontweight="bold", color="white", zorder=4)
+        ax.text(v - 0.00008, i, f"{name}  ·  {fam}", va="center", ha="right",
+                fontsize=9.7, color="0.2")
+        ax.text(b3, i + 0.36, f"Δ={d:+.5f}", va="center", ha="right", fontsize=8.4,
+                color=GRAY_DARK)
 
-    # درخت‌های متوالی که هرکدام خطای قبلی را اصلاح می‌کند
-    n_trees = 5
-    tree_x0 = 2.55
-    gap = 1.02
-    for i in range(n_trees):
-        cx = tree_x0 + i * gap
-        # تنه
-        ax.add_patch(Rectangle((cx - 0.04, 0.95), 0.08, 0.22, facecolor="#8a5a34", edgecolor="none"))
-        # تاج درخت (سه مثلث هم‌مرکز)
-        for k, (dy, w) in enumerate([(0.0, 0.5), (0.16, 0.4), (0.30, 0.3)]):
-            tri = plt.Polygon([(cx, 1.68 + dy), (cx - w / 2, 1.17 + dy), (cx + w / 2, 1.17 + dy)],
-                               closed=True, facecolor=BLUE, edgecolor="white", lw=0.8, alpha=0.55 + 0.09 * k)
-            ax.add_patch(tri)
-        ax.text(cx, 0.72, f"درخت {['۱', '۲', '۳', '۴', '۵'][i]}", ha="center", va="center",
-                fontsize=8.5, color="0.25")
-        if i < n_trees - 1:
-            ax.text(cx + gap / 2, 1.4, "+", ha="center", va="center", fontsize=15, color=RED,
-                    fontweight="bold")
-    ax.text(tree_x0 + (n_trees - 1) * gap / 2, 2.15,
-            "هر درخت فقط خطای باقی‌مانده‌ی درخت‌های قبلی را اصلاح می‌کند", ha="center",
-            fontsize=9.5, color="0.3")
+    ax.axvline(b3, color=RED, lw=1.5, ls="--", zorder=2)
+    ax.text(b3, -0.62, "خط پایه B3 = ۰.۰۱۳۳۵", ha="center", va="bottom", fontsize=10,
+            color=RED, fontweight="bold")
 
-    # جعبه‌ی خروجی
-    out_x = tree_x0 + (n_trees - 1) * gap + 0.85
-    ax.annotate("", xy=(out_x, 1.4), xytext=(out_x - 0.55, 1.4),
-                arrowprops=dict(arrowstyle="-|>", color="0.3", lw=1.6))
-    ax.add_patch(FancyBboxPatch((out_x, 0.9), 2.1, 1.0,
-                                 boxstyle="round,pad=0.02,rounding_size=0.06",
-                                 facecolor=GREEN, edgecolor="white"))
-    ax.text(out_x + 1.05, 1.55, "خروجی", ha="center", va="center", fontsize=12.5,
-            color="white", fontweight="bold")
-    ax.text(out_x + 1.05, 1.18, "چندک ۲۰٪ نرخ عدم‌دریافت\nهمان (روز، وعده، سلف، غذا)",
-            ha="center", va="center", fontsize=9, color="white")
-
-    ax.set_xlim(-0.15, out_x + 2.25)
-    ax.set_ylim(0.55, 2.4)
-    ax.axis("off")
+    ax.set_xlim(min(v for *_, v, _ in rows) - 0.00010, b3 + 0.00025)
+    ax.set_ylim(n - 0.42, -0.92)
+    ax.set_yticks([])
+    ax.set_xlabel("pinball نرخ (کمتر بهتر است)")
+    for s in ("top", "right", "left"):
+        ax.spines[s].set_visible(False)
     fig.tight_layout()
-    _finish(fig, "slides_23_champion_model")
+    _finish(fig, "slides_23_top_models_table")
 
 
 def main() -> None:
@@ -541,7 +527,7 @@ def main() -> None:
     fig_09_variance_donut()
     fig_14b_model_families()
     fig_15_funnel()
-    fig_23_champion_model()
+    fig_23_top_models_table()
     fig_17_ladder()
     fig_18_waste_rate()
     fig_19_tradeoff_bars()
