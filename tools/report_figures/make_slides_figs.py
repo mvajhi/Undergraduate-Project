@@ -165,7 +165,8 @@ def fig_07_timeline() -> None:
     cutoffs = [(2.0, "برش ناهار\nساعت پانزده روز قبل"), (3.7, "برش شام\nساعت بیست‌وسه روز قبل")]
     for x, label in cutoffs:
         ax.axvline(x, color="0.25", ls="--", lw=1.4, zorder=2)
-        ax.text(x, -0.55, label, ha="center", va="top", fontsize=9.5, color="0.25")
+        ax.text(x, -0.55, label, ha="center", va="top", fontsize=9.5, color="0.25",
+                 zorder=4, bbox=dict(facecolor="white", edgecolor="none", pad=3))
 
     ax.axvspan(1.55, 1.95, color=RED, alpha=0.10, zorder=0)
     ax.annotate("در لحظه‌ی برش ناهار هنوز سرو نشده، پس ممنوعه",
@@ -238,7 +239,7 @@ def fig_09_variance_donut() -> None:
 # ---------------------------------------------------------------------------
 
 def fig_15_funnel() -> None:
-    stages = ["خانواده‌ی مدل", "مدل آموزش‌دیده", "برد آماری معنادار", "قهرمان رسمی"]
+    stages = ["خانواده‌ی مدل", "مدل آموزش‌دیده", "برد آماری معنادار", "مدل برتر"]
     counts = [13, 25, 5, 1]
     colors = [GRAY, "#8fa8c4", BLUE, GREEN]
 
@@ -420,6 +421,115 @@ def fig_22_pilot_pairs() -> None:
     _finish(fig, "slides_22_pilot_pairs")
 
 
+# ---------------------------------------------------------------------------
+# اسلاید ۱۴-الف — ۱۳ خانواده‌ی مدل امتحان‌شده
+# ---------------------------------------------------------------------------
+
+def fig_14b_model_families() -> None:
+    families = [
+        "خطی و\nتعمیم‌یافته", "درختی و\nبوستینگ", "سری‌زمانی\nتک‌متغیره",
+        "سری‌زمانی\nچندمتغیره", "واریانس\nشرطی",
+        "کرنل و\nبردار پشتیبان", "شبکه‌ی\nعصبی", "سلسله‌مراتبی\nو بیزی",
+        "توزیعی و\nشمارشی", "نمونه‌محور",
+        "تصمیم‌محور", "ترکیب و\nآشتی", "کالیبراسیون\nو پوشش",
+    ]
+    champion_idx = 1  # خ۲ — درختی و بوستینگ
+    layer_idx = {11, 12}  # خ۱۲/خ۱۳ — لایه‌ی متعامد روی بقیه، نه رقیب مستقیم
+
+    rows = [5, 5, 3]
+    bw, bh, gap = 1.55, 0.95, 0.22
+
+    fig, ax = plt.subplots(figsize=(10.2, 5.6))
+    idx = 0
+    row_w = rows[0] * bw + (rows[0] - 1) * gap
+    for r, n in enumerate(rows):
+        this_w = n * bw + (n - 1) * gap
+        x0 = -this_w / 2
+        y = -r * (bh + gap * 1.3)
+        for c in range(n):
+            cx = x0 + c * (bw + gap) + bw / 2
+            if idx == champion_idx:
+                face, edge, tcolor = GREEN, "white", "white"
+            elif idx in layer_idx:
+                face, edge, tcolor = "#e4e4e4", GRAY_DARK, "0.25"
+            else:
+                face, edge, tcolor = "#7c98b3", "white", "white"
+            ax.add_patch(FancyBboxPatch((cx - bw / 2, y - bh / 2), bw, bh,
+                                         boxstyle="round,pad=0.02,rounding_size=0.07",
+                                         facecolor=face, edgecolor=edge, linewidth=1.2))
+            ax.text(cx, y + 0.20, f"خ{['۱','۲','۳','۴','۵','۶','۷','۸','۹','۱۰','۱۱','۱۲','۱۳'][idx]}",
+                    ha="center", va="center", fontsize=9, color=tcolor, alpha=0.85)
+            ax.text(cx, y - 0.14, families[idx], ha="center", va="center", fontsize=9.3,
+                    color=tcolor, fontweight="bold" if idx == champion_idx else "normal")
+            idx += 1
+
+    ax.text(0, -3 * (bh + gap * 1.3) + 0.55, "خ۲ = خانواده‌ی مدل برتر · خ۱۲/خ۱۳ لایه‌ی ترکیب و کالیبراسیون‌اند، نه یک رقیب مستقل",
+            ha="center", va="center", fontsize=9.5, color="0.35")
+
+    ax.set_xlim(-row_w / 2 - 0.3, row_w / 2 + 0.3)
+    ax.set_ylim(-3 * (bh + gap * 1.3) + 0.15, bh / 2 + 0.25)
+    ax.axis("off")
+    fig.tight_layout()
+    _finish(fig, "slides_14b_model_families")
+
+
+# ---------------------------------------------------------------------------
+# اسلاید ۱۵-الف — مدل برتر به زبان ساده (جنگل درخت‌های اصلاح‌کننده)
+# ---------------------------------------------------------------------------
+
+def fig_23_champion_model() -> None:
+    fig, ax = plt.subplots(figsize=(9.6, 4.4))
+
+    # جعبه‌ی ورودی
+    ax.add_patch(FancyBboxPatch((0.0, 0.9), 1.9, 1.0,
+                                 boxstyle="round,pad=0.02,rounding_size=0.06",
+                                 facecolor=GRAY, edgecolor="white"))
+    ax.text(0.95, 1.55, "ورودی‌ها", ha="center", va="center", fontsize=12.5,
+            color="white", fontweight="bold")
+    ax.text(0.95, 1.18, "۶۲ ویژگی: سلف، تقویم،\nرزرو، نرخ‌های اخیر", ha="center", va="center",
+            fontsize=9, color="white")
+
+    # درخت‌های متوالی که هرکدام خطای قبلی را اصلاح می‌کند
+    n_trees = 5
+    tree_x0 = 2.55
+    gap = 1.02
+    for i in range(n_trees):
+        cx = tree_x0 + i * gap
+        # تنه
+        ax.add_patch(Rectangle((cx - 0.04, 0.95), 0.08, 0.22, facecolor="#8a5a34", edgecolor="none"))
+        # تاج درخت (سه مثلث هم‌مرکز)
+        for k, (dy, w) in enumerate([(0.0, 0.5), (0.16, 0.4), (0.30, 0.3)]):
+            tri = plt.Polygon([(cx, 1.68 + dy), (cx - w / 2, 1.17 + dy), (cx + w / 2, 1.17 + dy)],
+                               closed=True, facecolor=BLUE, edgecolor="white", lw=0.8, alpha=0.55 + 0.09 * k)
+            ax.add_patch(tri)
+        ax.text(cx, 0.72, f"درخت {['۱', '۲', '۳', '۴', '۵'][i]}", ha="center", va="center",
+                fontsize=8.5, color="0.25")
+        if i < n_trees - 1:
+            ax.text(cx + gap / 2, 1.4, "+", ha="center", va="center", fontsize=15, color=RED,
+                    fontweight="bold")
+    ax.text(tree_x0 + (n_trees - 1) * gap / 2, 2.15,
+            "هر درخت فقط خطای باقی‌مانده‌ی درخت‌های قبلی را اصلاح می‌کند", ha="center",
+            fontsize=9.5, color="0.3")
+
+    # جعبه‌ی خروجی
+    out_x = tree_x0 + (n_trees - 1) * gap + 0.85
+    ax.annotate("", xy=(out_x, 1.4), xytext=(out_x - 0.55, 1.4),
+                arrowprops=dict(arrowstyle="-|>", color="0.3", lw=1.6))
+    ax.add_patch(FancyBboxPatch((out_x, 0.9), 2.1, 1.0,
+                                 boxstyle="round,pad=0.02,rounding_size=0.06",
+                                 facecolor=GREEN, edgecolor="white"))
+    ax.text(out_x + 1.05, 1.55, "خروجی", ha="center", va="center", fontsize=12.5,
+            color="white", fontweight="bold")
+    ax.text(out_x + 1.05, 1.18, "چندک ۲۰٪ نرخ عدم‌دریافت\nهمان (روز، وعده، سلف، غذا)",
+            ha="center", va="center", fontsize=9, color="white")
+
+    ax.set_xlim(-0.15, out_x + 2.25)
+    ax.set_ylim(0.55, 2.4)
+    ax.axis("off")
+    fig.tight_layout()
+    _finish(fig, "slides_23_champion_model")
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     fig_01_waffle()
@@ -429,7 +539,9 @@ def main() -> None:
     fig_07_timeline()
     fig_08_dinner_given_lunch()
     fig_09_variance_donut()
+    fig_14b_model_families()
     fig_15_funnel()
+    fig_23_champion_model()
     fig_17_ladder()
     fig_18_waste_rate()
     fig_19_tradeoff_bars()
