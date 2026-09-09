@@ -16,30 +16,20 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
-%
-% ---------------------------------------------------------------------------
-% نسخه‌ی فارسی‌سازی‌شده برای ارائه‌ی این پروژه — بر پایه‌ی
-% https://github.com/hoseinshetaie/UT_LaTeX_Present_Temp (که خودش یک fork
-% بدون تغییرِ آرم/جهت از قالب رسمی SINTEF است؛ عنوان «دانشگاه تهران» فقط به
-% محتوای آن ارائه اشاره داشت، نه برندینگ خودِ قالب). تغییرهای این نسخه:
-%   ۱. فونت لاتین ثابت (caladea/carlito) حذف شد — xepersian از main.tex فونت را کنترل می‌کند
-%   ۲. آرم SINTEF با آرم دانشگاه تهران (img/logo.png) جایگزین شد
-%   ۳. هر عنصر جهت‌دار (لوگوی گوشه، leftskip/rightskip عنوان اسلاید، chapter/sidepic)
-%      برای راست‌به‌چپ آینه شد
-%   ۴. نسبت صفحه از ۳:۲ (باگ کامنت/مقدار قالب اصلی) به ۱۶:۹ واقعی اصلاح شد
-% ---------------------------------------------------------------------------
 
-\ProvidesPackage{beamerthemesintef}[2021/11/02 fa]
+\ProvidesPackage{beamerthemesintef}[2021/11/02]
 
 \RequirePackage{etoolbox}
 \RequirePackage{tikz}
 \RequirePackage{listings}
 
-% نسبت صفحه‌ی ۱۶:۹ واقعی (استاندارد نمایشگر/پروژکتور امروز). اندازه‌ی مطلق ۱.۶
-% برابر ۱۶×۹cm خامِ ابتدایی شد چون فاصله‌گذاری‌های pt-محورِ قالب (فونت عنوان ۲۲pt
-% و مانند آن) روی بومِ کوچک‌تر همان نسبت overflow می‌داد (\vbox ۴۴pt بلندتر از قاب).
+% Force 16:9 aspect ratio
 \RequirePackage{geometry}
-\geometry{paperwidth=25.6cm,paperheight=14.4cm}
+\geometry{paperwidth=18cm,paperheight=12cm}
+
+% Caladea is a Cambria clone, Carlito a Calibri clone
+\RequirePackage{caladea,carlito}
+\renewcommand{\familydefault}{\sfdefault}
 
 \RequirePackage{graphicx,sintefcolor}
 
@@ -48,8 +38,8 @@
 
 \newcommand{\@footlinepayoff}{\@SINTEFmotto}
 \setbeamertemplate{footline}{%
-  \begin{beamercolorbox}[wd=\textwidth,ht=5mm,dp=3mm,leftskip=1cm]{footline}
-  \usebeamerfont{footline}\@footlinepayoff\hfill
+  \begin{beamercolorbox}[wd=\textwidth,ht=5mm,dp=3mm,rightskip=1cm]{footline}
+  \usebeamerfont{footline}\hfill\@footlinepayoff
   \end{beamercolorbox}
 }
 
@@ -69,10 +59,8 @@
 }
 \footlinecolor{} % Default: no footline
 
-% آرم دانشگاه تهران (final_report/img/logo.png، از مسیر img/logo.png لینک شده)
-% — یک تصویر برای هر دو حالت روشن/تیره کافی است چون خودش پس‌زمینه‌ی توپر دارد
-\pgfdeclareimage[width=0.09\paperwidth]{bluelogo}{img/logo.png}
-\pgfdeclareimage[width=0.09\paperwidth]{whitelogo}{img/logo.png}
+\pgfdeclareimage[width=0.09\paperwidth]{bluelogo}{images/SINTEF_Logo_Sentrert_RGB}
+\pgfdeclareimage[width=0.09\paperwidth]{whitelogo}{images/SINTEF_Logo_Sentrert_Negativ_RGB}
 \newcommand{\@SINTEFlogo}{bluelogo}
 
 % Set colours
@@ -111,11 +99,10 @@
 \setbeamerfont{block title}{series=\centering, size=\small}
 \setbeamerfont{block body}{size=\scriptsize}
 
-% سبک «rounded» قالب اصلی حذف شد: باکس گردشده‌اش از minipage داخلی استفاده می‌کند که
-% با ردیابی گروه چپ‌به‌راست/راست‌به‌چپ xepersian تداخل دارد و کامپایل را می‌شکند
-% («\endL or \endR problem» + «\endminipage» تعریف‌نشده — با تست کمینه تأیید شد).
-% سبک «default» گوشه‌تیز است ولی پایدار.
-\setbeamertemplate{blocks}[default]
+% Code to get prettier boxes
+% [rounded] با xepersian تداخل دارد (باکس گردشده از minipage داخلی استفاده می‌کند که
+% ردیابی چپ‌به‌راست/راست‌به‌چپ xepersian را می‌شکند) — به [default] تغییر یافت
+\setbeamertemplate{blocks}[default]%, shadow=true]
 
 % Bullets in several levels
 \setbeamertemplate{itemize item}{\textbullet}
@@ -132,54 +119,30 @@
 	\endgroup
 }
 
-% لوگو در گوشه‌ی بالا-راست هر اسلاید (برای فارسی/راست‌به‌چپ؛ نسخه‌ی اصلی بالا-چپ بود).
-% makebox[پهنا][راست‌چین] به‌جای hfill خام استفاده شد تا مستقل از جهت پاراگراف
-% محیط، همیشه واقعاً به لبه‌ی راست بچسبد.
-\setbeamertemplate{headline}{%
-  \makebox[\paperwidth][r]{\pgfuseimage{\@SINTEFlogo}\hspace{0.03\textwidth}}%
-}
+% Put the logo in each slide's top left area
+\setbeamertemplate{headline}{\hspace{0.03\textwidth}\pgfuseimage{\@SINTEFlogo}}
 
-% Define frame title and subtitle layout — rightskip جای leftskip (متن راست‌چین،
-% فاصله‌ی خالی برای آرم در سمت راست نگه داشته می‌شود)
+% Define frame title and subtitle layout
 \setbeamertemplate{frametitle}{%
   \vspace*{-3.5ex}
-  \begin{beamercolorbox}[rightskip=1.5cm]{frametitle}%
+  \begin{beamercolorbox}[leftskip=1.5cm]{frametitle}%
     \usebeamerfont{frametitle}\insertframetitle\\
     \usebeamerfont{framesubtitle}\insertframesubtitle
   \end{beamercolorbox}
 }
 
-% Define the title page — با ردیف دو‌آرمه‌ی نهادی (دانشگاه تهران + پردیس فنی)
-% در بالا، عیناً چیدمان coverPage در final_report/tex/tehran-thesis.cls
+% Define the title page
 \setbeamertemplate{title page}{
   \begin{center}
-    \begin{latin}
-    \noindent
-    \begin{minipage}[c]{0.22\textwidth}
-      \centering\includegraphics[height=1.4cm]{img/eng-logo.png}
-    \end{minipage}%
-    \begin{minipage}[c]{0.56\textwidth}
-      \centering
-      \begin{persian}
-      {\scriptsize\bfseries دانشگاه تهران --- پردیس دانشکده‌های فنی\\[1pt]
-      دانشکده مهندسی برق و کامپیوتر}
-      \end{persian}
-    \end{minipage}%
-    \begin{minipage}[c]{0.22\textwidth}
-      \centering\includegraphics[height=1.4cm]{img/logo.png}
-    \end{minipage}
-    \end{latin}
-    \vspace{1.2em}
-
     \vfill
     % Title
     {\usebeamercolor[fg]{title}\usebeamerfont{title}
-      \fontsize{22pt}{26pt}\selectfont\inserttitle\par}
+      \fontsize{24pt}{28pt}\selectfont\inserttitle\par}
     \vspace{1em}
 
     % Subtitle
     {\usebeamercolor[fg]{title}\usebeamerfont{subtitle}
-      \fontsize{13pt}{17pt}\selectfont\insertsubtitle\par}
+      \fontsize{14pt}{18pt}\selectfont\insertsubtitle\par}
     \vspace{1.5em}
 
     % Author
@@ -190,11 +153,6 @@
     % Date
     {\usebeamercolor[fg]{date}\usebeamerfont{date}
       \fontsize{10pt}{14pt}\selectfont\insertdate\par}
-    \vspace{0.8em}
-
-    % Institute (استاد راهنما) — قالب اصلی این را نداشت، برای ارائه‌ی دانشگاهی افزوده شد
-    {\usebeamercolor[fg]{author}\usebeamerfont{author}
-      \fontsize{11pt}{15pt}\selectfont\insertinstitute\par}
     \vfill
   \end{center}
 }
@@ -202,11 +160,11 @@
 \newcommand{\TikzSplitSlide}[1]{%
   \rule{0.4\paperwidth}{0pt}%
   \begin{tikzpicture}
-    \clip (0.5\paperwidth,-0.5\paperheight) --
-          (1.1\paperwidth,-0.5\paperheight) --
-          (1.1\paperwidth, 0.5\paperheight) --
-          (0.9\paperwidth, 0.5\paperheight) -- cycle;
-    \node at (0.8\paperwidth,0) {%
+    \clip (-0.1\paperwidth,-0.5\paperheight) --
+          ( 0.5\paperwidth,-0.5\paperheight) --
+          ( 0.5\paperwidth, 0.5\paperheight) --
+          ( 0.1\paperwidth, 0.5\paperheight) -- cycle;
+    \node at (0.2\paperwidth,0) {%
       \includegraphics[height=\paperheight]{#1}%
     };
   \end{tikzpicture}
@@ -224,7 +182,6 @@
 \renewcommand{\maketitle}{
 \begingroup
   \setbeamertemplate{footline}{}
-  \setbeamertemplate{headline}{}% لوگوی گوشه خاموش — صفحه‌ی عنوان خودش ردیف دو‌آرمه دارد
   \ifdefempty{\@TitleBackground}{}{% Skip if \@TitleBackground is empty
     \setbeamertemplate{background}{%
       \ifbool{splittitle}{%
@@ -242,13 +199,9 @@
 \endgroup
 }
 
-% نسخه‌ی راست‌به‌چپِ محیط «فصل» — تصویر حالا سمت چپ، متن سمت راست (برعکسِ نسخه‌ی
-% اصلی که برای چپ‌به‌راست بود). ⚠️ در قالب اصلی هم این محیط عملاً استفاده نشده بود؛
-% همان سطح پرداخت (نه بیشتر، نه کمتر) حفظ شد — قبل از استفاده‌ی واقعی، خروجی را چک کنید.
 \newenvironment{chapter}[3][]{% Args: image (optional), color, frame title
   \begingroup
   \themecolor{blue}
-  \setbeamertemplate{headline}{}
   \setbeamertemplate{footline}{}
   \ifstrequal{#2}{sinteflightgreen}{ % Use blue text on light green, else white
     \setbeamercolor{frametitle}{fg=sintefblue}
@@ -266,7 +219,7 @@
     \end{beamercolorbox}
   }
   \begin{frame}{#3}
-  \hspace*{0.60\textwidth}%
+  \hspace*{0.05\textwidth}%
   \minipage{0.35\textwidth}%
   \usebeamercolor[fg]{normal text}%
 }{%
@@ -275,21 +228,20 @@
   \endgroup
 }
 
-% نسخه‌ی راست‌به‌چپِ «تصویر کنار متن» — تصویر سمت چپ (۴۰٪ چپ)، متن سمت راست (۶۰٪ راست)
 \newenvironment{sidepic}[2]{% Args: image, frame title
   \begingroup
   \setbeamertemplate{background}{%
+  \hspace*{0.6\paperwidth}%
   \includegraphics[height=\paperheight]{#1}%
   }
-  \setbeamertemplate{frametitle}{% Same as normal, but with left skip reserved for image
+  \setbeamertemplate{frametitle}{% Same as normal, but with right skip
     \vspace*{-3.5ex}
-    \begin{beamercolorbox}[leftskip=0.4\textwidth,rightskip=2cm]{frametitle}%
+    \begin{beamercolorbox}[leftskip=2cm,rightskip=0.4\textwidth]{frametitle}%
       \usebeamerfont{frametitle}\insertframetitle\\
       \usebeamerfont{framesubtitle}\insertframesubtitle
     \end{beamercolorbox}
   }
   \begin{frame}{#2}
-  \hspace*{0.4\textwidth}%
   \minipage{0.6\textwidth}%
 }{%
   \endminipage
@@ -302,16 +254,14 @@
 \newcommand{\backmatter}{
 \begingroup
   \setbeamertemplate{footline}{}
-  \setbeamertemplate{headline}{}
   \themecolor{blue}
   \begin{frame}[c]{}
     \centering
     \begin{minipage}{\textwidth}
     	\usebeamercolor[fg]{normal text}
 	    \centering
-        \Huge پرسش و پیشنهاد؟
-    	\\[1em]
-    	\Large \textsl{با تشکر از توجه شما}
+        \Huge $$\mathcal Q \& \mathcal A$$
+    	\Large \textsl{Thank you for listening! }
     \end{minipage}
   \end{frame}
 \endgroup
@@ -319,6 +269,6 @@
 
 % MY CUSTOMIZATION
 
-\newcommand{\strtoc}{فهرست مطالب}
-\newcommand{\strsubsec}{بخش \thesection.\thesubsection}
+\newcommand{\strtoc}{Table of Contents}
+\newcommand{\strsubsec}{Section \thesection.\thesubsection}
 \input{customize}

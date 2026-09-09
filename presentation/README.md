@@ -1,92 +1,156 @@
-# ارائه‌ی بیمر برای جلسه با استاد راهنما
+# 🎓 University of Tehran – LaTeX Presentation Template  
+# 🎓 قالب ارائه لاتک دانشگاه تهران
 
-قالب Beamer فارسی برای ارائه‌ی نسخه‌ی فنی طبق بند ۱۱.۵
-`doc/progress/11-مستندسازی-و-ارائه.md` («نسخه‌ی فنی: روش‌شناسی و اعتبارسنجی‌محور، برای
-استاد/داور» — در برابر نسخه‌ی مدیریتی که هنوز نوشته نشده).
+A clean, modern, and customizable LaTeX Beamer template designed for academic presentations at the **University of Tehran**.  
+This template is adapted from the SINTEF Beamer theme and customized for my presentation titled:
 
-## منشأ قالب
+**Physics-Informed Neural Networks**  
+*A Framework for Solving the Two-Stream Instability Problem*
 
-پایه‌ی این قالب [`UT_LaTeX_Present_Temp`](https://github.com/hoseinshetaie/UT_LaTeX_Present_Temp)
-است. ⚠️ نکته‌ی مهم: آن مخزن با اینکه «دانشگاه تهران» را در نامش دارد، در واقع تم رسمی
-و متن‌باز **SINTEF** (یک مؤسسه‌ی پژوهشی نروژی) است که یک دانشجوی دیگر دانشگاه تهران
-بدون تغییر برندینگِ خودِ قالب (فایل تم هنوز به `images/SINTEF_Logo_*` اشاره می‌داد) برای
-ارائه‌ی فیزیک خودش دوباره استفاده کرده بود. یعنی «استاندارد دانشگاه تهران» بودنش فقط در
-عنوان README آن مخزن بود، نه در کد. کاری که اینجا انجام شد:
+یک قالب حرفه‌ای، مدرن و قابل سفارشی‌سازی برای ارائه‌های دانشگاهی، طراحی شده برای **دانشگاه تهران**.  
+این قالب بر اساس تم Beamer سینتف ساخته و برای پرزنتیشن من با عنوان:
 
-1. آرم SINTEF با آرم رسمی دانشگاه تهران (همان `final_report/img/logo.png`) جایگزین شد
-2. رنگ اصلی تم (`sintefblue`) با آبی‌فیروزه‌ای واقعی آرم دانشگاه (`RGB(11,174,221)`،
-   نمونه‌برداری‌شده از خودِ فایل لوگو) جایگزین شد — `sintefcolor.sty`
-3. کل تم فارسی/راست‌به‌چپ شد: فونت لاتین ثابت حذف و XePersian+Vazirmatn جایگزین شد،
-   و هر عنصر جهت‌دار (لوگوی گوشه، حاشیه‌ی عنوان اسلاید، محیط‌های `chapter`/`sidepic`)
-   آینه شد — جزئیات هرکدام در کامنت بالای همان خط در `beamerthemesintef.sty`
-4. نسبت صفحه از یک باگ در قالب اصلی (کامنت می‌گفت «۱۶:۹» ولی مقدار ۳:۲ بود) به ۱۶:۹
-   واقعی اصلاح شد
-5. یک باگ واقعی کشف و رفع شد: سبک بلوک `[rounded]` قالب اصلی با ردیابی گروه
-   چپ‌به‌راست/راست‌به‌چپ XePersian تداخل داشت و `alertblock`/`block` را کاملاً می‌شکست
-   (خطای `\endL or \endR problem` + `\endminipage` تعریف‌نشده) — با یک فایل کمینه تأیید
-   و به سبک `[default]` (گوشه‌تیز، پایدار) تغییر یافت
+**شبکه‌های عصبی آگاه از فیزیک (PINN)**  
+*چارچوبی برای حل پدیده ناپایداری دو‌جریانی*  
 
-مجوز قالب اصلی GPLv3 است (هدر بالای `beamerthemesintef.sty`)؛ طبق همان مجوز نگه داشته و
-تغییر داده شده است.
+سفارشی‌سازی شده است.
 
-## ساخت
+---
 
+## 🚀 Features  
+## 🚀 قابلیت‌ها
+
+- ✔️ Modern & minimal slide design  
+- ✔️ Fully compatible with **XeLaTeX**  
+- ✔️ Custom beamer class (`sintefbeamer.cls`)  
+- ✔️ Customizable color palette (`sintefcolor.sty`)  
+- ✔️ Supports animations, TikZ, multicol  
+- ✔️ Automatic slide numbering  
+- ✔️ Clean academic typography  
+
+- ✔️ طراحی مدرن و مینیمال  
+- ✔️ سازگار با کامپایلر **XeLaTeX**  
+- ✔️ کلاس بیمر اختصاصی (`sintefbeamer.cls`)  
+- ✔️ رنگ‌های قابل سفارشی‌سازی (`sintefcolor.sty`)  
+- ✔️ پشتیبانی از انیمیشن، TikZ، چندستونی  
+- ✔️ شماره‌گذاری خودکار اسلایدها  
+- ✔️ مناسب برای ارائه‌های علمی و دانشگاهی  
+
+---
+
+
+
+## ▶️ How to Compile  
+## ▶️ نحوه کامپایل
+
+### **Using command line**
 ```bash
-./build.sh
+xelatex main.tex
 ```
 
-معادل `xelatex main` دوبار (برای فهرست مطالب و ارجاعات داخلی). خروجی: `main.pdf`.
-نیازمندی‌ها: `xelatex` با `beamer`, `xepersian`, `todonotes`, `booktabs`, `pgfplots`,
-`listings` (روی این سیستم از قبل نصب‌اند).
+### **Using VS Code**
+Install **LaTeX Workshop** → Press `Ctrl + Alt + B`
 
-## ساختار
+### **Using Overleaf**
+Just upload the full folder.
 
-- `main.tex` — تک‌فایلی، محتوای واقعی ارائه
-- `sintefbeamer.cls` / `beamerthemesintef.sty` / `sintefcolor.sty` — قالب (بند بالا)
-- `customize.tex` — لایه‌ی سفارشی‌سازی قالب: فهرست مطالب خودکار ابتدای هر
-  `\section` (با بخش جاری برجسته)، زیرعنوان خودکار هر اسلاید (شماره+نام بخش)،
-  دستورهای کمکی متن رنگی، تنظیم بلوک کد. بارگذاری‌اش از داخل خودِ `.sty` است
-  (`\input{customize}`), نه از `main.tex`
-- `font/` — پنج وزن Vazirmatn (از `persian-writing` skill)
-- `img/` — لینک نمادین به سه شکل نمونه از `reports/figures/` (نسخه‌ی برچسب‌فارسی) +
-  `logo.png`/`eng-logo.png` (آرم دانشگاه تهران + پردیس دانشکده‌های فنی، لینک به
-  `final_report/img/`) — الگوی افزودن شکل تازه: همین‌طور لینک بسازید، مستقیم کپی نکنید
+---
 
-## دستورهای ویژه‌ی این قالب (فراتر از بیمر معمولی)
+### **خط فرمان**
+```bash
+xelatex main.tex
+```
 
-- `\maketitle` — صفحه‌ی عنوان با ردیف دو‌آرمه‌ی نهادی در بالا (چیدمانِ `coverPage` در
-  `final_report/tex/tehran-thesis.cls`)
-- `\backmatter` — اسلاید پایانی «پرسش و پیشنهاد؟» با پس‌زمینه‌ی آبی تمام‌رنگ
-- `\begin{alertblock}{عنوان} ... \end{alertblock}` — بلوک هشدار (قرمز) — استاندارد بیمر،
-  تست‌شده در این قالب
-- `\aboutpage{عنوان}{متن}` — یک اسلاید تک‌جمله‌ای تمام‌صفحه با پس‌زمینه‌ی آبی، برای
-  ادعای محوری یا گذار بین بخش‌ها
-- `\themecolor{blue|white}` — رنگ‌مایه‌ی اسلاید جاری را عوض می‌کند
-- ⚠️ `\begin{chapter}[...]{...}{...}` و `\begin{sidepic}{...}{...}` (تصویر کنار متن)
-  در قالب اصلی هم استفاده نشده بودند؛ اینجا فقط هندسه‌شان به‌صورت مکانیکی آینه شد، بدون
-  تست بصری. پیش از استفاده‌ی واقعی، خروجی را حتماً چک کنید.
+### **در VS Code**
+پلاگین LaTeX Workshop را نصب کنید → کلید `Ctrl + Alt + B`
 
-## وضعیت محتوا
+### **در Overleaf**
+فقط کل پوشه را آپلود کرده و Recompile کنید.
 
-اسکلت آماده است: صفحه‌ی عنوان (با مشخصات واقعی از `final_report/tex/faTitle.tex`)، فهرست
-مطالب خودکار، و قاعده‌ی برش اطلاعاتی و اعداد چکیده از پیش پر شده‌اند — این‌ها همان ارقامِ
-تأییدشده‌ی گزارش‌اند، دوباره اختراع نشده‌اند. بقیه‌ی اسلایدها با جعبه‌ی زرد `\todo[inline]`
-مشخص شده‌اند؛ هرکدام منبع دقیق (فایل + بند/ردیف) دارد. با نوشتن هر بخش، `\todo[inline]`
-مربوطه را با محتوای واقعی جایگزین کنید (خودِ ماکرو نیازی نیست حذف شود مگر بخواهید در PDF
-دیده نشود — برای دیدن نسخه‌ی بدون جعبه‌های زرد، `\usepackage{todonotes}` را با
-`\usepackage[disable]{todonotes}` عوض کنید).
+---
 
-⚠️ هر عدد تازه باید مثل بقیه‌ی گزارش منبع داشته باشد (قاعده‌ی `final_report/AGENTS.md`)؛
-اعشار همیشه در حالت ریاضی (`$8.05$`) نه رقم خام فارسی، وگرنه با باگ شناخته‌شده‌ی xepersian
-وارونه چاپ می‌شود (شاهد: بند ۱۱.۱ فایل progress بالا).
+## 🎨 Customization  
+## 🎨 سفارشی‌سازی
 
-⚠️ هر عکس تازه باید هم `width` هم `height` (با `keepaspectratio`) داشته باشد، نه فقط
-`width` — قاب این قالب کوچک‌تر از یک اسلاید معمولی ۴:۳ است و تصویرهای بلند به‌تنهایی از
-پایین اسلاید بیرون می‌زنند (سه شکل نمونه‌ی همین ارائه دقیقاً به همین باگ برخوردند و رفع
-شدند؛ الگو: `[width=0.8\textwidth,height=.55\paperheight,keepaspectratio]`).
+Modify everything in:
 
-## نکات فنی شناخته‌شده (بی‌خطر)
+```
+customize.tex
+```
 
-- هشدار `Font shape ... bx/n' undefined` در کامپایل: NFSS دنبال سری Bold Extended
-  می‌گردد و با وزن معمولی جایگزین می‌کند؛ چون Vazirmatn ایتالیک ندارد این هشدار بی‌اثر
-  است، ظاهر اسلاید را عوض نمی‌کند.
+You can change:
+- Title / Subtitle  
+- Author name  
+- Background  
+- Color palette  
+- Section formatting  
+
+تمام سفارشی‌سازی‌ها در فایل زیر انجام می‌شود:
+
+```
+customize.tex
+```
+
+موارد قابل تغییر:
+- عنوان و زیرعنوان  
+- نام ارائه‌دهنده  
+- تصویر پس‌زمینه  
+- پالت رنگ‌ها  
+- قالب‌بندی سکشن‌ها  
+
+---
+
+## 🖼 Adding Images  
+## 🖼 افزودن تصویر
+
+```latex
+\includegraphics[width=0.8\textwidth]{images/myfigure.png}
+```
+
+---
+
+## 🎞 Adding Animations  
+## 🎞 افزودن انیمیشن
+
+```latex
+\animategraphics[loop, autoplay, width=\linewidth]{15}{images/frame_}{0}{100}
+```
+
+---
+
+## 🎯 TikZ Support  
+## 🎯 پشتیبانی از TikZ
+
+Libraries loaded:
+
+```latex
+\usetikzlibrary{arrows.meta, positioning, calc}
+```
+
+کتابخانه‌های TikZ به صورت پیشفرض اضافه شده‌اند.
+
+---
+
+## 📝 License  
+## 📝 لایسنس
+
+This template is free to use and modify for academic purposes.  
+این قالب برای استفاده و ویرایش آزاد است.
+
+---
+
+## 👤 Author  
+## 👤 نویسنده
+
+**Hosein Shetaie**  
+Master’s Student — Physics  
+University of Tehran  
+
+دانشجوی کارشناسی ارشد فیزیک  
+دانشگاه تهران  
+
+Feel free to fork, open issues, or contribute!  
+در صورت تمایل پروژه را Fork کنید و Pull Request بدهید!
+
+
+

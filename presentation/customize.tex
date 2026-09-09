@@ -1,64 +1,65 @@
-% بسته‌ها، فونت، رنگ و دستورهای تازه
-\usepackage{amsfonts, amsmath, oldgerm, lmodern}
+% packages, font, color, and new commands
+\usepackage{amsfonts, amsmath, oldgerm, lmodern, animate}
 \usepackage{graphicx}
 \usepackage{verbatim}
 \usepackage{bm}
 \usepackage{pgfplots}
 
 \pgfplotsset{compat=1.18}
-% usefonttheme{serif} قالب اصلی حذف شد: xepersian خودش بسته‌ی beamerfontthemeserif
-% را از قبل با گزینه‌ی دیگری بار می‌کند و این خط با آن clash می‌داد (خطای کامپایل).
-% فونت متن با \settextfont در main.tex تعیین می‌شود، به این خط نیازی نبود.
+% usefonttheme{serif} غیرفعال شد: با بسته‌ی beamerfontthemeserif که xepersian خودش
+% از قبل بار می‌کند تداخل می‌کند و کامپایل را می‌شکند (Option clash)
+% \usefonttheme{serif}
 
 % TYPESETTING ELEMENTS
 
-% شکل نمایش هر بخش در فهرست مطالب
+% style of section presented in the table of contents
 \setbeamertemplate{section in toc}{$\blacktriangleright$~\inserttocsection}
 
-% شکل نمایش هر زیربخش در فهرست مطالب — خالی (فقط سطح بخش نمایش داده می‌شود)
+% style of subsection presented in the table of contents
 \setbeamertemplate{subsection in toc}{}
+% \setbeamertemplate{subsection in toc}{\footnotesize\hspace{1.2 em}$\blacktriangleright$~\inserttocsubsection}
 
-% زیرعنوان خودکار هر اسلاید: شماره + نام بخش جاری
+% automate subtitle of each frame
 \makeatletter
     \pretocmd\beamer@checkframetitle{\framesubtitle{\thesection \, \secname}}
 \makeatother
 
-% از شماره‌گذاری دوباره‌ی اسلایدهای شکسته‌شده به چند صفحه جلوگیری می‌کند
+% avoid numbering of frames that are breaked into multiply slides
 \setbeamertemplate{frametitle continuation}{}
 
-% ابتدای هر بخش: یک اسلاید فهرست مطالب با بخش جاری برجسته — لوگوی گوشه هم موقتاً
-% خاموش می‌شود چون روی پس‌زمینه‌ی آبی رنگش با آرم یکی می‌شود (هر دو آبی‌فیروزه‌ای دانشگاه)
+% at the begining of section, add table of contents with the current section highlighted
 \AtBeginSection[]
 {
     \begingroup
     \setbeamertemplate{footline}{}
-    \setbeamertemplate{headline}{}
     \themecolor{blue}
-    \begin{frame}{\strtoc}
+    \begin{frame}{Table of Contents}
         \tableofcontents[currentsection]
     \end{frame}
     \endgroup
 }
 
-% ابتدای هر زیربخش (در این ارائه استفاده نشده، ولی برای تکمیل قالب نگه داشته شد)
+% at the beginning of subsection, add subsection title page
 \AtBeginSubsection[]
 {
     \begin{frame}{\,}{\thesection \, \secname}
+        \fontfamily{ptm}\selectfont
         \centering\textsl{\textbf{\textcolor{sintefblue}{
-            \large \strsubsec
+            \large Section \thesection.\thesubsection
             \vskip15pt
             \LARGE \subsecname
         }}}
     \end{frame}
 }
 
-% تنظیمات بلوک کد
+% code bolck setting
 \definecolor{codegreen}{RGB}{101,218,120}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \lstdefinestyle{mystyle}{
+    % backgroundcolor=\color{backcolour},
     commentstyle=\color{airforceblue},
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{codegray},
@@ -80,13 +81,14 @@
 
 \lstset{style=mystyle}
 
-% دستورهای تازه
+% NEW COMMANDS
 
-% لینک رنگی
+% set colored hyperlinks command
 \newcommand{\hrefcol}[2]{\textcolor{airforceblue}{\href{#1}{#2}}}
 \newcommand{\hlinkcol}[1]{\hrefcol{#1}{#1}}
 
-% پاراگراف وسط‌چین با عرض محدود
+
+% centering paragraph statement
 \newcommand{\centerstate}[1]{
     \centering
     \begin{columns}
@@ -96,19 +98,22 @@
     \end{columns}
 }
 
-% متن پررنگ/مورب رنگی
+% colored textbf
 \newcommand{\ctextbf}[1]{\textbf{\textcolor{sintefblue}{#1}}}
 \newcommand{\btextbf}[1]{\textbf{\textcolor{airforceblue}{#1}}}
+
+% colored textsl
 \newcommand{\ctextsl}[1]{\textsl{\textcolor{sintefblue}{#1}}}
 \newcommand{\btextsl}[1]{\textsl{\textcolor{airforceblue}{#1}}}
+
+% colored emph
 \newcommand{\cemph}[1]{\emph{\textcolor{sintefblue}{#1}}}
 \newcommand{\bemph}[1]{\emph{\textcolor{airforceblue}{#1}}}
 
-% اسلاید تک‌جمله‌ای تمام‌صفحه (برای یک ادعای محوری/گذار بین بخش‌ها)
+% about page
 \newcommand{\aboutpage}[2]{
     \begingroup
     \setbeamertemplate{footline}{}
-    \setbeamertemplate{headline}{}
     \themecolor{blue}
     \begin{frame}[c]{#1}{\,}
         \centering
@@ -121,12 +126,13 @@
     \endgroup
 }
 
-% اسلاید مراجع (در این ارائه استفاده نشده، برای تکمیل قالب نگه داشته شد)
+% bibliography page
 \newcommand{\bibliographpage}{
-    \section{مراجع}
+    \section{References}
+
     \begingroup
     \themecolor{blue}
-    \begin{frame}[allowframebreaks]{مراجع}{\,}
+    \begin{frame}[allowframebreaks]{References}{\,}
         \tiny
         \printbibliography[heading=none]
     \end{frame}
