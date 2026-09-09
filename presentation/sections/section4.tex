@@ -17,6 +17,24 @@
   \lr{reports/phase9/9.2\_shap\_mean\_abs.csv}، \lr{reports/phase7/model\_comparison.md}.}
 \end{frame}
 
+\begin{frame}{چطور مدل‌ها ارزیابی شدند: دو نوع پنجره}
+  \begin{itemize}
+    \item ۵ دور اعتبارسنجی با مبدأ آموزش ثابت؛ فقط انتهای آموزش و محل آزمون جلوتر می‌رود
+    \item همین ۵ دور مدل برتر را انتخاب کردند، نه پنجره‌ی انتهایی
+    \item پنجره‌ی انتهایی قفل، فقط یک‌بار و بعد از انتخاب مدل، به‌عنوان آزمون فشار باز شد
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.64\textwidth]{slides_14a_eval_windows}
+  \end{figure}
+  \note{اگر استاد پرسید «چرا پنجره‌ی لغزان نه»: با ۱۴۲ روز سرو دورریختن داده‌ی قدیمی
+  قابل‌توجیه نبود. پنجره‌ی انتهایی عمداً به‌عنوان آزمون فشار طبقه‌بندی شد چون شامل بازگشت
+  پس از شکاف ۲۹روزه‌ی رمضان و سه روز سوگواری ملی است — یک رژیم غیرعادی که رتبه‌بندی مدل‌ها
+  را گمراه می‌کند، پس نباید معیار انتخاب باشد. شاهد: \lr{src/cv.py}
+  (\lr{WalkForwardSplitter}، \lr{holdout\_split})، \lr{data/processed/cv\_folds.json}،
+  \lr{doc/data\_manifest.md} (دروازه‌ی \lr{cv\_folds\_hash})، ردیف ۴۹ decision\_log.}
+\end{frame}
+
 \begin{frame}{۱۳ خانواده‌ی مدل امتحان شدند}
   \begin{itemize}
     \item از رگرسیون خطی ساده تا شبکه‌ی عصبی و مدل‌های بیزی — طیف کامل، نه فقط چند حدس
