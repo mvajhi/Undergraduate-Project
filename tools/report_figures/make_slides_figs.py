@@ -422,6 +422,78 @@ def fig_22_pilot_pairs() -> None:
 
 
 # ---------------------------------------------------------------------------
+# اسلاید ۱۴-الف — دو نوع پنجره‌ی ارزیابی: fold های گسترشی و پنجره‌ی قفل‌شده
+# ---------------------------------------------------------------------------
+
+def fig_14a_eval_windows() -> None:
+    """۵ fold گسترشی (`WalkForwardSplitter`) + پنجره‌ی انتهایی قفل‌شده (`holdout_split`).
+
+    محورها بر حسب روزِ فاصله از مبدأ مشترک fold ها (۱۴۰۲/۰۹/۰۱) است، نه پیکسل
+    تقویمی دقیق — فقط ترتیب و تناسب نسبی اهمیت دارد.
+    """
+    persian_digits = ["۱", "۲", "۳", "۴", "۵"]
+    # (train_start, train_end, test_start, test_end) بر حسب روز از مبدأ مشترک
+    folds = [
+        (0, 67, 68, 91),
+        (0, 91, 92, 110),
+        (0, 110, 111, 141),
+        (0, 141, 143, 160),
+        (0, 160, 161, 179),
+    ]
+    holdout = (0, 152, 153, 181)
+
+    bh, gap = 0.62, 0.34
+    row_step = bh + gap
+    n = len(folds)
+    fold_ys = [(n - 1 - i) * row_step for i in range(n)]
+    holdout_y = -row_step * 1.7
+
+    fig, ax = plt.subplots(figsize=(9.8, 5.0))
+
+    # مبدأ آموزش ثابت
+    ax.axvline(0, color="0.35", ls=":", lw=1.3, zorder=1)
+    ax.text(6, fold_ys[0] + bh / 2 + 0.32, "مبدأ آموزش ثابت برای همه‌ی دورها",
+            ha="left", va="bottom", fontsize=9.5, color="0.35")
+
+    for i, (tr_s, tr_e, te_s, te_e) in enumerate(folds):
+        y = fold_ys[i]
+        ax.add_patch(Rectangle((tr_s, y - bh / 2), tr_e - tr_s, bh,
+                                facecolor=BLUE, edgecolor="white", lw=1.0, zorder=3))
+        ax.add_patch(Rectangle((te_s, y - bh / 2), te_e - te_s, bh,
+                                facecolor=RED, edgecolor="white", lw=1.0, zorder=3))
+        ax.text(-6, y, f"دور {persian_digits[i]}", ha="right", va="center", fontsize=10.5,
+                color="0.2")
+
+    # جداکننده‌ی بصری بین fold های انتخاب مدل و پنجره‌ی قفل‌شده
+    sep_y = (fold_ys[-1] + holdout_y) / 2 + row_step * 0.15
+    ax.axhline(sep_y, color="0.75", ls="-", lw=1.0, zorder=1, xmin=0.02, xmax=0.98)
+
+    tr_s, tr_e, te_s, te_e = holdout
+    ax.add_patch(Rectangle((tr_s, holdout_y - bh / 2), tr_e - tr_s, bh,
+                            facecolor=GRAY, edgecolor="0.25", lw=1.6, ls="--", zorder=3))
+    ax.add_patch(Rectangle((te_s, holdout_y - bh / 2), te_e - te_s, bh,
+                            facecolor=RED, edgecolor="0.25", lw=1.6, ls="--", hatch="//", zorder=3))
+    ax.text(-6, holdout_y, "پنجره‌ی\nقفل‌شده", ha="right", va="center", fontsize=10.5,
+            color="0.2", fontweight="bold")
+    ax.text((te_s + te_e) / 2, holdout_y - bh / 2 - 0.22,
+            "فقط یک‌بار، بعد از انتخاب مدل", ha="center", va="top", fontsize=10,
+            color=RED, fontweight="bold")
+
+    # راهنما
+    legend_y = fold_ys[0] + bh / 2 + 0.85
+    ax.add_patch(Rectangle((0, legend_y - 0.10), 10, 0.24, facecolor=BLUE, edgecolor="none"))
+    ax.text(13, legend_y + 0.02, "آموزش", ha="left", va="center", fontsize=9.5, color="0.25")
+    ax.add_patch(Rectangle((45, legend_y - 0.10), 10, 0.24, facecolor=RED, edgecolor="none"))
+    ax.text(58, legend_y + 0.02, "آزمون", ha="left", va="center", fontsize=9.5, color="0.25")
+
+    ax.set_xlim(-42, 195)
+    ax.set_ylim(holdout_y - bh / 2 - 0.55, legend_y + 0.30)
+    ax.axis("off")
+    fig.tight_layout()
+    _finish(fig, "slides_14a_eval_windows")
+
+
+# ---------------------------------------------------------------------------
 # اسلاید ۱۴-الف — ۱۳ خانواده‌ی مدل امتحان‌شده
 # ---------------------------------------------------------------------------
 
@@ -573,6 +645,7 @@ def main() -> None:
     fig_07_timeline()
     fig_08_dinner_given_lunch()
     fig_09_variance_donut()
+    fig_14a_eval_windows()
     fig_14b_model_families()
     fig_14c_baselines()
     fig_15_funnel()
