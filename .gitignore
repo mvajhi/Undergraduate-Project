@@ -27,3 +27,7 @@ gpu_bundle.zip
 gpu_outputs/
 mlruns_gpu/
 models/gpu/
+
+# مقالات PDF منابع (final_report/tex/MyReferences.bib) — فقط برای مطالعه‌ی محلی،
+# بسیاری کپی‌رایت دارند و نباید در مخزن ذخیره شوند
+final_report/references_pdf/

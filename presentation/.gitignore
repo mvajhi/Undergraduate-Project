@@ -1,0 +1,11 @@
+# خروجی‌های میانی xelatex — برخلاف final_report/، اینجا main.pdf خودش commit می‌شود
+*.aux
+*.log
+*.toc
+*.out
+*.nav
+*.snm
+*.vrb
+*.fls
+*.fdb_latexmk
+*.synctex.gz

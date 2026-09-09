@@ -1,51 +1,108 @@
-\section{Conclusion}
+\section{چقدر صرفه‌جویی}
 
-\begin{frame}{Challenges}
-\begin{itemize}
-    \item  \textbf{Electric field provided to the model in forward problem}  
-    \quad In the paper, the electric field $E(x,t)$ was directly supplied to the PINN during forward training. this may limit the model's ability to infer $E$ self-consistently from the physics.
-
-    \vspace{0.3cm}
-    \item  \textbf{Integration in the Poisson equation}  
-    \quad The Poisson term $\displaystyle \frac{\partial E}{\partial x} = \int f\,dv - 1$ requires numerical integration.  
-    The choice of integration method (e.g., trapezoidal rule) affects stability and accuracy.
-
-    \vspace{0.3cm}
-    \item  \textbf{Unknown weighting of loss components}  
-    \quad The relative importance of each loss term ($L_{\text{eq}}, L_{\text{IC}}, L_{\text{BC}}$)  
-    is not clearly defined-improper weighting can hinder convergence or bias the network.
-
-    \vspace{0.3cm}
-    \item  \textbf{Sampling and resampling strategy}  
-    \quad The performance strongly depends on how training points are chosen in $(t,x,v)$.  
-    Optimal sampling frequency and resampling intervals remain open research questions.
-\end{itemize}
-\pause
-\begin{block}{Observation}
-Balancing physical accuracy, numerical stability, and training efficiency  
-is still the main challenge for PINN-Vlasov frameworks.
-\end{block}
+\begin{frame}{$\tau$ به‌عنوان اهرم سیاستی: سه سناریو}
+  \small
+  \begin{center}
+  \begin{tabular}{lccccc}
+    \toprule
+    سناریو & $\tau$ & نرخ کمبود سلول & تقاضای برآورده‌نشده & صرفه‌جویی سالانه \\
+    \midrule
+    محافظه‌کارانه & $0.02$ & $1.4\%$ & $0.02\%$ & $36.3$ میلیارد \\
+    متعادل        & $0.10$ & $7.9\%$ & $0.14\%$ & $54.7$ میلیارد \\
+    تهاجمی        & $0.20$ & $15.4\%$ & $0.28\%$ & $61.9$ میلیارد \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.58\textwidth]{10.7_tau_tradeoff_fa}
+  \end{figure}
+  \note{دو ستون «نرخ کمبود» و «تقاضای برآورده‌نشده» را کنار هم بگذار. عدد $15.4\%$ ترسناک
+  به‌نظر می‌رسد تا وقتی $0.28\%$ کنارش نباشد؛ اولی فقط رخداد را می‌شمارد، دومی اندازه را وزن
+  می‌دهد. بقیه‌ی اعداد این بخش روی سناریوی $\tau=0.20$ است. شاهد:
+  \lr{reports/phase10/10.3\_policy\_scenarios.md}.}
 \end{frame}
 
-\begin{frame}{Conclusion}
-\begin{itemize}
-    \item \textbf{Physics-Informed Neural Networks (PINNs)} bridge the gap between deep learning and physical modeling.
-    \item By embedding \textbf{governing PDEs} into the loss function, they ensure physical consistency.
-    \item Demonstrated capability for solving both \textbf{forward and inverse problems} with high interpretability.
-\end{itemize}
+\begin{frame}{نردبان: از یک روز تا یک سال تحصیلی}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.92\textwidth]{slides_17_ladder}
+  \end{figure}
+  \begin{center}
+    \footnotesize
+    مبنا: $48.5$ ردیف در هر روز سرو؛ $15.202$ پرس صرفه‌جویی به‌ازای هر ردیف؛ ۳۲ هفته‌ی
+    آموزشی؛ ۳۷۵ هزار تومان هر پرس. تابستان و نوروز بیرون گذاشته شده‌اند.
+  \end{center}
+  \note{مهم‌ترین اسلاید عددی ارائه؛ ردیف‌به‌ردیف بخوان: «هر روزی که دانشگاه غذا سرو می‌کند،
+  حدود هزار پرس دور ریخته می‌شود. با این مدل، هفتصد تای آن برمی‌گردد، یعنی روزی حدود ۲۷۷
+  میلیون تومان.» بازه‌ی اطمینان را بگو: صرفه‌جویی روزانه بین ۵۲۵ و ۹۶۹ پرس؛ سالانه بین $44.1$
+  و $81.4$ میلیارد تومان. این نردبان روی مبنای فولدهای رسمی ($48.5$ ردیف در روز) بسته شده در
+  حالی که کل داده $53.4$ ردیف در روز دارد — یعنی برآورد محافظه‌کارانه است، نه خوش‌بینانه.
+  شاهد: \lr{reports/phase10/10.4\_annual\_savings.md}، \lr{10.7\_tau\_curve.md}.}
 \end{frame}
 
-\begin{frame}{Future Work}
-    \begin{itemize}
-    \item  \textbf{Improving computational efficiency} — faster training for complex PDEs.
-    \item  \textbf{Adaptive sampling} — dynamic selection of collocation points.
-    \item  \textbf{Multi-physics extension} — include magnetic fields, collisions, higher dimensions (2D/3D).
-
-\end{itemize}
-\vspace{0.5cm}
-\pause
-\centering
-\textit{Future PINNs = Physics + Data + Efficiency → Scientific AI.}
+\begin{frame}{چند درصد از هدررفت جلوگیری می‌شود}
+  \begin{itemize}
+    \item \textbf{$71\%$ هدررفت حذف می‌شود، $29\%$ می‌ماند} — باقی‌مانده حدود ۶۷ هزار پرس در
+      سال، یعنی $25.2$ میلیارد تومان
+    \item برحسب نرخ عدم‌دریافت: از $8.05\%$ رزروها به $2.33\%$ می‌رسد
+    \item سقف تئوریک (پیش‌بینی کامل و بی‌خطا) $100\%$ است؛ فاصله تا آن سقف عمداً برای
+      اجتناب از کمبود گذاشته شده، نه ضعف مدل
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.52\textwidth]{slides_18_waste_rate}
+  \end{figure}
+  \note{این اسلاید جلوی سوءتفاهم رایج را می‌گیرد. مدل هدررفت را صفر نمی‌کند و نباید بکند؛
+  $29\%$ باقی‌مانده بهای بیمه‌ی نخوردن کمبود است.}
 \end{frame}
 
-\backmatter
+\begin{frame}{طرف دیگر معامله: کمبود}
+  \begin{itemize}
+    \item $15.4\%$ سلول‌ها کمبود می‌خورند، ولی \textbf{عمق میانگین هر کمبود $4.2$ پرس} است
+    \item در یک وعده در کل دانشگاه: میانگین ۱۸ پرس، میانه ۸ پرس؛ سالانه حدود $0.28\%$
+      تقاضا (سطح خدمت $99.72\%$)
+    \item به ازای هر ۱ پرس کمبود، حدود \textbf{۲۴ پرس} هدررفت جلوگیری می‌شود
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.85\textwidth]{slides_19_tradeoff_bars}
+  \end{figure}
+  \note{اگر استاد عدد خالص خواست: با فرض هزینه‌ی کمبود چهار برابر مازاد، هزینه‌ی کمبود
+  سالانه حدود $10.4$ میلیارد و سود خالص حدود $51.5$ میلیارد تومان می‌شود — این عدد در مخزن
+  نیست، محاسبه‌ی مشتق است؛ اگر آوردی فرضش را هم بگو. شاهد:
+  \lr{reports/phase10/10.3\_policy\_scenarios.md}، \lr{10.4\_annual\_savings.md}.}
+\end{frame}
+
+\begin{frame}{یک سلف مشخص: فنی امیرآباد}
+  \begin{columns}
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item بزرگ‌ترین سلف دانشگاه: میانگین \textbf{۷۵۶ رزرو در هر وعده} ($39\times$
+          کوچک‌ترین سلف)
+        \item میانگین پیش‌بینی مدل در $\tau=0.20$: نرخ عدم‌دریافت $6.2\%$
+        \item یعنی دستور پخت \textbf{۷۰۹ پرس به‌جای ۷۵۶}، حدود ۴۷ پرس کمتر — حدود $17.4$
+          میلیون تومان در هر وعده، حدود $3.9$ میلیارد تومان در سال
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \includegraphics[width=\textwidth]{slides_20_restaurant_example}
+    \end{column}
+  \end{columns}
+  \vspace{0.3cm}
+  \tiny
+  \begin{center}
+  \begin{tabular}{lccccc}
+    سلف & وعده & رزرو & دریافت واقعی & پخت پیشنهادی & نتیجه \\
+    \midrule
+    کشاورزی & شام & ۱۰۷ & ۹۶ & ۱۰۱ & ۵ پرس صرفه‌جویی، بدون کمبود \\
+    علوم اجتماعی & ناهار & ۲۶۶ & ۲۴۰ & ۲۴۷ & ۷ پرس صرفه‌جویی، بدون کمبود \\
+    تربیت بدنی & ناهار & ۱۶۰ & ۱۵۲ & ۱۴۹ & کمبود ۳ پرس \\
+  \end{tabular}
+  \end{center}
+  \note{بلافاصله، بدون اینکه استاد بپرسد: در پنجره‌ی آزمون، بیشترین نرخ کمبود کل دانشگاه هم
+  مال همین سلف بود ($40\%$). این تصادفی نیست؛ سلف‌های پرحجم هم‌زمان بهترین pinball و بیشترین
+  ریسک کمبود را دارند (یافته‌ی ۳۷). پیامد عملیاتی: پایلوت باید از سلف‌های پرحجم شروع شود، ولی
+  با پایش دقیق‌تر. شاهد: \lr{F1.10}، \lr{reports/phase9/9.3}، \lr{reports/phase8/8.3}،
+  \lr{reports/phase10/10.1\_cook\_quantity.md}.}
+\end{frame}

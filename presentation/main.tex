@@ -1,42 +1,47 @@
 \documentclass{sintefbeamer}
 \usepackage{multicol}
 \usepackage{animate}
+\usepackage{booktabs}
 \usetikzlibrary{arrows.meta, positioning}
 \usetikzlibrary{calc}
 
-% --- افزوده‌شده: پشتیبانی فونت فارسی (XePersian + Vazirmatn) ---
-% بدون هیچ تغییر دیگری در قالب — رنگ، لوگو، چیدمان همه دست‌نخورده‌اند
+% --- پشتیبانی فونت فارسی (XePersian + Vazirmatn) ---
 \usepackage[extrafootnotefeatures]{xepersian}
 \settextfont[Path=./font/, BoldFont=Vazirmatn-Bold.ttf]{Vazirmatn-Regular.ttf}
 \setlatintextfont[Path=./font/, BoldFont=Vazirmatn-Bold.ttf]{Vazirmatn-Regular.ttf}
 % --- پایان افزوده ---
 
+% شکل‌های ارائه از reports/figures/ مخزن می‌آیند، نه از images/ محلی
+\graphicspath{%
+  {images/}%
+  {../reports/figures/slides/}%
+  {../reports/figures/}%
+  {../reports/figures/phase8/}%
+  {../reports/figures/phase9/}%
+  {../reports/figures/phase10/}%
+  {../reports/figures/round4/}%
+  {../reports/figures/round5/}%
+}
+
 % meta-data
-\title{Physics-Informed Neural Networks}
-\subtitle{A Framework For Solving Two Stream Instability Problem}
-\author{Hosein Shetaie }
-\date{Aban 1404}
-\titlebackground{images/background}
+\title{بهینه‌سازی پیش‌بینی میزان پخت غذا در سلف‌های دانشگاه تهران}
+\subtitle{ارائه به استاد راهنما}
+\author{مهدی وجهی}
+\institute{دانشکده مهندسی برق و کامپیوتر، دانشگاه تهران \\ استاد راهنما: دکتر بابک نجار اعرابی}
+\date{شهریور ۱۴۰۵}
 \setbeamertemplate{footline}[frame number]
+
 % document body
 \begin{document}
 
 \maketitle
-
-% --- اسلاید تست فونت فارسی — نمونه‌ی جداگانه، به سکشن‌های اصلی دست نزده‌ایم ---
-\begin{frame}{تست فونت فارسی}
-  \begin{itemize}
-    \item این یک اسلاید آزمایشی برای بررسی نمایش درست متن فارسی است
-    \item اعداد فارسی: ۰۱۲۳۴۵۶۷۸۹
-    \item ترکیب فارسی و لاتین: \lr{Vazirmatn} و \lr{xepersian}
-  \end{itemize}
-\end{frame}
-% --- پایان اسلاید تست ---
 
 \include{sections/section1}
 \include{sections/section2}
 \include{sections/section3}
 \include{sections/section4}
 \include{sections/section5}
+\include{sections/section6}
+\include{sections/backup}
 
 \end{document}

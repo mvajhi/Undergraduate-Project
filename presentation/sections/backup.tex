@@ -1,0 +1,288 @@
+\section*{اسلایدهای پشتیبان}
+
+\aboutpage{اسلایدهای پشتیبان}{شماره‌گذاری‌شده تا سریع بپری رویشان}
+
+\begin{frame}{پ۱ — تابع زیان Pinball}
+  \[
+    \rho_\tau(u) = u\left(\tau - \mathbb{1}[u<0]\right), \qquad u = y - \hat y
+  \]
+  \begin{itemize}
+    \item برای $u\ge 0$ (کم‌زدن): شیب $\tau$؛ برای $u<0$ (زیادزدن): شیب $1-\tau$
+    \item کمینه‌کننده‌ی امید ریاضی این زیان دقیقاً چندک $\tau$اُم توزیع شرطی $y$ است — اثبات
+      با مشتق‌گیری از انتگرال تابع توزیع تجمعی
+  \end{itemize}
+  {\small شاهد: Literature\_Review.md بند ۲-۲.}
+\end{frame}
+
+\begin{frame}{پ۲ — چرا زیان با وزن حجم رزرو وزن‌دهی شد}
+  \begin{itemize}
+    \item واریانس $\rho$ به‌شدت به اندازه‌ی رزرو وابسته است: std چارک کوچک ÷ بزرگ $=3.03\times$
+    \item بدون وزن‌دهی، سلف‌های کوچکِ پرنوسان بر تابع زیان اثر نامتناسب می‌گذارند
+    \item راه‌حل: $w=Res$ در تابع زیان
+  \end{itemize}
+  {\small شاهد: \lr{F06}؛ ردیف ۲۵ decision\_log؛ یافته‌ی ۱۶.}
+\end{frame}
+
+\begin{frame}{پ۳ — جدول کامل تبدیل نسبت هزینه به چندک}
+  \begin{center}
+  \begin{tabular}{cccc}
+    \toprule
+    $C_u/C_o$ & چندک تقاضا & $\tau_\rho$ (چندک نرخ عدم‌دریافت) \\
+    \midrule
+    $2\times$ & $0.67$ & $0.33$ \\
+    $4\times$ & $0.80$ & $0.20$ \\
+    $9\times$ & $0.90$ & $0.10$ \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \[
+    \tau_\rho = \frac{C_o}{C_u+C_o} = 1 - \frac{C_u}{C_u+C_o}
+  \]
+  {\small شاهد: \lr{reports/tau\_sensitivity.md}، \lr{reports/phase10/10.2\_newsvendor.md}.}
+\end{frame}
+
+\begin{frame}{پ۴ — قاعده‌ی برش اطلاعاتی، کامل}
+  \small
+  \begin{tabular}{p{5.2cm}p{5.2cm}}
+    \toprule
+    مجاز & ممنوع \\
+    \midrule
+    \texttt{Reservation} تا $d+2$ &
+      \texttt{ReceiveWithCard/Code}, \texttt{DontReceive} برای روز $d$ \\
+    \texttt{Recv/NoRecv}, نرخ $\rho$ تا لحظه‌ی برش همان وعده‌ی هدف &
+      هر ستون پس از پخت، و هر وعده که هنوز سرو نشده \\
+    منو و ویژگی‌های تقویمی هر روز & — \\
+    \texttt{ReserveStatus} تاریخچه‌ی فرد $p$ تا لحظه‌ی برش (مدل B) &
+      \texttt{ReserveStatus} برای روز هدف $d$ \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.2cm}
+
+  تله‌ی رایج: شام روز $d-1$ در لحظه‌ی برش ناهار روز $d$ (ساعت ۱۵) هنوز سرو نشده — با اینکه
+  تاریخش $d-1$ است، استفاده از آن نشتی است.
+  {\small شاهد: AGENTS.md؛ بند ۴-۲ project-definition.md؛ ردیف ۹ decision\_log.}
+\end{frame}
+
+\begin{frame}{پ۵ — هشت خط پایه روی $\tau=0.20$}
+  \tiny
+  \begin{center}
+  \begin{tabular}{lccc}
+    \toprule
+    خط پایه & pinball & نرخ کمبود & \% کاهش هدررفت \\
+    \midrule
+    \lr{B3\_empirical\_quantile} & $0.01590$ & $9.6\%$ & $60.1\%$ \\
+    \lr{B7\_group\_residual\_quantile} & $0.01591$ & $8.9\%$ & $59.8\%$ \\
+    \lr{B2\_group\_shrunk} & $0.01695$ & $9.8\%$ & $54.7\%$ \\
+    \lr{B6\_day\_factor} & $0.01744$ & $13.6\%$ & $58.1\%$ \\
+    \lr{B1\_global\_mean} & $0.01847$ & $9.9\%$ & $43.4\%$ \\
+    \lr{B4\_seasonal\_naive} & $0.02158$ & $11.7\%$ & $43.5\%$ \\
+    \lr{B5\_rolling\_mean} & $0.02187$ & $18.3\%$ & $57.8\%$ \\
+    \lr{B0\_cook\_all} & $0.02288$ & $0.0\%$ & $0.0\%$ \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  {\small شاهد: \lr{reports/baselines\_tau020.md}.}
+\end{frame}
+
+\begin{frame}{پ۶ — قهرمان در برابر خط پایه، در نقطه‌ی سربه‌سر}
+  \begin{itemize}
+    \item در $\tau=0.20$ روی پنجره‌ی آزمون، قهرمان از قوی‌ترین خط پایه (\lr{B3}) عملاً چیزی جلو
+      نزد: $-0.011$ میلیارد تومان
+    \item مزیت مدل در $\tau$های کوچک‌تر ظاهر می‌شود: در $\tau=0.02$ برابر $+0.94$ میلیارد
+      تومان
+    \item بیشتر ارزش از خودِ سوئیچ به تصمیم چندکی می‌آید، نه از پیچیدگی مدل — مزیت واقعی مدل
+      در کالیبراسیون است
+  \end{itemize}
+  {\small شاهد: \lr{reports/phase10/10.2\_newsvendor.md}.}
+\end{frame}
+
+\begin{frame}{پ۷ — اندازه‌ی نمونه‌ی مؤثر و بوت‌استرپ بلوکی دوبعدی}
+  \begin{itemize}
+    \item اندازه‌ی نمونه: خام $7{,}579$ سلول، مؤثر تنها $593$ (ICC روز $=0.225$) — ضریب
+      تورم واریانس $12.8\times$
+    \item آزمون‌های آماری فاز ۷ باید روی این اندازه‌ی مؤثر، نه خام، تفسیر شوند
+    \item بوت‌استرپ روی هر دو بُعد (روز و سلف) بلوک می‌بندد چون ICC روز و سلف تقریباً برابرند
+  \end{itemize}
+  {\small شاهد: \lr{reports/baselines\_tau020.md}؛ \lr{F10}.}
+\end{frame}
+
+\begin{frame}{پ۸ — بیش‌پراکندگی و رد فرض استقلال افراد}
+  \begin{itemize}
+    \item در سطح فرد: واریانس گروهی $14.4\times$ دوجمله‌ای؛ $\chi^2/df=18.2$
+    \item ICC واحد سکونت $=+0.064$، دانشکده $=+0.033$
+    \item \textbf{پیامد حیاتی:} جمع ساده‌ی احتمالات فردی در مدل B عدم‌قطعیت را حدود
+      $3.8\times$ کم‌برآورد می‌کند — کوانتایل خوش‌بینانه، ریسک کمبود بیشتر از ادعای مدل
+  \end{itemize}
+  {\small شاهد: \lr{F08}.}
+\end{frame}
+
+\begin{frame}{پ۹ — پنج سطح داده}
+  \small
+  \begin{center}
+  \begin{tabular}{lll}
+    \toprule
+    سطح & واحد رکورد & حجم \\
+    \midrule
+    \lr{L1} سلول & $(d,m,r,f)$ & $7{,}579$ \\
+    \lr{L2} سلف×وعده & $(d,m,r)$ & حدود $4{,}100$ \\
+    \lr{L3} عامل روز & $(d,m)$ & $256$ \\
+    \lr{L4} سری زمانی & سری $(m,r)$ & ۴۱ سری، میانه ۱۹۷ نقطه \\
+    \lr{L5} رزرو فردی & $(p,d,m,r,f)$ & $2{,}049{,}322$ رزرو \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  «مدل \lr{A/B}» فازهای ۱ تا ۶: \lr{A} $\equiv$ \lr{L1/L2}، \lr{B} $\equiv$ \lr{L5}.
+  {\small شاهد: AGENTS.md.}
+\end{frame}
+
+\begin{frame}{پ۱۰ — کالیبراسیون و ACI}
+  \begin{itemize}
+    \item بدون کالیبراسیون: پوشش تجربی سیستماتیک بیشتر از اسمی است — بیشترین شکاف در
+      $\tau=0.30$ ($+18.0\%$)، یعنی مدل محافظه‌کارتر از حد اسمی
+    \item در نقطه‌ی عملیاتی $\tau=0.20$: پوشش از $33.6\%$ (شکاف $+13.6\%$) با ACI به
+      $20.1\%$ (شکاف $+0.1\%$) می‌رسد
+    \item pinball هم کمی بهتر می‌شود: از $0.01008$ به $0.00975$
+  \end{itemize}
+  {\small شاهد: \lr{reports/phase8/8.8\_calibration.md}.}
+\end{frame}
+
+\begin{frame}{پ۱۱ — ماجرای آلودگی هوا}
+  \begin{itemize}
+    \item اثر خام قوی: $r=+0.28$ ($p\approx 6\times10^{-134}$)
+    \item پس از کنترل سلف×وعده×روزهفته: $-0.013$ ($p=0.25$) — کاملاً صفر
+    \item سازوکار: تهران هم‌زمان بالاترین AQI و بالاترین نرخ را دارد
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{report_03_aqi_spurious_fa}
+  \end{figure}
+  {\small شاهد: \lr{F25}.}
+\end{frame}
+
+\begin{frame}{پ۱۲ — نمودار کالیبراسیون}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.62\textwidth]{8.8_reliability_fa}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{پ۱۳ — تحلیل باقیمانده}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\textwidth]{8.2_residual_hist_fa}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\textwidth]{8.2_resid_acf_fa}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{پ۱۴ — درخت جانشین قابل‌فهم}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.68\textwidth]{9.5_surrogate_tree_fa}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{پ۱۵ — منحنی یادگیری}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.62\textwidth]{8.9_learning_curve}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{پ۱۶ — مقایسه‌ی شش مجموعه‌ی ویژگی}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.68\textwidth]{5.12_feature_sets_fa}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{پ۱۷ — خودهمبستگی به تفکیک وعده}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.62\textwidth]{report_08_acf_by_meal_fa}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{پ۱۸ — توزیع متغیر هدف}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{report_01_target_distribution_fa}
+  \end{figure}
+\end{frame}
+
+\aboutpage{پرسش‌های محتمل}{جواب کوتاه}
+
+\begin{frame}{«مدل پیچیده چه چیزی بیشتر از یک قاعده‌ی ساده داد؟»}
+  خطرناک‌ترین سؤال — خودت اول مطرحش کن (اسلاید ۱۵).
+  \begin{itemize}
+    \item در $\tau=0.20$ روی پنجره‌ی آزمون، قهرمان از خط پایه‌ی \lr{B3} عملاً چیزی جلو نزد
+      ($-0.011$ میلیارد)
+    \item بیشتر ارزش از خودِ سوئیچ به تصمیم چندکی می‌آید، نه پیچیدگی مدل
+    \item مزیت مدل در $\tau$های کوچک‌تر ظاهر می‌شود ($\tau=0.02$: $+0.94$ میلیارد) و در
+      کالیبراسیون
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{«۶۲ میلیارد چقدر قابل اتکاست؟» / «چرا رگرسیون کوانتایل؟»}
+  \begin{itemize}
+    \item بازه‌ی $44$ تا $81$ میلیارد با بوت‌استرپ بلوکی، روی ۳۲ هفته‌ی آموزشی، بدون
+      تابستان، بدون تورم، بدون رشد ثبت‌نام — فرض‌ها در \lr{10.4\_annual\_savings.md}
+    \item تصمیم فقط به یک نقطه از توزیع نیاز دارد؛ تخمین کل توزیع خطای جاهای بی‌ربط را هم
+      وارد تصمیم می‌کند
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{«معادل‌سازی Pinball با نیوزوندور از کجاست؟» / «چرا تک‌مرحله‌ای اجرا نشد؟»}
+  \begin{itemize}
+    \item Ban \& Rudin (2019)، Huber و همکاران (2019)، صورت‌بندی رسمی در Risks (2026) —
+      همان مقاله هشدار می‌دهد کالیبراسیون باید جدا از دقت نقطه‌ای بررسی شود
+    \item اجرا شد: خانواده‌ی ۱۱ (\lr{\texttt{f11\_decision.py}}) همین آزمون هم‌ارزی را دارد؛
+      نتیجه: هدف واقعی نسخه‌ی وزن‌دار است، نه pinball خام
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{«هزینه‌ی کمبود را چطور تعیین کردی؟» / «نشتی داده چطور کنترل شد؟»}
+  \begin{itemize}
+    \item تعیین نشد — این یک تصمیم سیاستی است، نه کمیت قابل‌اندازه‌گیری از داده؛ کل بازه‌ی
+      نسبت هزینه از ۲ تا ۴۹ آزموده شد. $\tau=0.20$ توصیه است نه ادعا
+    \item نشتی: قاعده‌ی برش به تفکیک وعده با ممیزی خودکار، فولدهای منجمد با دروازه‌ی هش —
+      شام روز قبل در لحظه‌ی تصمیمِ ناهار فردا هنوز سرو نشده، پس ممنوع است
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{«چرا داده‌ی سطح فرد کمک نکرد؟» / «آلودگی هوا واقعاً بی‌اثر است؟»}
+  \begin{itemize}
+    \item ترکیب افراد فقط $10\%$ واریانس را توضیح می‌دهد، شوک روز $83\%$ — سیگنال فردی
+      افزونه بود نه تازه
+    \item اثر AQI خام قوی بود، پس از کنترل سلف و وعده صفر شد؛ آزمون آستانه‌ای هم چیزی پیدا
+      نکرد — سازوکارش این‌که تهران هم‌زمان بالاترین آلودگی و بالاترین نرخ را دارد
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{«چرا نرخ کمبود $15.4\%$ ولی مشکلی نیست؟» / «چرا فقط ۵ ماه داده؟»}
+  \begin{itemize}
+    \item $15.4\%$ فقط رخداد را می‌شمارد نه اندازه را؛ عمق میانگین هر سلول کمبوددار $4.2$
+      پرس است
+    \item ۵ ماه همان چیزی است که از معاونت دانشجویی تحویل گرفته شد — در محدودیت‌ها آمده و
+      اولین قلم کار آینده است
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{«۲۲۴ روز سرو از کجا آمد؟» / «۲۳۲ هزار پرس با ۱۶۲ هزار پرسِ ۵ ماه نمی‌خواند»}
+  \begin{itemize}
+    \item ۳۲ هفته‌ی آموزشی = دو نیم‌سال ۱۶هفته‌ای؛ تابستان و نوروز عمداً بیرون گذاشته شدند
+      چون الگوی سرو متفاوتی دارند که در این داده مشاهده نشده — هر ترم ۱۱۲ روز سرو
+    \item داده‌ی خام $53.4$ ردیف در روز سرو دارد، ولی نردبان روی مبنای فولدهای رسمی با
+      $48.5$ ردیف در روز بسته شده — یعنی برآورد محافظه‌کارانه است، نه خوش‌بینانه
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{«عدد $3.9$ میلیارد فنی امیرآباد چقدر دقیق است؟»}
+  \begin{itemize}
+    \item برآورد مرتبه‌ی بزرگی است، نه عدد گزارش‌شده در مخزن
+    \item از میانگین رزرو این سلف و میانگین پیش‌بینی مدل برای آن، ضرب در ۲۲۴ روز سرو ساخته
+      شده — هر دو ورودی از مخزن می‌آیند، ولی خود ضرب در گزارش نیامده
+  \end{itemize}
+\end{frame}

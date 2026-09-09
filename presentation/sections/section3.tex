@@ -1,91 +1,102 @@
-\section{Two Stream Instability}
+\section{آنچه داده گفت}
 
-\begin{frame}{two stream instability}
-    \begin{center}
-        \begin{figure}
-            \includegraphics[width=0.75\textwidth]{images/dis/distribution_10_000.png}
-        \end{figure}
-    \end{center}
+\begin{frame}{عدم‌دریافت یک تصمیم غذایی نیست، غیبت از دانشگاه است}
+  \begin{itemize}
+    \item اگر کسی ناهارش را نگیرد، احتمال نگرفتن شامش $3.2$ برابر می‌شود
+    \item فرضیه‌ی «ترجیح غذایی شخصی» رد شد: پایداری جفت (فرد، غذا) $0.24$ در برابر پایداری
+      خود فرد $0.43$
+    \item \textbf{پیامد:} تغییر منو ابزار کاهش هدررفت نیست
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.55\textwidth]{slides_08_dinner_given_lunch}
+  \end{figure}
+  \note{شاهد: \lr{F57}، \lr{F55}، \lr{F66}.}
 \end{frame}
 
-\begin{frame}{Vlasov-Poisson equation}
-Vlasov-Poisson equation:
-
-        \begin{equation*}\begin{gathered} \frac{{\partial f}}{{\partial t}} + {\mathbf{v}} \cdot \nabla f + \frac{q}{m}\left({\mathbf{E}} + {\mathbf{v}} \times {\mathbf{B}}\right) \cdot \frac{{\partial f}}{{\partial {\mathbf{v}}}} = 0 \\ \nabla \cdot {\mathbf{E}}{\,\boldsymbol{ = }}\,\frac{\rho }{\varepsilon } \\ \end{gathered} \end{equation*}
-        \pause
-Density:	
-
-        \begin{equation*}\begin{gathered} \rho = e(n_e-Z_i n_i)  \\ {n_{\text{e}}} = \int\limits_{ - \infty }^{ + \infty } f\left(t,x,v\right){\text{d}}v \\ \end{gathered} \end{equation*}
-        \pause
-1D Vlasov-Poisson equation:
-
-			\begin{align*} & \frac{{\partial f}}{{\partial t}} + v\frac{{\partial f}}{{\partial x}} + \frac{{eE}}{{{m_{\text{e}}}}}\frac{{\partial f}}{{\partial v}} = 0 \nonumber\\ & \frac{{\partial E}}{{\partial x}} = \frac{{e\left({n_{\text{e}}} - {n_i}\right)}}{\varepsilon }\end{align*}
-			
-
+\begin{frame}{$83\%$ نوسان از یک شوک مشترک روزانه می‌آید}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item تجزیه‌ی واریانس نرخ سلول: $7\%$ نویز نمونه‌گیری، $10\%$ ترکیب رزروکنندگان،
+          $83\%$ شوک مشترک روز
+        \item در $99.5\%$ جفت‌سلف‌ها این شوک هم‌جهت است — سراسری دانشگاه است نه محلی
+        \item خبر خوب: با اطلاعات مجاز در لحظه‌ی برش تا $R^2=0.60$ پیش‌بینی‌پذیر است
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{slides_09_variance_donut}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.62\textwidth]{report_14_day_shock_fa}
+  \end{figure}
+  \note{پیامد: مسئله در سطح «روز دانشگاه» مدیریت می‌شود، نه سطح فرد. شاهد: \lr{F59}، \lr{F60}، \lr{F61}.}
 \end{frame}
 
-\begin{frame}{Vlasov-Poisson equation}
-Normalization:
-    \begin{equation*}x = \frac{{{x^*}}}{{{\lambda _{\text{D}}}}},\,v = \frac{{{v^*}}}{{{v_{{\text{th}}}}}},\,t = \frac{{{t^*}}}{{\omega _{\text{p}}^{ - 1}}},\,m = \frac{{{m^*}}}{{{m_{\text{e}}}}},\,q = \frac{{{q^*}}}{e},\,E = {E^*}\frac{{e{\lambda _{\text{D}}}}}{{k{T_{\text{e}}}}}\end{equation*}
-
-\pause
-Normalized 1D Vlasov-Poisson equation:
-		
-	\begin{align*}
-         & \frac{{\partial f}}{{\partial t}} + v\frac{{\partial f}}{{\partial x}} - {\textrm E}\frac{{\partial f}}{{\partial v}} = 0 \nonumber\\ & \frac{{\partial {\textrm E}}}{{\partial x}} = \int\limits_{ - \infty }^{ + \infty } f\left(t,x,v\right){\text{d}}v - 1
-    \end{align*}
-
+\begin{frame}{روزهایی که بد به‌نظر می‌رسند، روزهایی نیستند که پول می‌سوزانند}
+  \begin{itemize}
+    \item همبستگی حجم رزرو با نرخ منفی است ($-0.35$) ولی با هدررفت مطلق شدیداً مثبت
+      ($+0.75$)
+    \item فهرست «بدترین روزها» با معیار نرخ و با معیار پرس فقط ۴ عضو از ۱۵ عضو مشترک دارند
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.62\textwidth]{R5_q43_volume_vs_rate}
+  \end{figure}
+  \note{مهم‌ترین حرف مدیریتی ارائه. شاخص پایش سلف باید «پرس» باشد نه «درصد»، وگرنه مدیریت
+  دقیقاً روزهای اشتباه را رصد می‌کند. شاهد: \lr{F80}، \lr{F81}، \lr{F54}.}
 \end{frame}
 
-\begin{frame}{PIC simulation}
-    \pause
-    \begin{center}
-        \begin{tikzpicture}[>=stealth, thick, node distance=2.5cm]
-
-% ---------- Styles ----------
-\tikzstyle{block} = [rectangle, draw, rounded corners=2pt,
-                     text width=5cm, align=center, minimum height=1.2cm]
-
-% ---------- Nodes ----------
-\node[block] (motion) {Integration of equations of motion, moving particles\\[2pt]
-$F_p \rightarrow v_p \rightarrow x_p$};
-
-\node[block, right=of motion] (weight1) {Weighting\\[2pt] $(x,v)_p \rightarrow (\rho, J)_g$};
-
-\node[block, below=of weight1] (field) {Integration of field equations on grid\\[2pt]
-$(\rho, J)_g \rightarrow (E,B)_g$};
-
-\node[block, left=of field] (weight2) {Weighting\\[2pt] $(E,B)_g \rightarrow F_p$};
-
-% % ---------- Central delta t circle ----------
-% \node[circle, draw, minimum size=0.8cm, inner sep=0pt, font=\Large] (dt) at ($(motion)!0.5!(field)$) {$\Delta t$};
-
-% ---------- Arrows ----------
-\draw[->] (motion) -- (weight1);
-\draw[->] (weight1) --  (field);
-\draw[->] (field) -- (weight2);
-\draw[->] (weight2) --  (motion);
-
-% % ---------- Circular arrow around Δt ----------
-% \draw[->, thick] (1.3,-0.2) arc[start angle=-10, end angle=250, radius=1.0cm];
-
-\end{tikzpicture}
-    \end{center}
-
+\begin{frame}{هدف‌گیری دانشجویان پرغیبت جواب نمی‌دهد}
+  \begin{itemize}
+    \item سقف نظری هر سیاستی که $10\%$ افراد را هدف بگیرد، $38\%$ هدررفت است
+    \item هدف‌گیری بر پایه‌ی مشخصات جمعیتی به $8.7\%$ می‌رسد — بدتر از انتخاب تصادفی
+      ($10\%$)، چون افراد پرنرخ عمدتاً کم‌رزرواند
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.62\textwidth]{report_12b_lorenz_targeting_fa}
+  \end{figure}
+  \note{پیامد: هر سیاست جریمه یا محدودیت بر پایه‌ی مقطع، جنسیت یا دوره مبنای داده‌ای ندارد.
+  این اسلاید یک ایده‌ی بد را پیش از تولدش می‌کشد. شاهد: \lr{F86}، \lr{F74}، \lr{F73}.}
 \end{frame}
 
-\begin{frame}{two stream instability}
-    \begin{center}
-        \begin{figure}
-            \includegraphics[width=0.75\textwidth]{images/dis/distribution_10_000.png}
-        \end{figure}
-    \end{center}
+\begin{frame}{تقویم سیگنال رایگان می‌دهد}
+  \begin{itemize}
+    \item روز قبل از تعطیلی: $3.1$ واحد درصد بالاتر، حدود $39\%$ نسبی
+    \item چهار روز اول بازگشت پس از وقفه‌ی چهارروزه یا بیشتر: $22\%$ نسبی بالاتر — بدترین
+      روز، روز \textbf{دوم} است نه اول
+    \item شام رمضان تقریباً دو برابر
+  \end{itemize}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\textwidth]{report_07_pre_holiday_fa}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=\textwidth]{r4_2_return_curve_fa}
+    \end{column}
+  \end{columns}
+  \note{همه‌ی این‌ها ماه‌ها قبل معلوم‌اند و اعمالشان هزینه‌ی صفر دارد، حتی بدون هیچ مدلی.
+  شاهد: \lr{F19}، \lr{F70}، \lr{F22}.}
 \end{frame}
 
-% \begin{frame}{two stream instability}
-%     \begin{center}
-%         \begin{figure}
-%             \animategraphics[loop,autoplay,width=0.75\linewidth]{15}{images/dis/distribution_10_}{000}{201}
-%         \end{figure}
-%     \end{center}
-% \end{frame}
+\begin{frame}{جغرافیا}
+  \begin{itemize}
+    \item تهران $8.7\%$ در برابر رضوانشهر $3.1\%$، با تفکیک تقریباً کامل بین پردیس‌ها
+    \item سازوکارش رفتار افراد است نه ترکیب سلف‌ها — در پردیس دورافتاده سلف تنها گزینه‌ی
+      غذایی است
+    \item \textbf{پیامد:} تمرکز منابع روی تهران
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.62\textwidth]{report_02_city_effect_fa}
+  \end{figure}
+  \note{اگر وقت اضافه داشتی یا استاد پرسید، ماجرای آلودگی هوا را بیاور (\lr{F25}، اسلاید پشتیبان
+  پ۱۱): اثر خام قوی بود ($r=+0.28$) و پس از کنترل سلف و وعده کاملاً صفر شد، چون تهران هم‌زمان
+  بالاترین آلودگی و بالاترین نرخ را دارد. شاهد: \lr{F12}، \lr{F14}.}
+\end{frame}
