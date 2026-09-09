@@ -474,6 +474,40 @@ def fig_14b_model_families() -> None:
 
 
 # ---------------------------------------------------------------------------
+# اسلاید ۱۴-ب — هشت خط پایه‌ی بدون یادگیری ماشین، رتبه‌بندی‌شده روی τ=۰.۲۰
+# ---------------------------------------------------------------------------
+
+def fig_14c_baselines() -> None:
+    labels = [
+        "کوانتایل تجربی گروه (سرسخت‌ترین)",
+        "کوانتایل باقیمانده‌ی گروه",
+        "نرخ گروهی کوچک‌شده",
+        "نرخ گروهی + شوک روز",
+        "میانگین سراسری",
+        "نایو فصلی (نرخ هفته‌ی قبل)",
+        "میانگین متحرک ۷روزه",
+        "پخت = کل رزرو (وضع موجود)",
+    ]
+    vals = [0.01590, 0.01591, 0.01695, 0.01744, 0.01847, 0.02158, 0.02187, 0.02288]
+    colors = [GREEN, BLUE, BLUE, BLUE, BLUE, BLUE, BLUE, GRAY]
+
+    fig, ax = plt.subplots(figsize=(8.8, 5.2))
+    y = np.arange(len(labels))
+    ax.barh(y, vals, color=colors, height=0.62)
+    for yi, v in zip(y, vals):
+        ax.text(v + 0.0004, yi, f"{v:.5f}", va="center", fontsize=10, color="0.25")
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels, fontsize=10.5)
+    ax.invert_yaxis()  # کم‌ترین زیان (بهترین) بالا
+    ax.set_xlabel("زیان Pinball روی τ=۰.۲۰ — کمتر بهتر")
+    ax.set_xlim(0, max(vals) * 1.20)
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    fig.tight_layout()
+    _finish(fig, "slides_14c_baselines")
+
+
+# ---------------------------------------------------------------------------
 # اسلاید ۱۵-الف — مدل برتر به زبان ساده (جنگل درخت‌های اصلاح‌کننده)
 # ---------------------------------------------------------------------------
 
@@ -540,6 +574,7 @@ def main() -> None:
     fig_08_dinner_given_lunch()
     fig_09_variance_donut()
     fig_14b_model_families()
+    fig_14c_baselines()
     fig_15_funnel()
     fig_23_champion_model()
     fig_17_ladder()
