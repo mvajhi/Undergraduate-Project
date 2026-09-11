@@ -1,0 +1,45 @@
+name: Build poster
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build A1 PDF
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Compile with XeLaTeX
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main.tex
+          latexmk_use_xelatex: true
+
+      - name: Verify output
+        shell: bash
+        run: test -s build/main.pdf
+
+      - name: Upload poster PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: tehran-poster
+          path: build/main.pdf
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,35 @@
+% !TeX program = xelatex
+\documentclass{tehran-poster}
+
+\input{config}
+\input{sections/introduction}
+\input{sections/results}
+\input{sections/method}
+\input{sections/conclusion}
+\input{sections/references}
+
+\begin{document}
+\PosterBackground
+\PosterHeader
+
+% The coordinates are measured from the upper-left corner of the A1 page.
+% Box heights follow doc/poster-a1-plan.md (بخش ب): نتایج و مقدمه بزرگ می‌شوند،
+% مراجع و روش کوچک می‌شوند؛ هر دو ستون روی ۸۲.۷۵ سانتی‌متر می‌بندند.
+\PosterBlock[26]{نتایج}
+  {1.30cm}{12.35cm}{28.05cm}{43.00cm}{\ResultsContent}
+
+\PosterBlock[26]{جمع‌بندی}
+  {1.30cm}{56.15cm}{28.05cm}{14.90cm}{\ConclusionContent}
+
+\PosterBlock[18]{مراجع اصلی}
+  {1.30cm}{71.85cm}{28.05cm}{10.90cm}{\ReferencesContent}
+
+\PosterBlock[28]{مقدمه}
+  {30.35cm}{12.35cm}{27.75cm}{24.00cm}{\IntroductionContent}
+
+\PosterBlock[26]{روش}
+  {30.35cm}{37.15cm}{27.75cm}{45.60cm}{\MethodContent}
+
+% The page is built from overlay modules; this anchor emits exactly one page.
+\null
+\end{document}

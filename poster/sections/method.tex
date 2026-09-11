@@ -1,0 +1,91 @@
+\newcommand{\FormulaBox}[2]{%
+  {\begin{minipage}[c][#2][c]{\linewidth}\centering
+     #1
+   \end{minipage}}%
+}
+
+\newcommand{\MethodContent}{%
+{\fontsize{22}{27}\selectfont
+\PosterSubhead{ویژگی‌های مسئله}
+\begin{itemize}
+  \item \textbf{چه زمانی:} پیش از دیدن تقاضای واقعی، فقط با رزرو تصمیم گرفته می‌شود
+  \item \textbf{هزینه‌ی نامتقارن:} هر پرس مازاد \PosterNum{۳۷۵} هزار تومان؛ هر پرس کمبود یعنی دانشجوی بی‌غذا
+  \item \textbf{خروجی مدل:} نرخ عدم‌دریافت، نه تقاضای مطلق
+\end{itemize}
+
+\PosterDivider
+
+\PosterSubhead{چارچوب تصمیم و تابع هدف پخت}
+
+\vspace{.10cm}
+\begin{tabular}{@{}p{15.6cm}@{\hspace{.5cm}}p{8.5cm}@{}}
+{\textbf{روزنامه‌فروش داده‌محور:} به‌دلیل فسادپذیری و برتری هزینه‌ی کمبود به مازاد، چندک بهینه مستقیماً از نسبت هزینه‌ها استخراج می‌شود (ورودی سیاستی مدیریت، نه پارامتر مدل).} &
+\FormulaBox{\beginL$\displaystyle \tau^{*}_{\rho} = \dfrac{C_o}{C_u+C_o}$\endL\\[.15cm]
+{\fontsize{15}{18}\selectfont\color{PosterMuted}نقطه‌ی عملیاتی: \beginL$C_u{=}4C_o$\endL}}{3.2cm} \\
+\end{tabular}
+
+\vspace{.18cm}
+\begin{tabular}{@{}p{15.6cm}@{\hspace{.5cm}}p{8.5cm}@{}}
+{\textbf{زیان \lr{Pinball}:} جریمه‌ی خطای کمبود \PosterNum{۴} برابر مازاد؛ کمینه‌کردن مستقیم این زیان معادل حل مسئله‌ی روزنامه‌فروش است.} &
+\FormulaBox{\beginL$\displaystyle L_{\tau}(y,\hat{y})=
+\begin{cases}
+\tau(y-\hat{y}) & y\ge\hat{y}\\[1pt]
+(1{-}\tau)(\hat{y}-y) & y<\hat{y}
+\end{cases}$\endL}{2.9cm} \\
+\end{tabular}
+
+\vspace{.10cm}
+\begin{center}
+\colorbox{white}{\begin{minipage}{0.94\linewidth}\centering
+\vspace{.06cm}
+{\fontsize{22}{26}\selectfont\textbf{مقدار پخت پیشنهادی:}\quad\beginL{\fontsize{26}{31}\selectfont$\displaystyle \mathrm{CookQty}=\left\lceil \mathrm{Res}\times(1-\hat{\rho}_{\tau})\right\rceil$}\endL}
+\vspace{.06cm}
+\end{minipage}}
+\end{center}
+
+\PosterDivider
+
+\PosterSubhead{داده و خانواده‌های مدل}
+داده‌های سامانه‌ی تغذیه با تفکیک دقیق مرز زمانی آماده‌سازی و خانواده‌های متنوع یادگیری ماشین روی آن ارزیابی شدند:
+
+\vspace{.05cm}
+\begin{center}
+{\fontsize{18}{20.5}\selectfont
+\setlength{\aboverulesep}{1pt}\setlength{\belowrulesep}{1pt}
+\begin{tabular}{@{}p{12.0cm}@{\hspace{.5cm}}p{12.0cm}@{}}
+\begin{tabular}{@{}p{4.0cm}p{7.9cm}@{}}
+\toprule
+\textbf{پایگاه داده} & \textbf{مقدار} \\
+\midrule
+داده خام & \PosterNum{۲} میلیون رزرو فردی، \PosterNum{۱۴۲} روز، \PosterNum{۳۰} سلف \\
+سلول تصمیم پخت & \PosterNum{۷٬۵۷۹} رکورد (روز، سلف، غذا) \\
+ویژگی‌ها & \PosterNum{۱۰۰} ویژگی \\
+\bottomrule
+\end{tabular}
+&
+\begin{tabular}{@{}p{4.0cm}p{7.9cm}@{}}
+\toprule
+\textbf{دسته مدل‌سازی} & \textbf{مدل‌های آزموده} \\
+\midrule
+پایه و درختی & خطی و چندکی · تقویت گرادیانی درختی \\
+زمانی و آماری & سری زمانی · بیزی سلسله‌مراتبی \\
+غیرخطی و محاسباتی & شبکه‌ی عصبی · فرایند گاوسی · نزدیک‌ترین همسایه \\
+تلفیق و پالایش & ترکیب مدل‌ها و کالیبراسیون \\
+\bottomrule
+\end{tabular}
+\\
+\end{tabular}\par}
+\end{center}
+
+\vspace{.05cm}
+{\fontsize{20}{24}\selectfont\textbf{مدل برگزیده:} \lr{LightGBM Quantile} با \PosterNum{۹}٪ کاهش معنادار زیان نامتقارن، تنها مدل برتر از خط‌پایه‌ی سخت‌گیرانه بود؛ سطح فردی و شبکه‌ی عصبی کمکی نکردند.\par}
+
+\PosterDivider
+
+\PosterSubhead{ارزیابی گام‌به‌جلو با پنجره‌ی آزمون قفل‌شده}
+\begin{center}
+\PosterImage[23.0cm]{assets/poster_eval_protocol.pdf}{4.9cm}
+\end{center}
+{\fontsize{20}{24}\selectfont ارزیابی همه‌ی مدل‌ها با زیان \lr{Pinball} روی \PosterNum{۵} دور زمانی گسترشی انجام شد. پنجره‌ی آزمون قفل‌شده تنها یک‌بار، پس از تثبیت مدل‌ها، باز شد و برتری مدل منتخب با آزمون آماری \lr{Diebold-Mariano} به تأیید رسید.\par}
+\par}
+}
