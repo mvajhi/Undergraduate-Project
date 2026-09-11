@@ -84,18 +84,21 @@
   ردیف ۴۹ decision\_log.}
 \end{frame}
 
-\begin{frame}{مدل برتر چطور کار می‌کند}
+\begin{frame}{۵ مدلی که واقعاً بردند}
   \begin{itemize}
-    \item یک \lr{LightGBM} کوانتایلی: صدها درخت تصمیم پشت‌سرهم، هرکدام فقط خطای باقی‌مانده‌ی
-      درخت‌های قبلی را اصلاح می‌کند
-    \item خروجی مستقیماً همان چندک $\tau=0.20$ است که برای مسئله انتخاب شده بود، نه یک
-      میانگین که بعداً تبدیل شود
-    \item روی \lr{fold}های رسمی از قوی‌ترین خط پایه (\lr{B3}) به‌طور معنادار برد
+    \item از ۲۵ مدل، \lr{lightgbm\_quantile} (خ۲ درختی/بوستینگ) قهرمان نهایی است؛ نزدیک‌ترین
+      رقیب یک مدل بیزی سلسله‌مراتبی (خ۸) است
+    \item هر ۵ مدل برنده به‌طور معنادار از خط پایه \lr{B3} بهترند، با فاصله‌ای بین
+      $0.0006$ تا $0.0012$ واحد \lr{pinball}
+    \item رتبه‌بندی بر پایه‌ی \lr{pinball} نرخ است — تنها ستونی که بین هر دو گروه \lr{CPU}/\lr{GPU}
+      این جدول مستقیماً قابل‌قیاس است
   \end{itemize}
   \begin{figure}
     \centering
-    \includegraphics[width=0.92\textwidth]{slides_23_champion_model}
+    \includegraphics[width=0.86\textwidth]{slides_23_top_models_table}
   \end{figure}
-  \note{عدد ۵ درخت روی شکل نمادین است، نه واقعی — مدل واقعی صدها درخت دارد. شاهد:
-  \lr{reports/models/lightgbm\_quantile.md}، ردیف ۴۶ decision\_log.}
+  \note{شاهد: \lr{reports/phase7/model\_comparison.md}، ردیف‌های ۴۰ و ۴۶ decision\_log
+  (انتخاب قهرمان و گسترش با ۴ قهرمان \lr{GPU}). \lr{bhm\_varying\_dispersion} چک‌لیست
+  همگرایی خودش را کامل پاس نکرده (ردیف ۴۶) — اگر استاد پرسید چرا نزدیک‌ترین رقیب قهرمان
+  نشد، همین را بگو.}
 \end{frame}
