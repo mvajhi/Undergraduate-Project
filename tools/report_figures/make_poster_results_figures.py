@@ -68,7 +68,7 @@ def _style_axis(ax, left=True, bottom=True):
 # نمودار ۱ — جنگلی، غنی‌شدگی در بدترین دهک (۱۰ ردیف)
 # ---------------------------------------------------------------------------
 
-W1, H1 = 140 * MM, 90 * MM
+W1, H1 = 144 * MM, 120 * MM
 
 # نقطه/CI از Q37 (doc/eda/round5/R5a_worst_decile.md) و از فراخوانی مستقیم
 # enrichment_table برای سه ردیفی که در چاپ استاندارد Q37 نیستند (کارشناسی‌ارشد‌ناپیوسته،
@@ -93,25 +93,25 @@ ENRICHMENT_ROWS = [
 
 def fig_enrichment():
     fig = plt.figure(figsize=(W1, H1))
-    ax = fig.add_axes([0.46, 0.24, 0.50, 0.63])
+    ax = fig.add_axes([0.38, 0.175, 0.58, 0.745])
 
     n = len(ENRICHMENT_ROWS)
     ys = list(range(n, 0, -1))
     ax.axvline(1.0, color="#6a6a6a", ls="--", lw=1.4, zorder=1)
-    ax.text(1.0, n + 0.75, viz_fa.fa("سهم منصفانه"), fontsize=15,
+    ax.text(1.0, n + 0.65, viz_fa.fa("سهم منصفانه"), fontsize=13.5,
              ha="center", va="bottom", color="#4a4a4a")
 
     for y, (label, point, lo, hi, color) in zip(ys, ENRICHMENT_ROWS):
         ax.plot([lo, hi], [y, y], color=color, lw=2.5, zorder=2, solid_capstyle="round")
-        ax.plot([point], [y], marker="o", ms=9.5, color=color, mec="white", mew=1.0, zorder=3)
+        ax.plot([point], [y], marker="o", ms=8.0, color=color, mec="white", mew=1.0, zorder=3)
 
-    ax.set_ylim(0.25, n + 1.15)
+    ax.set_ylim(0.2, n + 1.25)
     ax.set_yticks(ys)
-    ax.set_yticklabels([viz_fa.fa(r[0]) for r in ENRICHMENT_ROWS], fontsize=14.5)
+    ax.set_yticklabels([viz_fa.fa(r[0]) for r in ENRICHMENT_ROWS], fontsize=12.0)
     ax.set_xlim(0.0, 2.0)
     ax.set_xticks([0.5, 1.0, 1.5])
-    ax.set_xticklabels([fa_num(v, 1) for v in [0.5, 1.0, 1.5]], fontsize=15.5)
-    ax.set_xlabel(viz_fa.fa("نسبت حضور (۱ = سهم منصفانه)"), fontsize=15, labelpad=6)
+    ax.set_xticklabels([fa_num(v, 1) for v in [0.5, 1.0, 1.5]], fontsize=13.5)
+    ax.set_xlabel(viz_fa.fa("نسبت حضور (۱ = سهم منصفانه)"), fontsize=13.0, labelpad=4)
     ax.tick_params(color=AXIS, labelcolor=TEXT, length=3)
     ax.tick_params(axis="y", length=0)
     _style_axis(ax, left=False)
