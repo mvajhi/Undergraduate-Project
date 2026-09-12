@@ -31,3 +31,7 @@ models/gpu/
 # مقالات PDF منابع (final_report/tex/MyReferences.bib) — فقط برای مطالعه‌ی محلی،
 # بسیاری کپی‌رایت دارند و نباید در مخزن ذخیره شوند
 final_report/references_pdf/
+
+# agent workspaces & temporary artifacts
+.agents/
+

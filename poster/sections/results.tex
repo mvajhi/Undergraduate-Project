@@ -1,76 +1,82 @@
 \newcommand{\PosterOutcome}{\textcolor{PosterBlue}{\textbf{پیامد:}}}
-\newcommand{\ResultsCellHead}[1]{{\fontsize{26}{31}\selectfont\bfseries\color{PosterPurple}#1\par}}
+\newcommand{\ResultsCellHead}[1]{{\fontsize{23}{25}\selectfont\bfseries\color{PosterPurple}#1\par}}
+
+% نسبت ستون متن به ستون نمودار در بلوک ۴ (doc/poster/poster-results-box-spec.md، بند ۲):
+% نمودار ۱ در ابعاد طراحی‌شده‌ی ۱۴۰×۹۰mm جاسازی می‌شود (کوچک‌ترکردنش در اینجا فونت داخل
+% تصویر را زیر ۱۶pt می‌برد، چون فونت‌سایز چاپی داخل PNG با اندازه‌ی خودِ فایل گره خورده،
+% نه با ارتفاعی که در \PosterImage داده می‌شود)؛ ستون متن باقیمانده‌ی عرض را می‌گیرد.
+\newlength{\ResultsGutter}
+\setlength{\ResultsGutter}{.7cm}
+\newlength{\ResultsImgW}
+\setlength{\ResultsImgW}{15.0cm}
+% \linewidth از این نقطه به بعد قابل‌اعتماد نیست چون این فایل در پیش‌آمد (پیش از
+% \begin{document}) با \input بارگذاری می‌شود؛ عرض ستون متن باید همان‌جای مصرف، داخل
+% مینی‌پیج واقعی باکس «نتایج»، با \dimexpr\linewidth محاسبه شود (پایین‌تر در تابولار).
 
 \newcommand{\ResultsContent}{%
-{\fontsize{21}{27}\selectfont
+{\fontsize{21}{22}\selectfont
+\setlength{\parskip}{1pt}%
+\setlength{\aboverulesep}{1pt}\setlength{\belowrulesep}{1pt}%
 
-\PosterSubhead{چقدر صرفه‌جویی}
-\begin{center}
-{\fontsize{18}{22}\selectfont
-\begin{tabular}{@{}>{\centering\arraybackslash}p{.28\linewidth}*{3}{>{\centering\arraybackslash}p{.24\linewidth}}@{}}
-\toprule
-\textbf{افق} & \textbf{هدررفت} & \textbf{صرفه‌جویی} & \textbf{به تومان} \\
-\midrule
-یک روز سرو & \PosterNum{۱٬۰۳۷} پرس & ۷۳۷ پرس & ۲۷۷ میلیون \\
-یک سال تحصیلی & \PosterNum{۲۳۲٬۲۸۵} پرس & \PosterNum{۱۶۵٬۱۵۵} پرس & \PosterNum{۶۱.۹} میلیارد \\
-\bottomrule
-\end{tabular}\par}
-\end{center}
+\begin{tabular}{@{}p{\dimexpr(\linewidth-8mm)/2\relax}@{\hspace{8mm}}p{\dimexpr(\linewidth-8mm)/2\relax}@{}}
+{\ResultsCellHead{۱۰٪ دانشجویان، ۲۴٪ هدررفت}
+با اعمال سیاست‌های مناسب روی این \PosterNum{۱۰}٪ از هدردهندگان، می‌توان مستقیماً بر \PosterNum{۲۴}٪ از کل هدررفت غذا تأثیر گذاشت و آن را مدیریت کرد.\par} &
+{\ResultsCellHead{نرخ تهران تا ۳ برابر شهرهای دیگر}
+تهران \PosterNum{۸.۷}٪ در برابر \PosterNum{۳.۱}٪ در فومن و رضوانشهر، چون آنجا سلف تنها گزینه‌ی غذایی است. آستانه‌ی پخت باید برای هر سلف جدا تنظیم شود.\par} \\
+\end{tabular}
+
+\vspace{.05cm}
+\noindent\textcolor[HTML]{D8DADE}{\rule{\linewidth}{.7pt}}
+\vspace{.05cm}
+
+\ResultsCellHead{بدترین دهک: خوابگاهی نصف، شبانه یک‌ونیم برابر}
+\vspace{.05cm}
+\begin{tabular}{@{}p{\dimexpr\linewidth-\ResultsImgW-\ResultsGutter\relax}@{\hspace{\ResultsGutter}}p{\ResultsImgW}@{}}
+{عدد \PosterNum{۱} یعنی یک گروه دقیقاً به‌اندازه‌ی سهمش در بدترین \PosterNum{۱۰}٪ حضور دارد. ساکنان خوابگاه \PosterNum{۰.۶۰} و پردیس البرز \PosterNum{۰.۳۸}؛ در مقابل شبانه \PosterNum{۱.۵۳} و دکتری عمومی \PosterNum{۱.۵۱}. جنسیت روی خط \PosterNum{۱} می‌نشیند و چیزی نمی‌گوید.\par} &
+\PosterImage[\ResultsImgW]{assets/poster_res_enrichment.png}{9.6cm} \\
+\end{tabular}
+
 \vspace{.06cm}
+\noindent\textcolor[HTML]{D8DADE}{\rule{\linewidth}{.7pt}}
+\vspace{.05cm}
+
+\ResultsCellHead{تأثیر روزهای قبل و بعد تعطیلی: تا ۳۹٪ رشد عدم‌دریافت}
+\PosterImage[\linewidth]{assets/poster_res_calendar.png}{6.75cm}
+روز پیش از هر تعطیلی، نرخ عدم‌دریافت \PosterNum{۳.۱} واحد درصد بالا می‌رود؛ پس از وقفه‌ی \PosterNum{۴}روزه یا بیشتر، چهار روز اول بازگشت هم \PosterNum{۲۲}٪ بالاترند و بدترین روز دوم است. هر دو سیگنال ماه‌ها قبل معلوم‌اند: می‌توان پخت را پیش از این روزها، بدون هیچ مدلی، پایین آورد.\par
+
+\vspace{.05cm}
+\noindent\textcolor[HTML]{D8DADE}{\rule{\linewidth}{.7pt}}
+\vspace{.04cm}
+
+\ResultsCellHead{چقدر صرفه‌جویی}
+{\centering\renewcommand{\arraystretch}{.85}\fontsize{17}{20}\selectfont
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}cccc@{}}
+\toprule
+\textbf{افق} & \textbf{هدررفت} & \textbf{صرفه‌جویی} & \textbf{به تومان} \tabularnewline
+\midrule
+یک روز سرو & \PosterNum{۱٬۰۳۷} پرس & \PosterNum{۷۳۷} پرس & \PosterNum{۲۷۷} میلیون \tabularnewline
+یک ترم (\PosterNum{۱۱۲} روز) & \PosterNum{۱۱۶٬۱۴۲} پرس & \PosterNum{۸۲٬۵۷۷} پرس & \PosterNum{۳۱.۰} میلیارد \tabularnewline
+سال تحصیلی (\PosterNum{۲۲۴} روز) & \PosterNum{۲۳۲٬۲۸۵} پرس & \PosterNum{۱۶۵٬۱۵۵} پرس & \PosterNum{۶۱.۹} میلیارد \tabularnewline
+\bottomrule
+\end{tabular*}\par}
+{\fontsize{18}{20}\selectfont
 نرخ هدررفت از \PosterNum{۸.۰۵}٪ به \PosterNum{۲.۳}٪ می‌رسد؛ بازه‌ی اطمینان سالانه \PosterNum{۴۴.۱} تا \PosterNum{۸۱.۴} میلیارد تومان.
 
-{\fontsize{18}{22}\selectfont\color{PosterMuted}
-\PosterNote{\PosterNum{۴۸.۵} ردیف در هر روز سرو · ۳۲ هفته‌ی آموزشی · ۳۷۵ هزار تومان هر پرس · تابستان و نوروز کنار گذاشته شده‌اند.}}
+{\color{PosterMuted}
+\PosterNote{\PosterNum{۴۸.۵} ردیف در هر روز سرو · \PosterNum{۳۲} هفته‌ی آموزشی · \PosterNum{۳۷۵} هزار تومان هر پرس · تابستان و نوروز کنار گذاشته شده‌اند.}}}
 
-\vspace{.10cm}
-\PosterSubhead{طرف دیگر معامله}
-\begin{center}
-{\fontsize{17}{20}\selectfont
-\begin{tabular}{@{}>{\centering\arraybackslash}p{.20\linewidth}*{5}{>{\centering\arraybackslash}p{.16\linewidth}}@{}}
+\ResultsCellHead{صرفه‌جویی بیشتر یا ریسک کمتر؟}
+{\centering\renewcommand{\arraystretch}{.85}\fontsize{16.5}{20}\selectfont
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}cccccc@{}}
 \toprule
-\textbf{سیاست} & \textbf{چندک} & \textbf{نرخ کمبود} & \textbf{برآورده‌نشده} & \textbf{صرفه‌جویی} & \textbf{کاهش هدررفت} \\
+\textbf{سیاست} & \textbf{چندک} & \textbf{نرخ کمبود} & \textbf{برآورده‌نشده} & \textbf{صرفه‌جویی} & \textbf{کاهش هدررفت} \tabularnewline
 \midrule
-محافظه‌کارانه & \PosterNum{۰.۰۲} & \PosterNum{۱.۴}٪ & \PosterNum{۰.۰۲}٪ & \PosterNum{۳۶.۳} میلیارد & {\bfseries\color{PosterBlue}\PosterNum{۴۲}٪} \\
-متعادل & \PosterNum{۰.۱۰} & \PosterNum{۷.۹}٪ & \PosterNum{۰.۱۴}٪ & \PosterNum{۵۴.۷} میلیارد & {\bfseries\color{PosterBlue}\PosterNum{۶۳}٪} \\
-تهاجمی & \PosterNum{۰.۲۰} & \PosterNum{۱۵.۴}٪ & \PosterNum{۰.۲۸}٪ & \PosterNum{۶۱.۹} میلیارد & {\bfseries\color{PosterBlue}\PosterNum{۷۱}٪} \\
+محافظه‌کارانه & \PosterNum{۰.۰۲} & \PosterNum{۱.۴}٪ & \PosterNum{۰.۰۲}٪ & \PosterNum{۳۶.۳} میلیارد & \textcolor{PosterBlue}{\textbf{\PosterNum{۴۲}٪}} \tabularnewline
+متعادل & \PosterNum{۰.۱۰} & \PosterNum{۷.۹}٪ & \PosterNum{۰.۱۴}٪ & \PosterNum{۵۴.۷} میلیارد & \textcolor{PosterBlue}{\textbf{\PosterNum{۶۳}٪}} \tabularnewline
+تهاجمی & \PosterNum{۰.۲۰} & \PosterNum{۱۵.۴}٪ & \PosterNum{۰.۲۸}٪ & \PosterNum{۶۱.۹} میلیارد & \textcolor{PosterBlue}{\textbf{\PosterNum{۷۱}٪}} \tabularnewline
 \bottomrule
-\end{tabular}\par}
-\end{center}
-\vspace{.06cm}
-عمق میانگین هر کمبود \PosterNum{۴.۲} پرس است و سطح خدمت \PosterNum{۹۹.۷۲}٪ می‌ماند.
-
-\vspace{.16cm}
-{\fontsize{30}{36}\selectfont\bfseries\color{PosterPurple}آنچه داده گفت\par}
-\vspace{.10cm}
-
-\begin{tabular}{@{}p{\dimexpr(\linewidth-10mm)/2\relax}@{\hspace{10mm}}p{\dimexpr(\linewidth-10mm)/2\relax}@{}}
-{\ResultsCellHead{۱۰٪ دانشجویان، ۲۴٪ هدررفت}
-\PosterImage[\dimexpr(\linewidth-10mm)/2\relax]{assets/poster_res_lorenz.pdf}{85mm}
-{\fontsize{21}{26}\selectfont
-۱۰٪ بدترین‌ها (بر پایه‌ی نرخ کوچک‌شده) ۲۴٪ کل عدم‌دریافت را می‌سازند؛ با مرتب‌سازی بر پرس مطلق، ۳۸٪.
-\PosterOutcome{} مداخله‌ی هدفمند روی همین ۱۰٪، با رتبه‌بندی تاریخچه × حجم، تا ۳۸٪ هدررفت را پوشش می‌دهد. مکمل مدل است، نه جایگزین آن.\par}} &
-{\ResultsCellHead{ساکن خوابگاه کمتر، شهریه‌پرداز بیشتر}
-\PosterImage[\dimexpr(\linewidth-10mm)/2\relax]{assets/poster_res_enrichment.pdf}{85mm}
-{\fontsize{21}{26}\selectfont
-ساکن خوابگاه \PosterNum{۰.۵۹} برابر سهم منصفانه · غیرساکن \PosterNum{۱.۱۵} · دوره‌ی روزانه \PosterNum{۰.۹۵} · شبانه و نوبت دوم \PosterNum{۱.۵۳}.
-\PosterOutcome{} هرچه جایگزین غذایی بیرون از دانشگاه در دسترس‌تر باشد، رزرو راحت‌تر رها می‌شود.\par}} \\
-\end{tabular}
-
-\vspace{.10cm}
-\noindent\textcolor[HTML]{D8DADE}{\rule{\linewidth}{.7pt}}
-\vspace{.10cm}
-
-\begin{tabular}{@{}p{\dimexpr(\linewidth-10mm)/2\relax}@{\hspace{10mm}}p{\dimexpr(\linewidth-10mm)/2\relax}@{}}
-{\ResultsCellHead{هرچه از تهران دورتر، هدررفت کمتر}
-\PosterImage[\dimexpr(\linewidth-10mm)/2\relax]{assets/poster_res_city.pdf}{85mm}
-{\fontsize{21}{26}\selectfont
-تهران \PosterNum{۸.۷}٪ در برابر فومن و رضوانشهر \PosterNum{۳.۱}٪، تقریباً سه برابر. اثر شهر واقعی است نه نماینده‌ی اندازه یا نوع سلف: $R^2$ مدل سطح سلف از \PosterNum{۰.۱۷} به \PosterNum{۰.۶۲} می‌رسد.
-\PosterOutcome{} آستانه‌ی پخت باید \PosterEnglish{per}-سلف تنظیم شود، نه یک عدد یکسان برای کل دانشگاه.\par}} &
-{\ResultsCellHead{تقویم سیگنال رایگان می‌دهد}
-\PosterImage[\dimexpr(\linewidth-10mm)/2\relax]{assets/poster_res_calendar.pdf}{85mm}
-{\fontsize{21}{26}\selectfont
-روز قبل تعطیلی \PosterNum{۳۹}٪ نسبی بالاتر · چهار روز اول بازگشت \PosterNum{۲۲}٪ نسبی بالاتر، و بدترین روز، روز دوم است نه اول.
-\PosterOutcome{} هر دو ماه‌ها قبل از تقویم معلوم‌اند؛ هزینه‌ی اعمالشان صفر است، حتی بدون هیچ مدلی.\par}} \\
-\end{tabular}
+\end{tabular*}\par}
+{\fontsize{17}{19}\selectfont
+عمق میانگین هر کمبود \PosterNum{۴.۲} پرس است و سطح خدمت \PosterNum{۹۹.۷۲}٪ می‌ماند.\par}
 \par}
 }

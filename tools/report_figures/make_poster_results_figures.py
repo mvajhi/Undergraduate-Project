@@ -1,18 +1,32 @@
-"""چهار نمودار باکس «نتایج» پوستر (`doc/poster/poster-results-box-spec.md`, بند ۴).
+"""دو نمودار باکس «نتایج» پوستر — نسخه‌ی ۲ (`doc/poster/poster-results-box-spec.md`, بند ۴-۵).
 
-هر چهار فایل باید دقیقاً ۱۲۳ × ۸۵ میلی‌متر باشند (نمودار ۴ دو پنل ۵۸×۸۵ کنار هم با فاصله‌ی
-۷ میلی‌متر) چون در `\\PosterImage` با width و height صریح (نه فقط width) جاگذاری می‌شوند و
-چیدمان ردیفی باکس نتایج روی همین ابعاد ثابت حساب شده. به همین دلیل، برخلاف
-`make_slides_figs.py`/`figio.save_fig`، اینجا از ``bbox_inches="tight"`` استفاده نمی‌شود —
-آن گزینه ابعاد نهایی را با برش حاشیه به‌هم می‌زند؛ به‌جایش حاشیه‌ی داخلی هر شکل با
-``subplots_adjust``/``add_axes`` دستی جمع شده تا حاشیه‌ی سفید عملاً صفر و ابعاد دقیق باشد.
+نسخه‌ی قبلی این اسکریپت چهار نمودار می‌ساخت (لورنتس، غنی‌سازی، شهر، تقویم). طبق بند ۰ سند
+نسخه‌ی ۲، نمودار لورنتس و نمودار شهر حذف شدند و آن دو بلوک در پوستر فقط‌متنی‌اند؛ این‌جا
+فقط دو نمودار باقی‌مانده — غنی‌سازی و تقویم دوپنله — بازتولید می‌شوند.
+
+هر دو فایل در **ابعاد نهایی فیزیکی خودشان** (نه ابعاد نمایشگر) رسم می‌شوند: بوم matplotlib
+دقیقاً معادل اندازه‌ی چاپی (۱۴۰×۹۰ و ۲۵۶×۷۲ میلی‌متر) است تا هر فونت‌سایز نوشته‌شده در کد،
+همان‌قدر پوینت فیزیکی روی پوستر چاپ‌شده باشد. به همین دلیل، مثل نسخه‌ی قبلی، از
+``bbox_inches="tight"`` استفاده نمی‌شود — آن گزینه با برش حاشیه ابعاد نهایی (و نسبت واقعی
+فونت به بوم) را به‌هم می‌زند؛ حاشیه‌ی سفید هر شکل به‌جایش با ``add_axes`` دستی به‌تقریب صفر
+رسانده شده.
+
+داده‌ی هر دو نمودار مستقیماً از خروجی رانرهای EDA گرفته شده (نه گمانه‌زنی):
+- غنی‌سازی: ``python -m src.eda_lib.runners.r5a_worst_decile`` (Q37) + فراخوانی مستقیم
+  ``enrichment_table(..., "CollegeName")`` برای ردیف «پردیس البرز» که در چاپ استاندارد Q37
+  به ۱۲ ردیف بالا بریده می‌شود.
+- تقویم (پنل راست): ``src.eda_lib.runners.s10_external.run_holiday_profile`` (باقیمانده‌ی ρ
+  با کنترل سلف×وعده×روزهفته، d−۵ تا d−۱).
+- تقویم (پنل چپ): ``src.eda_lib.runners.r4_disruption.q32_return_curve`` (شوک وزنی، روزهای
+  بازگشت ۱ تا ۵ پس از شکاف سرویس ≥۴ روزه).
 
 طبق تجربه‌ی ثبت‌شده‌ی `make_poster_eval_protocol.py`: فقط ``arabic_reshaper`` کافی است،
-افزودن ``python-bidi`` متن را دوباره برمی‌گرداند و خراب می‌کند (matplotlib این محیط خودش
-ترتیب راست‌به‌چپ را هنگام رندر انجام می‌دهد).
+افزودن ``python-bidi`` متن را دوباره برمی‌گرداند و خراب می‌کند.
 
 اجرا: ``PYTHONPATH=. .venv/bin/python tools/report_figures/make_poster_results_figures.py``
 """
+
+import numpy as np
 
 import matplotlib
 matplotlib.use("Agg")
@@ -23,21 +37,21 @@ from src.config import ROOT_DIR
 
 OUT_DIR = ROOT_DIR / "poster" / "assets"
 
-RED = "#B7443C"      # هدررفت
-AMBER = "#C8862B"    # کمبود
-BLUE = "#3B6E9E"      # خروجی مدل / مقادیر مرجع
-GRAY = "#B9BCC1"      # خنثی
-AXIS = "#D8DADE"      # محورها
+# کد رنگی پوستر (بند ۵ سند): قرمز بالای مرجع، آبی زیر مرجع، خاکستری بی‌اثر.
+RED = "#B7443C"
+BLUE = "#3B6E9E"
+GRAY = "#9EA3AA"
+AXIS = "#D8DADE"
+TEXT = "#3A3A3A"
 
 MM = 1 / 25.4
-W, H = 123 * MM, 85 * MM  # ابعاد نهایی هر چهار فایل
 
 PERSIAN_DIGITS = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
 
 
-def fa_num(x, decimals=1):
-    s = f"{x:.{decimals}f}" if decimals else str(int(round(x)))
-    return s.translate(PERSIAN_DIGITS)
+def fa_num(x, decimals=1, sign=False):
+    s = f"{x:+.{decimals}f}" if sign else f"{x:.{decimals}f}"
+    return s.replace("-", "−").translate(PERSIAN_DIGITS)
 
 
 def _style_axis(ax, left=True, bottom=True):
@@ -51,174 +65,134 @@ def _style_axis(ax, left=True, bottom=True):
 
 
 # ---------------------------------------------------------------------------
-# نمودار ۱ — منحنی لورنتس ساده‌شده
+# نمودار ۱ — جنگلی، غنی‌شدگی در بدترین دهک (۱۰ ردیف)
 # ---------------------------------------------------------------------------
 
-def fig_lorenz():
-    fig = plt.figure(figsize=(W, H))
-    ax = fig.add_axes([0.15, 0.24, 0.83, 0.70])
+W1, H1 = 140 * MM, 90 * MM
 
-    x = [i / 100 for i in range(0, 101)]
-    p = 2.603  # از رابطه‌ی ۰.۹^p=۰.۷۶ (بدترین ۱۰٪ افراد = ۲۴٪ هدررفت، F73/F74)
-    y = [100 * (xi ** p) for xi in x]
-    xp = [xi * 100 for xi in x]
+# نقطه/CI از Q37 (doc/eda/round5/R5a_worst_decile.md) و از فراخوانی مستقیم
+# enrichment_table برای سه ردیفی که در چاپ استاندارد Q37 نیستند (کارشناسی‌ارشد‌ناپیوسته،
+# روزانه، پردیس البرز) — طبق ⚠️ بند ۵ سند، هیچ عددی از روی تصویر یا حدس گرفته نشده.
+# همه‌ی ۱۲ ردیف سند (بند ۵، نمودار ۱) با نام واقعی نگه داشته شده‌اند — بدون حذف یا
+# ناشناس‌سازی؛ تنها رنگ هر ردیف طبق قاعده‌ی «بازه شامل ۱ ⇐ خاکستری» تنظیم شده.
+ENRICHMENT_ROWS = [
+    ("حقوق و علوم سیاسی", 1.57, 1.38, 1.78, RED),
+    ("شبانه و نوبت دوم", 1.53, 1.40, 1.67, RED),
+    ("دکتری عمومی", 1.51, 1.23, 1.84, RED),
+    ("غیرساکن خوابگاه", 1.15, 1.11, 1.19, RED),
+    ("زن", 1.05, 0.99, 1.10, GRAY),
+    ("کارشناسی ارشد ناپیوسته", 1.04, 0.98, 1.10, GRAY),
+    ("مرد", 0.96, 0.92, 1.01, GRAY),
+    ("کارشناسی پیوسته", 0.95, 0.90, 1.00, GRAY),
+    ("روزانه", 0.94, 0.91, 0.98, GRAY),
+    ("شهریه‌پرداز", 0.86, 0.67, 1.09, GRAY),
+    ("ساکن خوابگاه", 0.60, 0.54, 0.65, BLUE),
+    ("پردیس البرز", 0.38, 0.16, 0.86, BLUE),
+]
 
-    ax.plot([0, 100], [0, 100], ls="--", lw=1.3, color="#9a9a9a", zorder=2)
-    ax.fill_between(xp, y, [xi for xi in xp], color=BLUE, alpha=0.12, zorder=1)
-    ax.plot(xp, y, lw=3.0, color=BLUE, zorder=3)
-
-    x0, y0 = 90, 100 * (0.9 ** p)  # ≈۷۶
-    ax.plot([x0, x0], [0, y0], ls=":", lw=1.4, color="#8a8a8a", zorder=2)
-    ax.plot([x0], [y0], marker="o", ms=8, color=RED, mec="white", mew=1.2, zorder=4)
-    ax.annotate(viz_fa.fa("۲۴٪"), xy=(x0, y0), xytext=(x0 - 27, y0 - 6),
-                fontsize=26, fontweight="bold", color=RED, ha="left", va="center")
-
-    ax.set_xlim(0, 100)
-    ax.set_ylim(0, 100)
-    ax.set_xticks([0, 50, 90, 100])
-    ax.set_xticklabels([fa_num(v, 0) for v in [0, 50, 90, 100]], fontsize=15)
-    ax.set_yticks([0, 50, 100])
-    ax.set_yticklabels([fa_num(v, 0) for v in [0, 50, 100]], fontsize=15)
-    ax.set_xlabel(viz_fa.fa("درصد دانشجویان (از کم‌ریسک‌ترین)"), fontsize=18)
-    ax.set_ylabel(viz_fa.fa("درصد هدررفت"), fontsize=18)
-    ax.tick_params(color=AXIS, labelcolor="#2a2a2a", length=3)
-    _style_axis(ax)
-    return fig
-
-
-# ---------------------------------------------------------------------------
-# نمودار ۲ — جنگلی چهارردیفه (غنی‌شدگی دهک بدترین)
-# ---------------------------------------------------------------------------
 
 def fig_enrichment():
-    # نقطه و CI: R5a_worst_decile.md (سکونت، مقطع/کارشناسی‌پیوسته به‌جای «دوره»ی مشابه، دوره)
-    rows = [
-        ("شبانه و نوبت دوم", 1.53, 1.40, 1.67),
-        ("غیرساکن", 1.15, 1.11, 1.19),
-        ("روزانه", 0.95, 0.90, 1.00),
-        ("ساکن خوابگاه", 0.59, 0.53, 0.64),
-    ]
+    fig = plt.figure(figsize=(W1, H1))
+    ax = fig.add_axes([0.46, 0.24, 0.50, 0.63])
 
-    fig = plt.figure(figsize=(W, H))
-    ax = fig.add_axes([0.47, 0.14, 0.49, 0.78])
-
-    ys = list(range(len(rows), 0, -1))
-    ax.axvline(1.0, color="#4a4a4a", ls="--", lw=1.3, zorder=1)
-    ax.text(1.0, len(rows) + 0.55, viz_fa.fa("سهم منصفانه"), fontsize=14,
+    n = len(ENRICHMENT_ROWS)
+    ys = list(range(n, 0, -1))
+    ax.axvline(1.0, color="#6a6a6a", ls="--", lw=1.4, zorder=1)
+    ax.text(1.0, n + 0.75, viz_fa.fa("سهم منصفانه"), fontsize=15,
              ha="center", va="bottom", color="#4a4a4a")
 
-    for y, (label, point, lo, hi) in zip(ys, rows):
-        color = RED if point > 1 else BLUE
-        ax.plot([lo, hi], [y, y], color=color, lw=2.2, zorder=2)
-        ax.plot([point], [y], marker="o", ms=9, color=color, zorder=3)
+    for y, (label, point, lo, hi, color) in zip(ys, ENRICHMENT_ROWS):
+        ax.plot([lo, hi], [y, y], color=color, lw=2.5, zorder=2, solid_capstyle="round")
+        ax.plot([point], [y], marker="o", ms=9.5, color=color, mec="white", mew=1.0, zorder=3)
 
-    ax.set_ylim(0.4, len(rows) + 0.9)
+    ax.set_ylim(0.25, n + 1.15)
     ax.set_yticks(ys)
-    ax.set_yticklabels([viz_fa.fa(r[0]) for r in rows], fontsize=15)
-    ax.set_xlim(0.35, 1.85)
+    ax.set_yticklabels([viz_fa.fa(r[0]) for r in ENRICHMENT_ROWS], fontsize=14.5)
+    ax.set_xlim(0.0, 2.0)
     ax.set_xticks([0.5, 1.0, 1.5])
-    ax.set_xticklabels([fa_num(v, 1) for v in [0.5, 1.0, 1.5]], fontsize=15)
-    ax.set_xlabel(viz_fa.fa("نسبت حضور در بدترین دهک"), fontsize=18)
-    ax.tick_params(color=AXIS, labelcolor="#2a2a2a", length=3)
+    ax.set_xticklabels([fa_num(v, 1) for v in [0.5, 1.0, 1.5]], fontsize=15.5)
+    ax.set_xlabel(viz_fa.fa("نسبت حضور (۱ = سهم منصفانه)"), fontsize=15, labelpad=6)
+    ax.tick_params(color=AXIS, labelcolor=TEXT, length=3)
+    ax.tick_params(axis="y", length=0)
     _style_axis(ax, left=False)
     return fig
 
 
 # ---------------------------------------------------------------------------
-# نمودار ۳ — میله‌ای افقی شش‌شهره
+# نمودار ۲ — تقویم، دو پنل در یک فایل (راست=قبل از تعطیلی، چپ=بازگشت پس از وقفه)
 # ---------------------------------------------------------------------------
 
-def fig_city():
-    cities = [
-        ("تهران", 8.7, True),
-        ("کرج", 7.0, False),
-        ("قم", 6.0, False),
-        ("پاکدشت", 4.2, False),
-        ("فومن", 3.1, False),
-        ("رضوانشهر", 3.1, False),
-    ]
+W2, H2 = 256 * MM, 72 * MM
 
-    fig = plt.figure(figsize=(W, H))
-    ax = fig.add_axes([0.30, 0.05, 0.62, 0.92])
+# پنل راست — باقیمانده‌ی ρ×۱۰۰ بر حسب «روز تا تعطیلی بعدی» (F19، منبع S10 run_holiday_profile)
+HOLIDAY_DAYS = [-5, -4, -3, -2, -1]
+HOLIDAY_VAL = [1.73, -0.19, 1.64, 1.09, 3.14]
+HOLIDAY_LO = [0.44, -0.84, 0.75, 0.14, 2.10]
+HOLIDAY_HI = [3.01, 0.46, 2.54, 2.04, 4.18]
 
-    ys = list(range(len(cities), 0, -1))
-    for y, (name, val, is_tehran) in zip(ys, cities):
-        color = RED if is_tehran else GRAY
-        ax.barh(y, val, color=color, height=0.62, zorder=2)
-        ax.text(val + 0.25, y, viz_fa.fa(f"{fa_num(val, 1)}٪"), fontsize=18,
-                 va="center", ha="left", color="#1a1a1a")
+# پنل چپ — شوک وزنی×۱۰۰ در روزهای بازگشت پس از شکاف سرویس ≥۴ روزه (F70، منبع r4_disruption q32_return_curve)
+RETURN_DAYS = [1, 2, 3, 4, 5]
+RETURN_VAL = [1.53, 2.39, 0.83, 2.01, 0.20]
+RETURN_LO = [0.30, 1.74, 0.17, 1.05, -0.83]
+RETURN_HI = [3.81, 3.16, 1.57, 3.17, 1.45]
 
-    ax.set_ylim(0.35, len(cities) + 0.65)
-    ax.set_yticks(ys)
-    ax.set_yticklabels([viz_fa.fa(c[0]) for c in cities], fontsize=18)
-    ax.set_xlim(0, 11)
-    ax.get_xaxis().set_visible(False)
-    ax.spines["bottom"].set_visible(False)
-    _style_axis(ax, left=False, bottom=False)
-    return fig
+YMIN, YMAX = -1.5, 5.0
 
 
-# ---------------------------------------------------------------------------
-# نمودار ۴ — تقویم، دو پنل کنار هم (راست=قبل از تعطیلی، چپ=بعد از وقفه)
-# ---------------------------------------------------------------------------
+def _panel(ax, xs, vals, los, his, index_i, tick_labels, title):
+    x = np.arange(len(xs))
+    ax.axhline(0, color="#8a8a8a", ls="--", lw=1.2, zorder=1)
+    ax.plot(x, vals, "-", color="#a8a8a8", lw=1.3, zorder=2)
+    for i in range(len(xs)):
+        is_idx = i == index_i
+        color = RED if is_idx else GRAY
+        ms = 11 if is_idx else 7
+        yerr = [[vals[i] - los[i]], [his[i] - vals[i]]]
+        ax.errorbar(x[i], vals[i], yerr=yerr, fmt="o", ms=ms, color=color,
+                    ecolor=color, elinewidth=1.6, capsize=4, capthick=1.6, zorder=3)
+    ax.annotate(fa_num(vals[index_i], 1, sign=True), xy=(x[index_i], his[index_i]),
+                xytext=(0, 6), textcoords="offset points", ha="center",
+                fontsize=15, fontweight="bold", color=RED)
+    ax.set_xlim(-0.65, len(xs) - 0.35)
+    ax.set_xticks(x)
+    ax.set_xticklabels(tick_labels, fontsize=16)
+    ax.set_ylim(YMIN, YMAX)
+    ax.set_yticks([0, 2, 4])
+    ax.set_title(viz_fa.fa(title), fontsize=19, fontweight="bold", pad=10)
+    ax.tick_params(color=AXIS, labelcolor=TEXT, length=3)
+
 
 def fig_calendar():
-    fig = plt.figure(figsize=(W, H))
+    fig = plt.figure(figsize=(W2, H2))
 
-    gap = 7 * MM
-    panel_w = (W - gap) / 2
-    left_frac = panel_w / W
-    gap_frac = gap / W
-    margin = 0.04 * left_frac  # حاشیه‌ی کوچک هر پنل تا برچسب/میله به لبه‌ی شکل نچسبد
+    gap = 8 * MM
+    panel_w = (W2 - gap) / 2
+    frac = panel_w / W2
+    gap_frac = gap / W2
+    margin = 0.04 * frac
+    left_axis_margin = 9 * MM / W2  # جای برچسب‌های عددی محور عمودی، که حالا هر دو پنل دارند
 
-    ax_b = fig.add_axes([margin, 0.20, left_frac - 2 * margin, 0.64])
-    ax_a = fig.add_axes([left_frac + gap_frac + margin, 0.20, left_frac - 2 * margin, 0.64])
+    ax_b = fig.add_axes([left_axis_margin, 0.20, frac - left_axis_margin - margin, 0.62])  # چپ: بعد از وقفه
+    ax_a = fig.add_axes([frac + gap_frac + margin, 0.20, frac - 2 * margin, 0.62])          # راست: قبل از تعطیلی
 
-    ymax = 4.0
-
-    # پنل ۴الف — قبل از تعطیلی (برچسب دوخطی چون پنل ۵۸mm برای دو عبارت کنار هم تنگ است)
-    a_labels = ["روز\nعادی", "روز قبل\nتعطیلی"]
-    a_vals = [0.0, 3.1]
-    a_colors = [GRAY, RED]
-    ax_a.bar([0, 1], a_vals, color=a_colors, width=0.55, zorder=2)
-    ax_a.text(1, 3.1 + 0.22, viz_fa.fa(f"+{fa_num(3.1,1)} واحد درصد"), fontsize=13,
-               fontweight="bold", color=RED, ha="center", va="bottom")
-    ax_a.set_xlim(-0.65, 1.65)
-    ax_a.set_xticks([0, 1])
-    ax_a.set_xticklabels([viz_fa.fa(t) for t in a_labels], fontsize=12)
-    ax_a.set_ylim(0, ymax)
-    ax_a.set_yticks([0, 1, 2, 3, 4])
-    ax_a.set_yticklabels([fa_num(v, 0) for v in [0, 1, 2, 3, 4]], fontsize=14)
-    ax_a.set_ylabel(viz_fa.fa("واحد درصد"), fontsize=15)
-    ax_a.set_title(viz_fa.fa("قبل از تعطیلی"), fontsize=16, fontweight="bold", pad=8)
-    ax_a.tick_params(color=AXIS, labelcolor="#2a2a2a", length=3)
+    _panel(ax_a, HOLIDAY_DAYS, HOLIDAY_VAL, HOLIDAY_LO, HOLIDAY_HI, index_i=4,
+           tick_labels=[fa_num(d, 0) for d in HOLIDAY_DAYS], title="قبل از تعطیلی")
+    ax_a.set_yticklabels([fa_num(v, 0) for v in [0, 2, 4]], fontsize=16)
+    ax_a.set_ylabel(viz_fa.fa("واحد درصد"), fontsize=17)
     _style_axis(ax_a)
 
-    # پنل ۴ب — چهار روز اول بازگشت
-    b_vals = [1.5, 2.4, 0.8, 2.0, 0.2]
-    b_colors = [GRAY, RED, GRAY, GRAY, GRAY]
-    xs = list(range(5))
-    ax_b.bar(xs, b_vals, color=b_colors, width=0.6, zorder=2)
-    ax_b.axhline(0, color="#9a9a9a", lw=1.1, zorder=1)
-    ax_b.text(4.75, 0.12, viz_fa.fa("روزهای عادی"), fontsize=13, color="#6a6a6a",
-               ha="right", va="bottom")
-    ax_b.set_xlim(-0.65, 4.65)
-    ax_b.set_xticks(xs)
-    ax_b.set_xticklabels([fa_num(v, 0) for v in [1, 2, 3, 4, 5]], fontsize=14)
-    ax_b.set_ylim(0, ymax)
-    ax_b.set_yticks([0, 1, 2, 3, 4])
-    ax_b.set_yticklabels([])
-    ax_b.set_title(viz_fa.fa("بعد از وقفه"), fontsize=16, fontweight="bold", pad=8)
-    ax_b.tick_params(color=AXIS, labelcolor="#2a2a2a", length=3)
-    _style_axis(ax_b, left=False)
+    _panel(ax_b, RETURN_DAYS, RETURN_VAL, RETURN_LO, RETURN_HI, index_i=1,
+           tick_labels=[fa_num(d, 0) for d in RETURN_DAYS], title="بعد از وقفه")
+    ax_b.set_yticklabels([fa_num(v, 0) for v in [0, 2, 4]], fontsize=16)
+    ax_b.text(1.5, -0.20, viz_fa.fa("روزهای عادی"), fontsize=13,
+              color="#6a6a6a", ha="center", va="top")
+    _style_axis(ax_b)
 
     return fig
 
 
 FIGURES = {
-    "poster_res_lorenz": fig_lorenz,
     "poster_res_enrichment": fig_enrichment,
-    "poster_res_city": fig_city,
     "poster_res_calendar": fig_calendar,
 }
 
@@ -233,6 +207,14 @@ def main() -> None:
             fig.savefig(out_path, dpi=dpi, facecolor="white")
             print(out_path)
         plt.close(fig)
+
+    stale = ["poster_res_lorenz", "poster_res_city"]
+    for name in stale:
+        for suffix in (".pdf", ".png"):
+            p = OUT_DIR / f"{name}{suffix}"
+            if p.exists():
+                p.unlink()
+                print(f"removed {p}")
 
 
 if __name__ == "__main__":
