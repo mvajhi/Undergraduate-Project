@@ -585,6 +585,98 @@ details.acc .acc-body { padding: 16px; font-size: 14.5px; line-height: 1.85; col
 .ld-v b { font-size: 18px; font-weight: 700; }
 .ld-v span { display: block; font-size: 12.5px; color: var(--ink-3); }
 
+/* ============================================================================
+   شکل‌های ارائه، بزرگ‌نمایی، و اجزای بخش اقتصاد
+   ========================================================================== */
+
+.figs { margin-block-start: 16px; }
+.fig-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.fig-grid.one { grid-template-columns: 1fr; }
+
+.fig {
+  margin: 0; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column;
+}
+.fig-img {
+  border: 0; padding: 0; margin: 0; background: #fff; cursor: zoom-in;
+  display: block; width: 100%; line-height: 0;
+}
+.fig-img img { width: 100%; height: auto; display: block; }
+/* شکل‌ها زمینه‌ی سفید دارند؛ در تم تیره یک قاب روشن زیرشان می‌ماند تا نخوانا نشوند */
+:root[data-theme="dark"] .fig-img { background: #f4f3ef; }
+.fig figcaption { padding: 12px 15px 14px; font-size: 13.5px; line-height: 1.75; }
+.fig figcaption b { display: block; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.fig figcaption span { display: block; color: var(--ink-2); margin-block-start: 3px; }
+/* ویژگی‌خواصِ `.fig figcaption span` بر `.src` غالب است، پس کلید «شواهد» را
+   اینجا با همان ویژگی‌خواص دوباره اعمال می‌کنیم. */
+.fig figcaption .src { display: none; margin-block-start: 8px; }
+body.show-src .fig figcaption .src { display: block; }
+
+details.acc.fig-fold { margin-block-start: 14px; }
+details.acc.fig-fold > summary { font-size: 14px; color: var(--ink-2); }
+
+.lightbox {
+  position: fixed; inset: 0; z-index: 200; display: none;
+  background: rgba(10,14,18,.92); padding: 24px; cursor: zoom-out;
+  flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+}
+.lightbox.on { display: flex; }
+.lightbox img {
+  max-width: 96vw; max-height: 84vh; border-radius: 10px; background: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.lightbox .lb-cap { color: #e9eeec; font-size: 15px; text-align: center; max-width: 70ch; }
+
+/* --- میله‌ی انباشته‌ی سه‌گانه‌ی هدررفت ----------------------------------- */
+.stack {
+  display: flex; height: 64px; border-radius: var(--r-sm); overflow: hidden;
+  margin-block-start: 14px; border: 1px solid var(--line);
+}
+.stack-seg {
+  display: grid; place-content: center; text-align: center; color: #fff;
+  min-width: 0; padding-inline: 6px;
+}
+.stack-seg.save  { background: var(--save); }
+.stack-seg.short { background: var(--short); }
+:root[data-theme="dark"] .stack-seg { color: #0b1114; }
+.stack-seg b { font-size: 20px; font-weight: 700; line-height: 1.2; }
+.stack-seg span { font-size: 12px; opacity: .9; }
+.stack-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 18px; margin-block-start: 11px;
+  font-size: 13px; color: var(--ink-2);
+}
+.stack-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.stack-legend i { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+
+/* --- دوراهی دو ستونه ------------------------------------------------------ */
+.duo { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-block-start: 14px; }
+@media (max-width: 700px) { .duo { grid-template-columns: 1fr; } }
+.duo-side {
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 15px 16px; background: var(--surface-2);
+}
+.duo-side.bad  { border-inline-start: 3px solid var(--amber); }
+.duo-side.warn { border-inline-start: 3px solid var(--short); }
+.duo-h { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.duo-n { font-size: 38px; font-weight: 700; line-height: 1.2; margin-block-start: 4px; }
+.duo-s { font-size: 12.5px; color: var(--ink-3); }
+.duo-r {
+  font-size: 13.5px; line-height: 1.8; margin-block-start: 10px;
+  padding-block-start: 10px; border-block-start: 1px dashed var(--line-2); color: var(--ink-2);
+}
+.duo-r b { color: var(--ink); font-weight: 600; }
+
+/* --- کارت سلف نمونه ------------------------------------------------------- */
+.spot { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-block-start: 14px; }
+.spot > div {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--r-sm); padding: 11px 13px;
+}
+.spot > div.hi { background: var(--save-soft); border-color: var(--save); }
+.spot b { display: block; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.spot > div.hi b { color: var(--save); }
+
 /* --------------------------------------------------------------------- چاپ */
 
 @media print {
@@ -593,9 +685,14 @@ details.acc .acc-body { padding: 16px; font-size: 14.5px; line-height: 1.85; col
   body { font-size: 11pt; background: #fff; }
   main { max-width: none; padding: 0; }
   .sec { break-inside: auto; padding-block: 14px; }
-  .sec-head, .card, .kpi, .fact, .ld-row, .bar-row, .dv-row, details.acc {
+  .sec-head, .card, .kpi, .fact, .ld-row, .bar-row, .dv-row, details.acc,
+  .fig, .duo-side, .stack {
     break-inside: avoid;
   }
+  .lightbox { display: none !important; }
+  .fig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .fig-img { cursor: default; }
+  .fig-img img { max-height: 9cm; object-fit: contain; }
   .card, .kpi, .fact { box-shadow: none; }
 
   /* قلاب روی کاغذ سفید چاپ می‌شود، پس رنگ‌های روی‌زمینه‌ی تیره باید برگردند */

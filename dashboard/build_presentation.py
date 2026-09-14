@@ -320,6 +320,233 @@ MECHANISM = {
 }
 
 
+# ------------------------------------------------------- نمودارهای ارائه
+
+# شکل‌های ۳۰ اسلاید اول `presentation/main.pdf` (به‌علاوه‌ی دو شکل بخش ۶). مسیرها نسبت به
+# `reports/figures/` نوشته می‌شوند و داشبورد از طریق symlink `dashboard/figures` به آن‌ها
+# می‌رسد — شکلی کپی نمی‌شود. `build()` وجود تک‌تک فایل‌ها را بررسی می‌کند و اگر یکی نبود
+# با خطا متوقف می‌شود، تا صفحه هرگز قاب خالی نشان ندهد.
+# ستون `claim` عنوان گزاره‌ای شکل است، نه برچسب — همان قاعده‌ی «بینش، نه توصیف».
+
+FIGURES = [
+    # --- مسئله و مبانی نظری (اسلاید ۲ تا ۹)
+    {"slot": "problem-a", "file": "slides/slides_01_waffle.png", "fold": True,
+     "title": "از هر ۱۰۰ پرس، ۸ پرس دور ریخته می‌شود",
+     "claim": "همان نمودار اسلاید اول ارائه — نرخ وزنی حجم، نه میانگین ساده."},
+    {"slot": "problem-a", "file": "slides/slides_03_asymmetric_cost.png",
+     "title": "هزینه‌ی دو خطا برابر نیست",
+     "claim": "منحنی زیان حول نقطه‌ی بهینه نامتقارن است؛ به همین دلیل پاسخ بهینه میانگین نیست."},
+    {"slot": "problem-b", "file": "slides/slides_05_pinball.png",
+     "title": "تابع زیان پین‌بال",
+     "claim": "وزن τ به کم‌زدن و وزن ۱−τ به زیادزدن — یادگیری مدل و حل مسئله‌ی روزنامه‌فروش یک کارند."},
+    {"slot": "problem-b", "file": "slides/slides_06_tau_mapping.png",
+     "title": "نگاشت نسبت هزینه به چندک هدف",
+     "claim": "تنها ورودی سیاستی پروژه همین نسبت است؛ بقیه‌اش حساب است."},
+    {"slot": "problem-c", "file": "slides/slides_07_timeline.png",
+     "title": "خط زمانی قاعده‌ی برش اطلاعاتی",
+     "claim": "دو لحظه‌ی تصمیم متفاوت در یک روز — و به همین دلیل «هر روز گذشته مجاز است» کافی نیست."},
+    {"slot": "problem-c", "file": "4.8_variance_vs_res.png",
+     "title": "نوسان واقعی تا ۱۵.۶ برابر فرض دوجمله‌ای",
+     "claim": "فرمول بسته‌ی نیوزوندور اینجا کار نمی‌کند؛ چندک باید مستقیماً از داده آموخته شود."},
+
+    # --- داده (پوشش زمانی)
+    {"slot": "data", "file": "slides/slides_21_calendar_coverage.png",
+     "title": "پوشش تقویمی داده",
+     "claim": "پنج ماه از یک سال تحصیلی — تابستان و نوروز هرگز دیده نشده‌اند."},
+
+    # --- آنچه داده گفت (اسلاید ۱۰ تا ۱۶)
+    {"slot": "insight-mech", "file": "slides/slides_08_dinner_given_lunch.png",
+     "title": "غیبت شام، به‌شرط غیبت ناهار همان روز",
+     "claim": "۳.۱۸ برابر — سازوکار، غیبت از دانشگاه است نه ترجیح غذایی."},
+    {"slot": "insight-var", "file": "slides/slides_09_variance_donut.png",
+     "title": "تجزیه‌ی واریانس نرخ سلول",
+     "claim": "سهم «چه کسانی رزرو کرده‌اند» تقریباً هیچ است."},
+    {"slot": "insight-var", "file": "report_14_day_shock_fa.png",
+     "title": "سری شوک روزانه، به تفکیک سلف",
+     "claim": "خط‌ها با هم بالا و پایین می‌روند — شوک سراسری دانشگاه است، نه محلی."},
+    {"slot": "insight-worst", "file": "round5/R5_q43_volume_vs_rate.png",
+     "title": "حجم رزرو در برابر نرخ عدم‌دریافت",
+     "claim": "نرخ بالا عمدتاً نشانه‌ی کم‌حجمی است، نه نشانه‌ی هدررفت بزرگ."},
+    {"slot": "insight-target", "file": "report_12b_lorenz_targeting_fa.png",
+     "title": "منحنی پوشش هدررفت به‌ازای استراتژی هدف‌گیری",
+     "claim": "خط جمعیت‌شناسی زیر قطر تصادفی می‌افتد."},
+    {"slot": "insight-cal", "file": "report_07_pre_holiday_fa.png",
+     "title": "اثر روز پیش از تعطیلی",
+     "claim": "بزرگ‌ترین اثر تقویمی، و ماه‌ها پیش معلوم است."},
+    {"slot": "insight-cal", "file": "round4/r4_2_return_curve_fa.png",
+     "title": "منحنی بازگشت پس از وقفه‌ی سرویس",
+     "claim": "بدترین روز، روز دوم است نه روز اول."},
+    {"slot": "insight-cal", "file": "report_02_city_effect_fa.png",
+     "title": "نرخ عدم‌دریافت به تفکیک شهر",
+     "claim": "پردیس‌های خارج تهران تفکیک تقریباً کامل دارند — ولی ۹۰٪ حجم در تهران است."},
+
+    # --- مدل (اسلاید ۱۷ تا ۲۳)
+    {"slot": "model-proto", "file": "slides/slides_14a_eval_windows.png",
+     "title": "پنجره‌های اعتبارسنجی و پنجره‌ی آزمون",
+     "claim": "پنجره‌ی آزمون یک‌بار باز شد، بعد از قفل‌شدن پروتکل."},
+    {"slot": "model-proto", "file": "slides/slides_14c_baselines.png",
+     "title": "خط‌های پایه",
+     "claim": "هر مدل در برابر خط پایه‌ی B3 سنجیده می‌شود، نه در برابر صفر."},
+    {"slot": "model-funnel", "file": "slides/slides_14b_model_families.png",
+     "title": "سیزده خانواده‌ی مدل",
+     "claim": "هر خانواده حداقل یک نماینده تا مرحله‌ی آخر برد."},
+    {"slot": "model-funnel", "file": "slides/slides_15_funnel.png", "fold": True,
+     "title": "قیف انتخاب مدل",
+     "claim": "همان قیف اسلاید ارائه."},
+    {"slot": "model-table", "file": "slides/slides_23_top_models_table.png", "fold": True,
+     "title": "مدل‌های برتر",
+     "claim": "پنج مدلی که برد آماری معنادار داشتند."},
+    {"slot": "model-feat", "file": "phase9/9.1_perm_importance_fa.png", "fold": True,
+     "title": "اهمیت جایگشتی فیچرها",
+     "claim": "مدل همان ساختاری را یاد گرفته که تحلیل داده پیش‌بینی کرده بود."},
+
+    # --- ارزیابی
+    {"slot": "eval", "file": "phase8/8.8_reliability_fa.png", "fold": True,
+     "title": "نمودار قابلیت اطمینان",
+     "claim": "مدل نظام‌مند بیش از ادعای اسمی‌اش پوشش می‌دهد — پیش از ACI."},
+
+    # --- ارزش عملیاتی (اسلاید ۲۴ تا ۲۹)
+    {"slot": "value-curve", "file": "phase10/10.7_tau_tradeoff_fa.png", "fold": True,
+     "title": "منحنی معاوضه‌ی چندک",
+     "claim": "کاهش هدررفت سریع اشباع می‌شود، نرخ کمبود خطی بالا می‌رود."},
+    {"slot": "value-curve", "file": "phase10/10.7_tau_tradeoff_toman_fa.png",
+     "title": "همان منحنی، با ارزش تومانی",
+     "claim": "پس از چندک ۰.۲۰ هر واحد ریسک اضافه، پول کمتری برمی‌گرداند."},
+    {"slot": "value-curve", "file": "phase10/10.7_tau_tradeoff_unmet_fa.png",
+     "title": "کسر تقاضای برآورده‌نشده",
+     "claim": "مقیاس‌گذارِ نرخ کمبود: حتی در جسورانه‌ترین نقطه زیر نیم درصد است."},
+    {"slot": "value-ladder", "file": "slides/slides_17_ladder.png", "fold": True,
+     "title": "نردبان: از یک وعده تا یک سال تحصیلی",
+     "claim": "مهم‌ترین نمودار عددی ارائه."},
+    {"slot": "value-waste", "file": "slides/slides_18_waste_rate.png",
+     "title": "چند درصد از هدررفت حذف می‌شود",
+     "claim": "۲۹٪ باقی‌مانده بهای بیمه‌ی نخوردن کمبود است، نه ضعف مدل."},
+    {"slot": "value-trade", "file": "slides/slides_19_tradeoff_bars.png",
+     "title": "دو طرف معامله، در یک مقیاس",
+     "claim": "نوار کمبود در برابر نوار نجات — نسبت را پیش از خواندن هر عددی می‌شود دید."},
+    {"slot": "value-rest", "file": "slides/slides_20_restaurant_example.png",
+     "title": "یک سلف مشخص: فنی امیرآباد",
+     "claim": "بزرگ‌ترین سلف دانشگاه، جایی که بیشترین پول در آن است."},
+
+    # --- گام بعد
+    {"slot": "next", "file": "slides/slides_22_pilot_pairs.png",
+     "title": "جفت‌های همتاشده‌ی پایلوت",
+     "claim": "دو جفت از دو خوشه‌ی پایدار، چهار هفته، ۷۲ مشاهده در هر بازو."},
+]
+
+
+# --------------------------------------------------- اعداد اقتصادی ارائه
+
+# ورودی‌های نمونه‌ی «یک سلف مشخص» از اسلاید ۲۸ ارائه؛ عدد پخت و ارزش تومانی‌اش پایین‌تر
+# از همین دو ورودی مشتق می‌شود، نه از حافظه.
+SPOTLIGHT = {
+    "name": "فنی امیرآباد",
+    "meanRes": 756,
+    "rhoHat": 0.062,
+    "note": "بزرگ‌ترین سلف دانشگاه — ۳۹ برابر کوچک‌ترین سلف",
+    "caveat": "در پنجره‌ی آزمون، بیشترین نرخ کمبود کل دانشگاه هم مال همین سلف بود (۴۰٪). "
+              "سلف‌های پرحجم هم‌زمان بهترین pinball و بیشترین ریسک کمبود را دارند — "
+              "پایلوت باید از همین‌جا شروع شود، ولی با پایش دقیق‌تر.",
+    "src": "presentation/sections/section5.tex · reports/phase8/8.3_by_RestaurantName.csv",
+}
+
+# دوراهی تصمیم اسلاید ۶، برای ملموس‌کردن نامتقارنی پیش از هر عدد بزرگی.
+DILEMMA = {
+    "res": 200, "absent": 15, "cookLow": 185, "demand": 190,
+    "src": "presentation/sections/section2.tex · doc/project-definition.md بند ۱-۱",
+}
+
+
+def cook_examples() -> dict:
+    """جدول «مثال کاربردی» بند ۱۰.۱ — نمونه‌های واقعی پنجره‌ی آزمون.
+
+    ستون‌ها: تاریخ | سلف | وعده | Res | Recv واقعی | ρ̂ (پیش‌بینی) | پخت پیشنهادی | کمبود رخ داد؟
+    صرفه‌جویی هر ردیف نسبت به رفتار امروزِ سلف (پخت = رزرو) حساب می‌شود.
+    """
+    src = REPORTS / "phase10" / "10.1_cook_quantity.md"
+    rows = []
+    for row in table_rows(src):
+        if "سلف" not in row or "پخت پیشنهادی" not in row:
+            continue
+        res = num(to_en_digits(row["Res"]))
+        cook = num(to_en_digits(strip_md(row["پخت پیشنهادی"])))
+        recv = num(to_en_digits(row["Recv واقعی"]))
+        if res is None or cook is None:
+            continue
+        rows.append({
+            "restaurant": strip_md(row["سلف"]),
+            "meal": strip_md(row["وعده"]),
+            "res": res, "recv": recv, "cook": cook,
+            "rhoHat": num(to_en_digits(row.get("ρ̂ (پیش‌بینی)", ""))),
+            "savedPortions": res - cook,          # نسبت به پخت روی رزرو
+            "gap": cook - recv,                   # مثبت: مازاد باقی‌مانده · منفی: کمبود
+        })
+    if not rows:
+        raise SystemExit(f"جدول مثال‌های بند ۱۰.۱ در {rel(src)} خوانده نشد")
+    return {"rows": rows, "src": rel(src)}
+
+
+def economics(headline: dict, basis: dict, op: dict, scen: list[dict]) -> dict:
+    """همه‌ی اعداد بخش اقتصاد، هرکدام با یک فرمول صریح از اعداد فاز ۱۰.
+
+    هیچ عددی اینجا تایپ نمی‌شود جز `cuOverCo` که خودش یک *فرض* است و در صفحه هم
+    به‌عنوان فرض اعلام می‌شود (ردیف ۳۴ decision_log: برآورد ذی‌نفع).
+    """
+    price = basis["unitPriceToman"]
+    days = basis["servingDaysPerYear"]
+    cu_over_co = 4                                   # برآورد ذی‌نفع، ردیف ۳۴ decision_log
+
+    residual_portions = headline["annualWastePortions"] - op["annualPortions"]
+    shortage_annual = op["shortagePerDay"] * days
+    shortage_cost = shortage_annual * cu_over_co * price
+
+    return {
+        "unitPriceToman": price,
+        "servingDays": days,
+        "cuOverCo": cu_over_co,
+
+        # سه‌گانه‌ی هدررفت
+        "wastePortions": headline["annualWastePortions"],
+        "wasteToman": headline["annualWasteToman"],
+        "savedPortions": op["annualPortions"],
+        "savedToman": op["annualToman"],
+        "savedTomanLo": op["annualTomanLo"],
+        "savedTomanHi": op["annualTomanHi"],
+        "residualPortions": residual_portions,
+        "residualToman": residual_portions * price,
+        "wasteReduction": headline["wasteReduction"],
+
+        # نرخ عدم‌دریافت مؤثر، قبل و بعد
+        "rhoBefore": headline["rhoWeighted"],
+        "rhoAfter": headline["rhoWeighted"] * (1 - headline["wasteReduction"]),
+
+        # طرف دیگر معامله
+        "shortageRate": op["shortageRate"],
+        "shortageAnnualPortions": shortage_annual,
+        "shortagePerDay": op["shortagePerDay"],
+        "shortagePerMeal": op["shortagePerMeal"],
+        "shortageMedianPerMeal": op["medianShortagePerMeal"],
+        "shortageWorstMeal": op["worstMeal"],
+        "meanDepth": op["meanDepth"],
+        "fillRate": op["fillRate"],
+        "tradeRatio": headline["tradeRatio"],
+
+        # سود خالص — یک مشتق با فرض صریح، نه عددی از مخزن
+        "shortageCostToman": shortage_cost,
+        "netToman": op["annualToman"] - shortage_cost,
+
+        # روزانه، با بازه
+        "savedPerDay": op["annualPortions"] / days,
+        "savedPerDayLo": op["annualTomanLo"] / price / days,
+        "savedPerDayHi": op["annualTomanHi"] / price / days,
+        "wastePerDay": headline["annualWastePortions"] / days,
+
+        # چرا مبنا محافظه‌کارانه است
+        "rowsPerDayFolds": basis["rowsPerDay"],
+        "rowsPerDayAll": 7579 / 142,      # کل داده: n سلول ÷ n روز (data_manifest)
+    }
+
+
 # ---------------------------------------------------------------- جمع‌آوری
 
 def build() -> dict:
@@ -338,6 +565,14 @@ def build() -> dict:
     p_meal = REPORTS / "phase8" / "8.3_by_Meal.csv"
     p_quart = REPORTS / "phase8" / "8.3_by_res_quartile.csv"
     p_back = REPORTS / "phase8" / "8.5_tradeoff_table.csv"
+
+    figures = []
+    for f in FIGURES:
+        path = REPORTS / "figures" / f["file"]
+        if not path.exists():
+            raise SystemExit(f"شکل ارائه پیدا نشد: {rel(path)}")
+        figures.append({**f, "fold": f.get("fold", False),
+                        "src": rel(path), "url": "../figures/" + f["file"]})
 
     scen_raw = read_csv(p_scen)
     basis = basis_from_scenarios(scen_raw)
@@ -370,6 +605,7 @@ def build() -> dict:
         "shortageRate": num(r["shortage_rate"]),
         "shortagePerDay": num(r["shortage_portions_per_day"]),
         "shortagePerMeal": num(r["shortage_portions_per_meal"]),
+        "medianShortagePerMeal": num(r["median_shortage_portions_per_meal"]),
         "worstMeal": num(r["worst_meal_shortage_portions"]),
         "meanDepth": num(r["mean_shortage_depth"]),
         "unmetDemandRate": num(r["unmet_demand_rate"]),
@@ -562,6 +798,14 @@ def build() -> dict:
         "targeting": TARGETING,
         "calendar": CALENDAR,
         "mechanism": MECHANISM,
+        "economics": economics(headline, basis, op, scenarios),
+        "examples": cook_examples(),
+        "spotlight": {**SPOTLIGHT,
+                      "cook": round(SPOTLIGHT["meanRes"] * (1 - SPOTLIGHT["rhoHat"])),
+                      "savedPortions": SPOTLIGHT["meanRes"]
+                          - round(SPOTLIGHT["meanRes"] * (1 - SPOTLIGHT["rhoHat"]))},
+        "dilemma": DILEMMA,
+        "figures": figures,
         "worst": WORST,
         "scale": SCALE,
         "coverage": COVERAGE,

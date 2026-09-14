@@ -98,6 +98,9 @@
     </div>
   </div>
 
+  <div class="figs" data-slot="problem-a"></div>
+  <div class="figs" data-slot="problem-b"></div>
+
   <div class="card" style="margin-block-start:16px">
     <h3>قاعده‌ی برش اطلاعاتی — سخت‌ترین قید پروژه</h3>
     <p class="card-note">
@@ -121,6 +124,8 @@
     </div>
     <div class="src">doc/project-definition.md بند ۴-۲ · doc/leakage_audit.md · doc/decision_log.md ردیف ۹</div>
   </div>
+
+  <div class="figs" data-slot="problem-c"></div>
 </section>
 
 <!-- ───────────────────────────────────────────────────────── داده ── -->
@@ -172,6 +177,8 @@
       <div class="src">reports/phase10/10.4_annual_savings.md · doc/data_manifest.md</div>
     </div>
   </div>
+
+  <div class="figs" data-slot="data"></div>
 </section>
 
 <!-- ────────────────────────────────────────────── یافته‌های داده ── -->
@@ -193,7 +200,7 @@
         اگر کسی ناهار را نگیرد، احتمال اینکه شام همان روز را هم نگیرد
         <b id="mech-ratio">—</b> برابر می‌شود. این عدد با هیچ توضیح غذایی سازگار نیست.
       </p>
-      <div id="mech-bars"></div>
+      <div class="figs" data-slot="insight-mech"></div>
       <div class="takeaway">
         تغییر منو ابزار کاهش هدررفت نیست. متغیر پنهان، <b>حضور یا نبودِ فرد در دانشگاه</b> است —
         و همین توضیح می‌دهد چرا شوک روزانه بر همه چیز غالب است.
@@ -207,7 +214,7 @@
         واریانس نرخ هر سلول به سه سهم شکسته شد. سهم «چه کسانی رزرو کرده‌اند» تقریباً
         هیچ است؛ تقریباً همه‌چیز از خودِ <b>روز</b> می‌آید.
       </p>
-      <div id="variance-chart"></div>
+      <div class="figs" data-slot="insight-var"></div>
       <div class="takeaway">
         اولویت اول مدل‌سازی شد <b>عامل روزِ دانشگاه</b>، نه فیچر فردی. این تصمیم مستقیماً
         از همین عدد آمد و بعداً با شکست مدل سطح‌فرد تأیید شد.
@@ -223,6 +230,7 @@
         است و پرحجم.
       </p>
       <div id="worst-lists"></div>
+      <div class="figs" data-slot="insight-worst"></div>
       <div class="takeaway">
         شاخص پایش مدیریت باید <b>پرس</b> باشد نه درصد. و امضای تقویمیِ فهرست اول مستقل
         نیست — کاملاً از راه کم‌حجمی می‌آید (آزمون جایگشت همتاشده، <bdi>p=۰.۸۱۳</bdi>).
@@ -236,6 +244,7 @@
         اگر بخواهیم ۱۰٪ افراد را هدف بگیریم، هر استراتژی چقدر از هدررفت را پوشش می‌دهد؟
       </p>
       <div id="targeting-bars"></div>
+      <div class="figs" data-slot="insight-target"></div>
       <div class="takeaway">
         سیاست تنبیهی بر پایه‌ی مقطع، دانشکده یا جنسیت <b>مبنای داده‌ای ندارد</b> —
         جمعیت‌شناسی افراد پرنرخ را پیدا می‌کند، و پرنرخ‌ها کم‌رزروند.
@@ -252,6 +261,7 @@
       قابل استفاده است.
     </p>
     <div id="calendar-bars"></div>
+    <div class="figs" data-slot="insight-cal"></div>
     <div class="takeaway">
       در پنجره‌ی بازگشت پس از وقفه، بدترین روز <b>روز دوم</b> است نه روز اول — جزئیاتی که
       بدون تحلیل روزبه‌روز دیده نمی‌شد.
@@ -307,6 +317,9 @@
     </div>
   </div>
 
+  <div class="figs" data-slot="model-funnel"></div>
+  <div class="figs" data-slot="model-proto"></div>
+
   <div class="card" style="margin-block-start:16px">
     <h3>جدول مقایسه‌ی نهایی — ۲۵ مدل با بودجه‌ی کامل</h3>
     <p class="card-note">
@@ -323,6 +336,8 @@
     </div>
     <div class="src" id="model-src"></div>
   </div>
+
+  <div class="figs" data-slot="model-table"></div>
 
   <div class="grid g-wide" style="margin-block-start:16px">
     <div class="card">
@@ -349,6 +364,8 @@
       <div class="src">doc/findings_register.md</div>
     </div>
   </div>
+
+  <div class="figs" data-slot="model-feat"></div>
 </section>
 
 <!-- ─────────────────────────────────────────────────── ارزیابی ── -->
@@ -400,12 +417,140 @@
       <div class="src" id="slice-src"></div>
     </div>
   </div>
+
+  <div class="figs" data-slot="eval"></div>
 </section>
 
 <!-- ──────────────────────────────────────────────────── ارزش ── -->
 <section class="sec" id="value">
   <div class="sec-head">
-    <div class="eyebrow">۶ · ارزش عملیاتی</div>
+    <div class="eyebrow">۶ · اقتصاد تصمیم</div>
+    <h2>یک تغییر تصمیم، ۶۲ میلیارد تومان در سال</h2>
+    <p class="claim">
+      پخت روی چندک به‌جای پخت روی رزرو. نه سیستم جدید، نه تجهیزات جدید، نه تغییر منو —
+      فقط <b>یک عدد متفاوت به آشپزخانه</b>. این بخش نشان می‌دهد آن عدد چقدر می‌ارزد، چه
+      چیزی در ازایش داده می‌شود، و چه چیزی همچنان باقی می‌ماند.
+    </p>
+  </div>
+
+  <div class="kpis" id="econ-kpis"></div>
+
+  <div class="grid g-wide" style="margin-block-start:16px">
+    <div class="card">
+      <h3>هدررفت سالانه، به سه تکه</h3>
+      <p class="card-note">
+        کل هدررفت امروز، آن بخشی که مدل برمی‌گرداند، و آن بخشی که عمداً باقی می‌ماند.
+      </p>
+      <div id="econ-split"></div>
+      <div class="takeaway">
+        <b id="econ-residual-pct">—</b> باقی‌مانده بهای بیمه‌ی نخوردن کمبود است، نه ضعف مدل.
+        سقف تئوریک ۱۰۰٪ است و فاصله تا آن <b>عمداً</b> گذاشته شده.
+      </div>
+      <div class="src" id="econ-split-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>نرخ عدم‌دریافت مؤثر</h3>
+      <p class="card-note">
+        همان نرخ سرخط صفحه، این‌بار بعد از اعمال تصمیم پخت.
+      </p>
+      <div id="econ-rho"></div>
+      <div class="takeaway">
+        عددی که مدیریت سلف واقعاً می‌بیند از <b id="econ-rho-b">—</b> به
+        <b id="econ-rho-a">—</b> می‌رسد — بدون آنکه یک نفر هم از غذا محروم بماند
+        بیش از <b id="econ-unmet">—</b> تقاضا.
+      </div>
+      <div class="src" id="econ-rho-src"></div>
+    </div>
+  </div>
+
+  <div class="grid g-wide" style="margin-block-start:16px">
+    <div class="card">
+      <h3>طرف دیگر معامله: کمبود</h3>
+      <p class="card-note">
+        نرخ کمبود فقط <em>رخداد</em> را می‌شمارد. این جدول <em>اندازه</em> را نشان می‌دهد،
+        که همان چیزی است که به تجربه‌ی دانشجو می‌رسد.
+      </p>
+      <div class="tbl-wrap" id="econ-shortage-tbl"></div>
+      <div class="takeaway">
+        کمبودِ متوسط <b id="econ-depth">—</b> پرس در یک سلول است — یعنی چند نفر آخر صف،
+        نه یک وعده‌ی تعطیل‌شده.
+      </div>
+      <div class="src" id="econ-shortage-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>سود خالص، با فرض صریح</h3>
+      <p class="card-note">
+        اگر کمبود را هم قیمت‌گذاری کنیم، چه می‌ماند؟ این عدد در مخزن نیست —
+        <b>مشتق است</b> و فرضش اینجا نوشته شده.
+      </p>
+      <div id="econ-net"></div>
+      <div class="interp-note" id="econ-net-note">—</div>
+      <div class="takeaway">
+        حتی با قیمت‌گذاری کامل کمبود، بیش از <b id="econ-net-share">—</b> ارزش ناخالص
+        باقی می‌ماند.
+      </div>
+      <div class="src" id="econ-net-src"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-block-start:16px">
+    <h3>دوراهی، در مقیاس یک وعده</h3>
+    <p class="card-note">
+      پیش از هر عدد میلیاردی، همان تصمیم در ابعاد یک وعده‌ی واقعی:
+    </p>
+    <div id="econ-dilemma"></div>
+    <div class="takeaway">
+      این نامتقارنی است که کل پروژه دربارهٔ آن است: <b>هزینه‌ی مازاد بی‌صداست و در بودجه
+      مستهلک می‌شود، هزینه‌ی کمبود بلند و فوری است</b> — پس محافظه‌کاری سلف یک رفتار
+      کاملاً عقلانی است، تا وقتی کسی عدد بهینه را به او ندهد.
+    </div>
+    <div class="src" id="econ-dilemma-src"></div>
+  </div>
+
+  <div class="grid g-wide" style="margin-block-start:16px">
+    <div class="card">
+      <h3>یک سلف مشخص: <span id="spot-name">—</span></h3>
+      <div id="spot-body"></div>
+      <div class="takeaway" id="spot-caveat">—</div>
+      <div class="src" id="spot-src"></div>
+    </div>
+    <div class="card">
+      <h3>چرا این برآورد محافظه‌کارانه است</h3>
+      <p class="card-note">
+        تعمیم سالانه روی <b id="econ-rpd-f">—</b> ردیف در هر روز سرو بسته شده، در حالی که
+        کل داده <b id="econ-rpd-a">—</b> ردیف در روز دارد.
+      </p>
+      <div id="econ-basis"></div>
+      <div class="takeaway">
+        یعنی مبنای محاسبه حدود <b id="econ-basis-gap">—</b> کمتر از حجم واقعی داده است —
+        برآورد از پایین بسته شده، نه از بالا.
+      </div>
+      <div class="src" id="econ-basis-src"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-block-start:16px">
+    <h3>پنج نمونه‌ی واقعی از پنجره‌ی آزمون</h3>
+    <p class="card-note">
+      عدد پخت پیشنهادی مدل در برابر رفتار امروز سلف (پخت به‌اندازه‌ی رزرو)، روی
+      ردیف‌های واقعی — با نتیجه‌ی واقعی همان وعده.
+    </p>
+    <div class="tbl-wrap" id="examples-tbl"></div>
+    <div class="takeaway">
+      ردیف آخر عمداً اینجاست: <b>یک کمبود واقعی</b>. مدل معجزه نمی‌کند و قرار هم نیست
+      بکند؛ قرار است در بلندمدت معاوضه را به سود دانشگاه ببندد.
+    </div>
+    <div class="src" id="examples-src"></div>
+  </div>
+
+  <div class="figs" data-slot="value-waste"></div>
+  <div class="figs" data-slot="value-trade"></div>
+  <div class="figs" data-slot="value-rest"></div>
+
+  <div class="sec-head" style="margin-block-start:44px">
+    <div class="eyebrow">۶.۲ · اهرم سیاستی</div>
     <h2>چقدر ریسک کمبود می‌پذیرید؟</h2>
     <p class="claim">
       این تنها جای گزارش است که تصمیم دست مدل نیست. نسبت هزینه‌ی کمبود به مازاد یک
@@ -461,6 +606,8 @@
     <div class="src" id="scen-src"></div>
   </div>
 
+  <div class="figs" data-slot="value-curve"></div>
+
   <div class="card" style="margin-block-start:16px">
     <h3>از یک وعده تا یک سال</h3>
     <p class="card-note">همان عدد، در چهار مقیاس. مبنا در هر چهار پله یکی است.</p>
@@ -470,6 +617,8 @@
     </div>
     <div class="src" id="ladder-src"></div>
   </div>
+
+  <div class="figs" data-slot="value-ladder"></div>
 </section>
 
 <!-- ─────────────────────────────────────────────── محدودیت‌ها ── -->
@@ -534,6 +683,8 @@
       <div class="src">reports/models/ — کارت مدل، بند «شرایطی که مدل نباید استفاده شود»</div>
     </div>
   </div>
+
+  <div class="figs" data-slot="next"></div>
 </section>
 
 <!-- ───────────────────────────────────────────────── شواهد ── -->
@@ -574,6 +725,11 @@
 </section>
 
 </main>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="بزرگ‌نمایی نمودار">
+  <img alt="">
+  <div class="lb-cap"></div>
+</div>
 
 <script src="data.js"></script>
 <script src="app.js"></script>

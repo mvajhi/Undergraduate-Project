@@ -92,22 +92,6 @@ function lineChart(cfg) {
   return s;
 }
 
-/** دونات چندبخشی. parts: {label, value, color} — مجموع value باید ۱ باشد. */
-function donut(parts, centerTop, centerSub) {
-  const R = 34, r = 21, C = 50, TAU = Math.PI * 2;
-  let a0 = -Math.PI / 2, s = `<svg class="chart" viewBox="0 0 100 100" style="max-height:220px" role="img">`;
-  for (const p of parts) {
-    const a1 = a0 + p.value * TAU, big = p.value > .5 ? 1 : 0;
-    const pt = (rad, a) => [(C + rad * Math.cos(a)).toFixed(2), (C + rad * Math.sin(a)).toFixed(2)];
-    const [x0, y0] = pt(R, a0), [x1, y1] = pt(R, a1), [x2, y2] = pt(r, a1), [x3, y3] = pt(r, a0);
-    s += `<path d="M${x0},${y0} A${R},${R} 0 ${big} 1 ${x1},${y1} L${x2},${y2} A${r},${r} 0 ${big} 0 ${x3},${y3} Z" fill="${p.color}"><title>${p.label}: ${pct(p.value)}</title></path>`;
-    a0 = a1;
-  }
-  s += `<text x="50" y="49" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">${centerTop}</text>`;
-  s += `<text x="50" y="60" text-anchor="middle" font-size="5.4" fill="var(--ink-3)">${centerSub}</text>`;
-  return s + `</svg>`;
-}
-
 /** نوارهای واگرا حول خط پایه (صفر در وسط). */
 function diverging(items, fmt) {
   const m = Math.max(...items.map(i => Math.abs(i.value)));
@@ -200,25 +184,10 @@ function renderData() {
 /* ------------------------------------------------------------- ۳ · یافته‌ها */
 
 function renderInsights() {
-  /* سازوکار غیبت */
-  const mx = Math.max(...D.mechanism.rows.map(r => r.value));
+  /* سازوکار غیبت و تجزیه‌ی واریانس، هر دو با شکل خودِ ارائه نمایش داده می‌شوند
+     (جایگاه‌های insight-mech و insight-var)؛ اینجا فقط عدد و شاهدشان نوشته می‌شود. */
   set("#mech-ratio", n(D.mechanism.ratio, 2));
-  set("#mech-bars", bars(D.mechanism.rows.map((r, i) => ({
-    label: r.label, value: r.value, text: pct(r.value, 2), tone: i ? "mute" : "short",
-  })), { max: mx }));
-  set("#mech-src", `${D.mechanism.src || ""} ${factSrc(D.mechanism.factId)}`);
-
-  /* تجزیه‌ی واریانس */
-  const colors = { hero: "var(--indigo)", mid: "var(--amber)", low: "var(--line-2)" };
-  const P = D.variance.parts;
-  set("#variance-chart",
-    `<div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center">
-      <div style="width:190px">${donut(P.map(p => ({ ...p, color: colors[p.tone] })), pct(P[0].value, 0), "شوک روزانه")}</div>
-      <div>${P.map(p => `<div style="display:flex;align-items:center;gap:8px;font-size:14px;margin-block-end:7px">
-        <i style="width:11px;height:11px;border-radius:3px;background:${colors[p.tone]};flex:none"></i>
-        <span style="flex:1;color:var(--ink-2)">${p.label}</span>
-        <b class="num">${pct(p.value, 1)}</b></div>`).join("")}</div>
-    </div>`);
+  set("#mech-src", factSrc(D.mechanism.factId));
   set("#variance-src", factSrc(D.variance.factId));
 
   /* دو فهرست بدترین */
@@ -517,6 +486,202 @@ function updateSim() {
  *  پوشش می‌دهد — نه فقط سه نقطه‌ای که جدول سناریو دارد. */
 const shortagePerDayAt = t => atTau(t).unmetDemand * H.receivedPerDay;
 
+/* ------------------------------------------------------------ گالری شکل‌ها */
+
+/** یک قاب شکل: تصویر + عنوان گزاره‌ای + مسیر شاهد. کلیک = بزرگ‌نمایی. */
+function figure(f) {
+  return `<figure class="fig">
+    <button class="fig-img" type="button" data-zoom="${f.url}" data-cap="${f.title}"
+            aria-label="بزرگ‌نمایی: ${f.title}">
+      <img src="${f.url}" alt="${f.title}" loading="lazy">
+    </button>
+    <figcaption>
+      <b>${f.title}</b>
+      <span>${f.claim}</span>
+      <span class="src">${f.src}</span>
+    </figcaption>
+  </figure>`;
+}
+
+/** هر <div class="figs" data-slot="…"> را با شکل‌های همان جایگاه پر کن.
+ *  شکل‌هایی که نسخه‌ی تعاملی‌شان بالاتر در همان بخش هست، تاشده می‌آیند. */
+function renderFigures() {
+  for (const box of $$(".figs")) {
+    const mine = D.figures.filter(f => f.slot === box.dataset.slot);
+    if (!mine.length) { box.remove(); continue; }
+    const open = mine.filter(f => !f.fold), folded = mine.filter(f => f.fold);
+    let html = "";
+    if (open.length)
+      html += `<div class="fig-grid${open.length === 1 ? " one" : ""}">${open.map(figure).join("")}</div>`;
+    if (folded.length)
+      html += `<details class="acc fig-fold"><summary>${
+        folded.length === 1 ? "نمودار متناظر در ارائه" : `${fa(folded.length)} نمودار متناظر در ارائه`
+      }</summary><div class="acc-body"><div class="fig-grid${
+        folded.length === 1 ? " one" : ""}">${folded.map(figure).join("")}</div></div></details>`;
+    box.innerHTML = html;
+  }
+
+  /* بزرگ‌نمایی */
+  const lb = $("#lightbox"), img = lb.querySelector("img"), cap = lb.querySelector(".lb-cap");
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-zoom]");
+    if (b) { img.src = b.dataset.zoom; img.alt = b.dataset.cap; cap.textContent = b.dataset.cap; lb.classList.add("on"); return; }
+    if (e.target.closest("#lightbox")) lb.classList.remove("on");
+  });
+  addEventListener("keydown", e => { if (e.key === "Escape") lb.classList.remove("on"); });
+}
+
+/* ------------------------------------------------------------ ۶ · اقتصاد */
+
+function renderEconomics() {
+  const E = D.economics;
+
+  const k = [
+    { c: "c-amber", l: "هدررفت سالانه، امروز", v: mrd(E.wasteToman), u: "تومان",
+      s: `${n(E.wastePortions)} پرس · ${n(E.wastePerDay)} پرس در هر روز سرو` },
+    { c: "c-save", l: "بازیافتنی با مدل", v: mrd(E.savedToman), u: "تومان",
+      s: `${pct(E.wasteReduction, 0)} هدررفت · ${n(E.savedPortions)} پرس` },
+    { c: "c-ink", l: "سود خالص پس از قیمت‌گذاری کمبود", v: mrd(E.netToman), u: "تومان",
+      s: `با فرض هزینه‌ی کمبود ${fa(E.cuOverCo)} برابر مازاد — مشتق، نه عدد مخزن` },
+    { c: "c-short", l: "هدررفت باقی‌مانده", v: mrd(E.residualToman), u: "تومان",
+      s: `${n(E.residualPortions)} پرس · عمداً باقی می‌ماند` },
+  ];
+  $("#econ-kpis").innerHTML = k.map(x => `
+    <div class="kpi ${x.c}">
+      <div class="k-label">${x.l}</div>
+      <div class="k-value num">${x.v}<small>${x.u}</small></div>
+      <div class="k-sub">${x.s}</div>
+    </div>`).join("");
+
+  /* سه‌گانه‌ی هدررفت — یک میله‌ی انباشته */
+  const share = E.savedPortions / E.wastePortions;
+  set("#econ-split", `
+    <div class="stack">
+      <div class="stack-seg save" style="width:${(share * 100).toFixed(1)}%">
+        <b>${pct(share, 0)}</b><span>بازیافتنی</span></div>
+      <div class="stack-seg short" style="width:${((1 - share) * 100).toFixed(1)}%">
+        <b>${pct(1 - share, 0)}</b><span>باقی‌مانده</span></div>
+    </div>
+    <div class="stack-legend">
+      <span><i style="background:var(--save)"></i> ${n(E.savedPortions)} پرس · ${mrd(E.savedToman)} تومان</span>
+      <span><i style="background:var(--short)"></i> ${n(E.residualPortions)} پرس · ${mrd(E.residualToman)} تومان</span>
+    </div>`);
+  set("#econ-residual-pct", pct(1 - share, 0));
+  set("#econ-split-src", `${D.scenarios.src} · ${D.tau.src}`);
+
+  /* نرخ مؤثر، قبل و بعد */
+  set("#econ-rho", bars([
+    { label: "امروز (پخت روی رزرو)", value: E.rhoBefore, text: pct(E.rhoBefore, 2), tone: "short" },
+    { label: "با مدل (پخت روی چندک)", value: E.rhoAfter, text: pct(E.rhoAfter, 2), tone: "" },
+  ], { max: E.rhoBefore }));
+  set("#econ-rho-b", pct(E.rhoBefore, 2));
+  set("#econ-rho-a", pct(E.rhoAfter, 2));
+  set("#econ-unmet", pct(1 - E.fillRate, 2));
+  set("#econ-rho-src", `doc/data_facts_register.md · F01 · ${D.tau.src}`);
+
+  /* اندازه‌ی کمبود، نه فقط رخدادش */
+  set("#econ-shortage-tbl", table(["کمیت", "مقدار", "یعنی چه"], [
+    { cells: ["نرخ کمبود سلول", { v: pct(E.shortageRate, 1), cls: "n" },
+              { v: `<span class="wrap">کسری از سلول‌ها که <em>اصلاً</em> کمبود دیدند</span>` }] },
+    { cells: ["عمق میانگین هر کمبود", { v: n(E.meanDepth, 1) + " پرس", cls: "n" },
+              { v: `<span class="wrap">وقتی کمبود رخ می‌دهد، معمولاً این‌قدر است</span>` }] },
+    { cells: ["کمبود در هر وعده، کل دانشگاه", { v: n(E.shortagePerMeal, 1) + " پرس", cls: "n" },
+              { v: `<span class="wrap">میانه‌اش ${n(E.shortageMedianPerMeal, 1)} پرس است — توزیع چوله</span>` }] },
+    { cells: ["بدترین وعده‌ی کل دوره", { v: n(E.shortageWorstMeal) + " پرس", cls: "n" },
+              { v: `<span class="wrap">بدترین حالت مشاهده‌شده، نه حالت معمول</span>` }] },
+    { cls: "hi", cells: ["کسر تقاضای برآورده‌نشده", { v: pct(1 - E.fillRate, 2), cls: "n" },
+              { v: `<span class="wrap">سطح خدمت ${pct(E.fillRate, 2)} — عددی که واقعاً به دانشجو می‌رسد</span>` }] },
+    { cls: "hi", cells: ["معاوضه", { v: n(E.tradeRatio, 1) + " به ۱", cls: "n" },
+              { v: `<span class="wrap">پرس نجات‌یافته به ازای هر یک پرس کمبود</span>` }] },
+  ]));
+  set("#econ-depth", n(E.meanDepth, 1));
+  set("#econ-shortage-src", D.scenarios.src);
+
+  /* سود خالص */
+  const netShare = E.netToman / E.savedToman;
+  set("#econ-net", bars([
+    { label: "ارزش ناخالص صرفه‌جویی", value: E.savedToman, text: mrd(E.savedToman), tone: "" },
+    { label: `هزینه‌ی کمبود (${fa(E.cuOverCo)}× مازاد)`, value: E.shortageCostToman,
+      text: mrd(E.shortageCostToman), tone: "short" },
+    { label: "سود خالص", value: E.netToman, text: mrd(E.netToman), tone: "ink" },
+  ], { max: E.savedToman }));
+  set("#econ-net-note",
+    `فرض: هزینه‌ی هر پرس کمبود <bdi>${fa(E.cuOverCo)}×</bdi> هزینه‌ی هر پرس مازاد ` +
+    `(${n(E.unitPriceToman)} تومان) — همان نسبتی که چندک ${round(M.operatingTau, 2)} از آن می‌آید. ` +
+    `کمبود سالانه ${n(E.shortageAnnualPortions)} پرس برآورد شده است. ` +
+    `این یک محاسبه‌ی مشتق است و در هیچ گزارشی از مخزن منتشر نشده.`);
+  set("#econ-net-share", pct(netShare, 0));
+  set("#econ-net-src", `${D.scenarios.src} · doc/decision_log.md ردیف ۳۴ (برآورد نسبت هزینه)`);
+
+  /* دوراهی یک وعده */
+  const L = D.dilemma, price = E.unitPriceToman;
+  set("#econ-dilemma", `
+    <div class="duo">
+      <div class="duo-side bad">
+        <div class="duo-h">اگر به‌اندازه‌ی رزرو بپزیم</div>
+        <div class="duo-n num">${n(L.res)}</div>
+        <div class="duo-s">پرس پخت برای ${n(L.res)} رزرو</div>
+        <div class="duo-r">${fa(L.absent)} نفر نمی‌آیند ⟵
+          <b>${fa(L.absent)} پرس هدررفت</b> ≈ ${n(L.absent * price / 1e6, 1)} میلیون تومان</div>
+      </div>
+      <div class="duo-side warn">
+        <div class="duo-h">اگر بی‌ضابطه کم بپزیم</div>
+        <div class="duo-n num">${n(L.cookLow)}</div>
+        <div class="duo-s">پرس پخت، بدون مدل</div>
+        <div class="duo-r">${n(L.demand)} نفر می‌آیند ⟵
+          <b>${fa(L.demand - L.cookLow)} پرس کمبود</b> و صف خالی</div>
+      </div>
+    </div>`);
+  set("#econ-dilemma-src", L.src);
+
+  /* یک سلف مشخص */
+  const S = D.spotlight;
+  set("#spot-name", S.name);
+  set("#spot-body", `
+    <p class="card-note">${S.note}</p>
+    <div class="spot">
+      <div><span class="o-l">میانگین رزرو هر وعده</span><b class="num">${n(S.meanRes)}</b></div>
+      <div><span class="o-l">نرخ پیش‌بینی‌شده</span><b class="num">${pct(S.rhoHat, 1)}</b></div>
+      <div class="hi"><span class="o-l">پخت پیشنهادی</span><b class="num">${n(S.cook)}</b></div>
+      <div class="hi"><span class="o-l">صرفه‌جویی هر وعده</span><b class="num">${n(S.savedPortions)} پرس</b></div>
+    </div>
+    <p class="card-note" style="margin-block-start:12px">
+      یعنی <b>${n(S.savedPortions * E.unitPriceToman / 1e6, 1)} میلیون تومان در هر وعده</b>،
+      و حدود <b>${mrd(S.savedPortions * E.servingDays * E.unitPriceToman)} تومان در سال</b>
+      فقط از همین یک سلف.
+    </p>`);
+  set("#spot-caveat", S.caveat);
+  set("#spot-src", S.src);
+
+  /* چرا محافظه‌کارانه */
+  set("#econ-rpd-f", n(E.rowsPerDayFolds, 1));
+  set("#econ-rpd-a", n(E.rowsPerDayAll, 1));
+  set("#econ-basis", bars([
+    { label: "کل داده", value: E.rowsPerDayAll, text: n(E.rowsPerDayAll, 1) + " ردیف/روز", tone: "mute" },
+    { label: "مبنای این برآورد", value: E.rowsPerDayFolds, text: n(E.rowsPerDayFolds, 1) + " ردیف/روز", tone: "" },
+  ], { max: E.rowsPerDayAll }));
+  set("#econ-basis-gap", pct(1 - E.rowsPerDayFolds / E.rowsPerDayAll, 0));
+  set("#econ-basis-src", `${D.scenarios.src} · doc/data_manifest.md`);
+
+  /* نمونه‌های واقعی */
+  set("#examples-tbl", table(
+    ["سلف", "وعده", "رزرو", "پخت پیشنهادی", "صرفه‌جویی", "ارزش", "دریافت واقعی", "نتیجه"],
+    D.examples.rows.map(r => ({
+      cls: r.gap < 0 ? "" : "hi",
+      cells: [
+        { v: `<span class="wrap">${r.restaurant}</span>` }, r.meal,
+        { v: n(r.res), cls: "n" }, { v: `<b>${n(r.cook)}</b>`, cls: "n" },
+        { v: n(r.savedPortions) + " پرس", cls: "n" },
+        { v: n(r.savedPortions * E.unitPriceToman / 1e6, 1) + " میلیون", cls: "n" },
+        { v: n(r.recv), cls: "n" },
+        r.gap < 0
+          ? `<span class="pill bad">کمبود ${fa(Math.abs(r.gap))} پرس</span>`
+          : `<span class="pill win">بدون کمبود · ${fa(r.gap)} پرس مازاد</span>`,
+      ],
+    }))));
+  set("#examples-src", D.examples.src);
+}
+
 /* -------------------------------------------------------------- ۹ · شواهد */
 
 function renderEvidence() {
@@ -545,7 +710,7 @@ function renderEvidence() {
 
 const SECTIONS = [
   ["hook", "سرآغاز"], ["problem", "مسئله"], ["data", "داده"], ["insight", "یافته‌ها"],
-  ["model", "مدل"], ["eval", "ارزیابی"], ["value", "ارزش"], ["limits", "محدودیت"],
+  ["model", "مدل"], ["eval", "ارزیابی"], ["value", "اقتصاد"], ["limits", "محدودیت"],
   ["next", "گام بعد"], ["evidence", "شواهد"],
 ];
 
@@ -605,6 +770,8 @@ renderInsights();
 renderModel();
 renderEval();
 renderValue();
+renderEconomics();
+renderFigures();
 renderEvidence();
 chrome();
 
