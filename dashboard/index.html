@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>داشبورد دانش پروژه</title>
+  <meta name="description" content="تجمیع دانش پروژه‌ی پیش‌بینی نرخ عدم‌دریافت غذا در سلف‌های دانشگاه تهران">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <h1>داشبورد دانش پروژه</h1>
+    <span class="sub">پیش‌بینی نرخ عدم‌دریافت غذا در سلف‌های دانشگاه تهران</span>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <input id="searchBtn" readonly placeholder="جست‌وجو در کل دانش پروژه…" aria-label="جست‌وجوی سراسری">
+      <span class="hint">Ctrl+K</span>
+    </div>
+  </div>
+
+  <div class="topbar-meta">
+    <span id="buildMeta"></span>
+    <button class="icon-btn" id="themeBtn" type="button">🌙 تیره</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidenav" id="sidenav"></nav>
+  <main id="main"></main>
+</div>
+
+<div class="searchpanel" id="searchpanel">
+  <div class="sheet">
+    <input id="searchInput" placeholder="حقیقت، یافته، تصمیم، فیچر، مدل، شکل، سند…" autocomplete="off">
+    <div class="results" id="searchResults"></div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <img alt="">
+  <div class="lb-cap"></div>
+</div>
+
+<script src="data/dashboard-data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
