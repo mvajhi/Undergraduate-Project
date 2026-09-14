@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>گزارش تصویری پروژه — بهینه‌سازی پخت غذا در سلف‌های دانشگاه تهران</title>
+<meta name="description" content="داشبورد ارائه‌ی پروژه‌ی پیش‌بینی نرخ عدم‌دریافت غذا با رگرسیون کوانتایل: مسئله، داده، یافته‌ها، مدل، ارزیابی و ارزش عملیاتی.">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="mark">پ</span>
+      <b>گزارش تصویری پروژه</b>
+    </div>
+    <nav class="navpills" id="nav" aria-label="بخش‌های گزارش"></nav>
+    <div class="tools">
+      <button class="btn" id="srcBtn" type="button" aria-pressed="false" title="زیر هر عدد، مسیر فایل شاهدش را نشان بده">شواهد</button>
+      <button class="btn" id="themeBtn" type="button" title="تغییر روشن/تیره">تیره</button>
+      <button class="btn" id="printBtn" type="button" title="خروجی چاپ / PDF">چاپ</button>
+    </div>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<main>
+
+<!-- ───────────────────────────────────────────────────────── قلاب ── -->
+<section class="hero" id="hook">
+  <div class="hero-in">
+    <div>
+      <span class="tag">پروژه‌ی کارشناسی · دانشگاه تهران</span>
+      <h1>
+        سلف‌های دانشگاه هر روز حدود <span class="hl" id="h-waste-day">—</span> پرس غذا
+        دور می‌ریزند. علتش انتخاب غذا نیست، <span class="hl">غیبت</span> است.
+      </h1>
+      <p class="lede">
+        و چون غیبت قابل‌پیش‌بینی است، بخش بزرگی از این هدررفت برگشت‌پذیر است.
+        این گزارش نشان می‌دهد مسئله چقدر بزرگ است، داده درباره‌ی سازوکارش چه گفت،
+        و پیش‌بینیِ چندکِ نرخ عدم‌دریافت چقدر از آن را برمی‌گرداند.
+      </p>
+      <div class="basis" id="h-basis">—</div>
+    </div>
+    <div class="waffle-wrap">
+      <div class="waffle" id="waffle" aria-hidden="true"></div>
+      <div class="waffle-cap" id="waffle-cap">—</div>
+    </div>
+  </div>
+</section>
+
+<div class="kpis" id="kpis"></div>
+
+<!-- ────────────────────────────────────────────────────── مسئله ── -->
+<section class="sec" id="problem">
+  <div class="sec-head">
+    <div class="eyebrow">۱ · مسئله</div>
+    <h2>این مسئله‌ی پیش‌بینی نیست، مسئله‌ی تصمیم است</h2>
+    <p class="claim">
+      سلف امروز به‌اندازه‌ی تعداد رزرو می‌پزد، و تعداد رزرو همیشه بیش‌برآورد تقاضاست.
+      خروجی پروژه یک عدد پخت است، نه یک پیش‌بینی نقطه‌ای؛ و چون هزینه‌ی کمبود و مازاد
+      برابر نیست، <b>عدد درست، چندک است نه میانگین</b>.
+    </p>
+  </div>
+
+  <div class="grid g-wide">
+    <div class="card">
+      <h3>از پیش‌بینی تا عدد پخت</h3>
+      <p class="card-note">
+        مدل نرخ عدم‌دریافت <bdi>ρ</bdi> را در چندک <bdi>τ</bdi> پیش‌بینی می‌کند و عدد پخت
+        از روی آن ساخته می‌شود:
+      </p>
+      <div class="card flat" style="margin-block-start:12px;text-align:center;font-size:18px">
+        <bdi>CookQty = ⌈ Res × (1 − ρ̂<sub>τ</sub>) ⌉</bdi>
+      </div>
+      <p class="card-note" style="margin-block-start:12px">
+        هیچ قید عملیاتی فعال نیست: نه گرد کردن به بسته‌ی پخت، نه سقف ظرفیت آشپزخانه.
+        خروجی مدل مستقیماً همان عددی است که آشپزخانه لازم دارد، در سطح
+        <b>(روز، وعده، سلف، نوع غذا)</b>.
+      </p>
+      <div class="takeaway">
+        چون <bdi>ρ</bdi> متمم تقاضاست، فرکتایل کلاسیک نیوزوندور برمی‌گردد:
+        <b><bdi>τ*<sub>ρ</sub> = C<sub>o</sub>/(C<sub>u</sub>+C<sub>o</sub>)</bdi></b>،
+        نه <bdi>C<sub>u</sub>/(C<sub>u</sub>+C<sub>o</sub>)</bdi>. این تصحیح، سهم نظری پروژه است.
+      </div>
+      <div class="src">reports/phase10/10.1_cook_quantity.md · doc/decision_log.md ردیف ۳۶</div>
+    </div>
+
+    <div class="card">
+      <h3>نسبت هزینه، چندک را تعیین می‌کند</h3>
+      <p class="card-note">
+        مدیریت سلف فقط یک عدد را باید تصمیم بگیرد: کمبود چند برابر مازاد گران است؟
+        بقیه‌اش حساب است.
+      </p>
+      <div class="tbl-wrap" id="taustar-tbl"></div>
+      <div class="src" id="taustar-src"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-block-start:16px">
+    <h3>قاعده‌ی برش اطلاعاتی — سخت‌ترین قید پروژه</h3>
+    <p class="card-note">
+      لحظه‌ی تولید پیش‌بینی به تفکیک وعده است، نه یکسان برای کل روز. این یعنی
+      «هر روزِ پیش از روز هدف مجاز است» <b>کافی نیست</b>: شام روز <bdi>d−۱</bdi> در
+      ساعت ۱۵ همان روز هنوز سرو نشده، پس برای ناهار روز <bdi>d</bdi> ممنوع است — با
+      اینکه تاریخش گذشته است.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>وعده‌ی هدف</th><th>لحظه‌ی برش</th><th>آخرین نتیجه‌ی در دسترس</th><th>ممنوع، با اینکه تاریخش گذشته است</th></tr></thead>
+        <tbody>
+          <tr><td>ناهار روز <bdi>d</bdi></td><td class="n">۱۵:۰۰ روز <bdi>d−۱</bdi></td><td>ناهار روز <bdi>d−۱</bdi></td><td style="color:var(--short)">شام روز <bdi>d−۱</bdi></td></tr>
+          <tr><td>شام روز <bdi>d</bdi></td><td class="n">۲۳:۰۰ روز <bdi>d−۱</bdi></td><td>شام روز <bdi>d−۱</bdi></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="takeaway">
+      هر فیچر <bdi>lag</bdi> در پروژه <b>آگاه به نوع وعده‌ی هدف</b> ساخته شده است.
+      ممیزی نشتی مستقل این قاعده را روی کل فیچرست تأیید کرده است.
+    </div>
+    <div class="src">doc/project-definition.md بند ۴-۲ · doc/leakage_audit.md · doc/decision_log.md ردیف ۹</div>
+  </div>
+</section>
+
+<!-- ───────────────────────────────────────────────────────── داده ── -->
+<section class="sec" id="data">
+  <div class="sec-head">
+    <div class="eyebrow">۲ · داده</div>
+    <h2>پنج ماه داده‌ی واقعی سرویس، در پنج سطح تحلیل</h2>
+    <p class="claim">
+      یک دوره‌ی قفل‌شده‌ی آذر ۱۴۰۲ تا خرداد ۱۴۰۳. همان داده در پنج سطح متفاوت خوانده
+      می‌شود، و <b>سطح داده خودش یکی از محورهای آزمایش مدل بود</b> — نه یک انتخاب از پیش‌تعیین‌شده.
+    </p>
+  </div>
+
+  <div class="grid g3" id="scale-tiles"></div>
+
+  <div class="grid g-wide" style="margin-block-start:16px">
+    <div class="card">
+      <h3>پنج سطح داده</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>سطح</th><th>واحد رکورد</th><th>حجم</th><th>نقش</th></tr></thead>
+          <tbody>
+            <tr class="hi"><td><b>L1</b></td><td><bdi>(d, m, r, f)</bdi> سلول</td><td class="n">۷٬۵۷۹</td><td>سطح خروجی عملیاتی و سطح قهرمان</td></tr>
+            <tr><td><b>L2</b></td><td><bdi>(d, m, r)</bdi> سلف×وعده</td><td class="n">~۴٬۱۰۰</td><td>تجمیع روی نوع غذا</td></tr>
+            <tr><td><b>L3</b></td><td><bdi>(d, m)</bdi> عامل روز</td><td class="n">۲۵۶</td><td>خانواده‌ی سری‌زمانی</td></tr>
+            <tr><td><b>L4</b></td><td>سری <bdi>(m, r)</bdi></td><td class="n">۴۱ سری</td><td>مدل عاملی پویا</td></tr>
+            <tr><td><b>L5</b></td><td><bdi>(p, d, m, r, f)</bdi> رزرو فردی</td><td class="n">۲٬۰۴۹٬۳۲۲</td><td>رفتار فردی</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="takeaway">
+        سطح <bdi>(m, r, f)</bdi> هرگز سطح <b>آموزش</b> نشد (میانه‌ی طول سری فقط ۴ نقطه) —
+        فقط سطح <b>خروجی</b> است.
+      </div>
+      <div class="src">doc/data_manifest.md · AGENTS.md</div>
+    </div>
+
+    <div class="card">
+      <h3>پوشش زمانی — و آنچه پوشش داده نشده</h3>
+      <p class="card-note">
+        داده فقط نیم‌سال تحصیلی را می‌بیند. تابستان، نوروز و شروع مهر بیرون‌اند و
+        هیچ ادعایی درباره‌ی آن‌ها در این گزارش نیست.
+      </p>
+      <div id="coverage-bar"></div>
+      <div class="takeaway">
+        همه‌ی برآوردهای مالی روی <b>۳۲ هفته‌ی آموزشی</b> بسته شده‌اند، نه ۱۲ ماه — تا
+        عددی که تولید می‌شود، ادعایی فراتر از داده نکند.
+      </div>
+      <div class="src">reports/phase10/10.4_annual_savings.md · doc/data_manifest.md</div>
+    </div>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────── یافته‌های داده ── -->
+<section class="sec" id="insight">
+  <div class="sec-head">
+    <div class="eyebrow">۳ · آنچه داده گفت</div>
+    <h2>چهار کشف که جهت مدل‌سازی را عوض کردند</h2>
+    <p class="claim">
+      این بخش قلب پروژه است: پیش از هر مدلی، ۸۶ حقیقت آماری تأییدشده ثبت شد و
+      <b>هیچ فیچری ساخته نشد که به یکی از آن‌ها وصل نباشد</b>. چهارتای زیر بیشترین اثر
+      را روی تصمیم‌های بعدی گذاشتند.
+    </p>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3>۱. عدم‌دریافت، تصمیم غذایی نیست — غیبت از دانشگاه است</h3>
+      <p class="card-note">
+        اگر کسی ناهار را نگیرد، احتمال اینکه شام همان روز را هم نگیرد
+        <b id="mech-ratio">—</b> برابر می‌شود. این عدد با هیچ توضیح غذایی سازگار نیست.
+      </p>
+      <div id="mech-bars"></div>
+      <div class="takeaway">
+        تغییر منو ابزار کاهش هدررفت نیست. متغیر پنهان، <b>حضور یا نبودِ فرد در دانشگاه</b> است —
+        و همین توضیح می‌دهد چرا شوک روزانه بر همه چیز غالب است.
+      </div>
+      <div class="src" id="mech-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>۲. هشتاد و سه درصد نوسان، یک شوک مشترک روزانه است</h3>
+      <p class="card-note">
+        واریانس نرخ هر سلول به سه سهم شکسته شد. سهم «چه کسانی رزرو کرده‌اند» تقریباً
+        هیچ است؛ تقریباً همه‌چیز از خودِ <b>روز</b> می‌آید.
+      </p>
+      <div id="variance-chart"></div>
+      <div class="takeaway">
+        اولویت اول مدل‌سازی شد <b>عامل روزِ دانشگاه</b>، نه فیچر فردی. این تصمیم مستقیماً
+        از همین عدد آمد و بعداً با شکست مدل سطح‌فرد تأیید شد.
+      </div>
+      <div class="src" id="variance-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>۳. روزهایی که بد به‌نظر می‌رسند، روزهایی نیستند که پول می‌سوزانند</h3>
+      <p class="card-note">
+        فهرست «بدترین روزها به نرخ» و «بدترین روزها به پرس هدررفت» فقط
+        <b>۴ عضو از ۱۵</b> مشترک دارند. اولی شانه‌ی تعطیلات است و کم‌حجم؛ دومی وسط هفته
+        است و پرحجم.
+      </p>
+      <div id="worst-lists"></div>
+      <div class="takeaway">
+        شاخص پایش مدیریت باید <b>پرس</b> باشد نه درصد. و امضای تقویمیِ فهرست اول مستقل
+        نیست — کاملاً از راه کم‌حجمی می‌آید (آزمون جایگشت همتاشده، <bdi>p=۰.۸۱۳</bdi>).
+      </div>
+      <div class="src" id="worst-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>۴. هدف‌گیری جمعیتی، از انتخاب تصادفی بدتر است</h3>
+      <p class="card-note">
+        اگر بخواهیم ۱۰٪ افراد را هدف بگیریم، هر استراتژی چقدر از هدررفت را پوشش می‌دهد؟
+      </p>
+      <div id="targeting-bars"></div>
+      <div class="takeaway">
+        سیاست تنبیهی بر پایه‌ی مقطع، دانشکده یا جنسیت <b>مبنای داده‌ای ندارد</b> —
+        جمعیت‌شناسی افراد پرنرخ را پیدا می‌کند، و پرنرخ‌ها کم‌رزروند.
+        تاریخچه × حجم عملاً به سقف نظری می‌رسد.
+      </div>
+      <div class="src" id="targeting-src"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-block-start:16px">
+    <h3>سیگنال رایگان تقویم</h3>
+    <p class="card-note">
+      بخشی از سیگنال ماه‌ها پیش معلوم است و هزینه‌ی اجرای صفر دارد — حتی بدون هیچ مدلی
+      قابل استفاده است.
+    </p>
+    <div id="calendar-bars"></div>
+    <div class="takeaway">
+      در پنجره‌ی بازگشت پس از وقفه، بدترین روز <b>روز دوم</b> است نه روز اول — جزئیاتی که
+      بدون تحلیل روزبه‌روز دیده نمی‌شد.
+    </div>
+    <div class="src" id="calendar-src"></div>
+  </div>
+
+  <details class="acc" id="facts-acc">
+    <summary>همه‌ی حقایق کلیدی این بخش، با شاهد آماری کامل</summary>
+    <div class="acc-body"><div class="cols" id="facts-list"></div></div>
+  </details>
+</section>
+
+<!-- ──────────────────────────────────────────────────────── مدل ── -->
+<section class="sec" id="model">
+  <div class="sec-head">
+    <div class="eyebrow">۴ · مدل</div>
+    <h2>سیزده خانواده آزموده شد؛ پنج مدل واقعاً بردند</h2>
+    <p class="claim">
+      پروتکل مقایسه <b>پیش از دیدن نتیجه</b> بسته شد: یک مجموعه‌ی <bdi>fold</bdi> منجمد با
+      هش ثبت‌شده، بوت‌استرپ بلوکی دوبعدی روی روز×سلف، و کنارگذاشتن هر اجرایی که روی
+      همان <bdi>fold</bdi>ها نرفته باشد.
+    </p>
+  </div>
+
+  <div class="grid g-wide">
+    <div class="card">
+      <h3>قیف انتخاب مدل</h3>
+      <div class="funnel" id="funnel"></div>
+      <div class="takeaway">
+        <b>۲۰ مدل از ۲۵ مدل، برد معناداری بر خط پایه نداشتند.</b> اینکه این‌ها هم ثبت
+        شده‌اند، نه حذف، همان چیزی است که عدد قهرمان را قابل‌باور می‌کند.
+      </div>
+      <div class="src" id="funnel-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>پایداری قهرمان در برش‌های اجباری</h3>
+      <p class="card-note">
+        قهرمان روی هر برشِ از پیش تعیین‌شده جداگانه در برابر خط پایه آزموده شد:
+        ناهار/شام، تهران/غیرتهران، چارک حجم رزرو، سلف دانشکده‌ای/خوابگاهی،
+        روز عادی/پیش‌از‌تعطیلی/رمضان/برف.
+      </p>
+      <div class="readout" style="text-align:center">
+        <div class="big" id="cuts-val">—</div>
+        <div style="font-size:14px;color:var(--ink-2)">برشی که قهرمان کلی در آن هم برنده ماند</div>
+      </div>
+      <div class="takeaway">
+        در <b>هیچ</b> برشی قهرمان جای خود را به مدل دیگری نداد — یعنی برتری‌اش از یک
+        زیرگروه خاص نمی‌آید.
+      </div>
+      <div class="src" id="cuts-src"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-block-start:16px">
+    <h3>جدول مقایسه‌ی نهایی — ۲۵ مدل با بودجه‌ی کامل</h3>
+    <p class="card-note">
+      مرتب بر اساس <bdi>pinball</bdi> نرخ (کمتر بهتر). نوار سبز = برد آماری معنادار بر خط پایه‌ی <bdi>B3</bdi>.
+    </p>
+    <div id="model-chart"></div>
+    <details class="acc">
+      <summary>جدول کامل با فاصله‌ی اطمینان و هزینه‌ی محاسباتی</summary>
+      <div class="acc-body"><div class="tbl-wrap" id="model-tbl"></div></div>
+    </details>
+    <div class="takeaway">
+      فاصله‌ی قهرمان تا خط پایه کوچک است و همین صادقانه گزارش می‌شود:
+      برتری واقعی است و آماری معنادار، ولی <b>معجزه نیست</b>.
+    </div>
+    <div class="src" id="model-src"></div>
+  </div>
+
+  <div class="grid g-wide" style="margin-block-start:16px">
+    <div class="card">
+      <h3>مدل به چه چیزی نگاه می‌کند</h3>
+      <p class="card-note">
+        اهمیت جایگشتی (مرجع اصلی) — اهمیت درختی به فیچرهای دسته‌ای با کاردینالیتی بالا
+        سوگیری دارد و برای رتبه‌بندی استفاده نشد.
+      </p>
+      <div id="feat-bars"></div>
+      <div class="takeaway">
+        سه فیچر اول، <b>هویت سلف</b>، <b>برهم‌کنش روزهفته×شهر</b> و <b>حجم رزرو</b> هستند —
+        یعنی مدل دقیقاً همان ساختاری را یاد گرفته که تحلیل داده پیش‌بینی کرده بود.
+      </div>
+      <div class="src" id="feat-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>چه چیزهایی جواب نداد</h3>
+      <ul class="list warn" id="negatives"></ul>
+      <div class="takeaway">
+        نتیجه‌ی منفیِ از پیش ثبت‌شده، یافته است نه شکست. انتظار هر خانواده
+        <b>پیش از اجرا</b> نوشته شد تا خلاف‌انتظارها قابل‌ادعا بمانند.
+      </div>
+      <div class="src">doc/findings_register.md</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────── ارزیابی ── -->
+<section class="sec" id="eval">
+  <div class="sec-head">
+    <div class="eyebrow">۵ · ارزیابی</div>
+    <h2>پنجره‌ی آزمون یک‌بار باز شد، و نتیجه‌اش بی‌کم‌و‌کاست گزارش می‌شود</h2>
+    <p class="claim">
+      قهرمانِ اعتبارسنجی و قهرمانِ پنجره‌ی آزمون <b>یکی نبودند</b>، و طبق پروتکل عوض نشد.
+      پنجره‌ی آزمون یک رژیم غیرعادی دارد (بازگشت از رمضان و سوگواری ملی) و اندازه‌ی مؤثرش
+      با احتساب همبستگی درون‌روز فقط <bdi>۱۰۵</bdi> است، نه <bdi>۱٬۵۲۶</bdi>.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>عملکرد روی پنجره‌ی آزمون قفل‌شده</h3>
+    <div class="tbl-wrap" id="holdout-tbl"></div>
+    <div class="takeaway">
+      برآورد مالی پروژه عمداً روی <b><bdi>fold</bdi>های رسمی اعتبارسنجی</b> بسته شد، نه
+      روی این پنجره — چون رژیمش غیرعادی است و عدد بزرگ‌تری می‌داد.
+    </div>
+    <div class="src" id="holdout-src"></div>
+  </div>
+
+  <div class="grid g-wide" style="margin-block-start:16px">
+    <div class="card">
+      <h3>کالیبراسیون: مدل محافظه‌کارتر از ادعای اسمی‌اش بود</h3>
+      <p class="card-note">
+        پوشش تجربی در برابر چندک اسمی. نقطه روی قطر یعنی کالیبره؛ بالای قطر یعنی
+        مدل بیش از آنچه قول داده پوشش می‌دهد.
+      </p>
+      <div id="calib-chart"></div>
+      <div class="takeaway">
+        لایه‌ی <bdi>ACI</bdi> شکاف پوشش را از <b id="aci-before">—</b> به
+        <b id="aci-after">—</b> رساند و <bdi>pinball</bdi> را هم بهتر کرد —
+        جایی که <bdi>CQR</bdi> ساده شکست خورده بود.
+      </div>
+      <div class="src" id="calib-src"></div>
+    </div>
+
+    <div class="card">
+      <h3>خطا کجا بیشتر است</h3>
+      <p class="card-note">خطا در سلول‌های کم‌حجم بیشتر است — همان‌جایی که نرخ ذاتاً بی‌ثبات است.</p>
+      <div id="slice-bars"></div>
+      <div class="takeaway">
+        نرخ کمبود در چارک پرحجم بالاتر است ولی <b>خطای نسبی</b> پایین‌تر — یعنی مدل
+        دقیقاً در سلول‌هایی که پول در آن‌هاست، دقیق‌تر است.
+      </div>
+      <div class="src" id="slice-src"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────────────────────── ارزش ── -->
+<section class="sec" id="value">
+  <div class="sec-head">
+    <div class="eyebrow">۶ · ارزش عملیاتی</div>
+    <h2>چقدر ریسک کمبود می‌پذیرید؟</h2>
+    <p class="claim">
+      این تنها جای گزارش است که تصمیم دست مدل نیست. نسبت هزینه‌ی کمبود به مازاد یک
+      <b>ورودی سیاستی</b> است؛ دسته را بکشید و ببینید معاوضه چطور جابه‌جا می‌شود.
+    </p>
+  </div>
+
+  <div class="sim">
+    <div class="card">
+      <h3>منحنی معاوضه</h3>
+      <div id="tau-chart"></div>
+      <div class="legend">
+        <span><i style="background:var(--save)"></i> کاهش هدررفت</span>
+        <span><i style="background:var(--short)"></i> نرخ کمبود (رخداد)</span>
+        <span><i style="background:var(--amber)"></i> کسر تقاضای برآورده‌نشده</span>
+      </div>
+      <div class="interp-note" id="tau-note">—</div>
+      <div class="src" id="tau-src"></div>
+    </div>
+
+    <div>
+      <div class="slider-box">
+        <label for="ratio">کمبود چند برابر مازاد برایتان گران است؟</label>
+        <p class="hint">سیاست سلف را اینجا تعیین کنید؛ چندک هدف خودش حساب می‌شود.</p>
+        <input type="range" id="ratio" min="0" max="6" step="1" value="4" aria-describedby="ratio-out">
+        <div class="ticks" id="ratio-ticks"></div>
+        <div class="readout" id="ratio-out">
+          <div>نسبت انتخابی: <b class="num" id="r-ratio">—</b> · چندک هدف:
+            <b class="num" id="r-tau">—</b></div>
+        </div>
+        <div class="out-grid">
+          <div class="out save"><div class="o-l">پرس نجات‌یافته در سال</div><div class="o-v num" id="r-saved">—</div></div>
+          <div class="out short"><div class="o-l">پرس کمبود در هر روز سرو</div><div class="o-v num" id="r-short">—</div></div>
+          <div class="out save"><div class="o-l">صرفه‌جویی سالانه</div><div class="o-v num" id="r-toman">—</div></div>
+          <div class="out"><div class="o-l">سطح خدمت (تقاضای برآورده‌شده)</div><div class="o-v num" id="r-fill">—</div></div>
+        </div>
+        <div class="interp-note">
+          هر عدد ترسناک، کنار مقیاس‌گذارش می‌آید: نرخ کمبود فقط <em>رخداد</em> را می‌شمارد،
+          سطح خدمت <em>اندازه</em>ی آن را وزن می‌دهد.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-block-start:16px">
+    <h3>سه سیاست، سه عدد</h3>
+    <div class="tbl-wrap" id="scen-tbl"></div>
+    <div class="takeaway">
+      توصیه‌ی پروژه سیاست <b>تهاجمی</b> است (<bdi>τ=۰.۲۰</bdi>): دو مسیر مستقل — فرمول
+      نیوزوندور با برآورد ذی‌نفع از نسبت هزینه، و تحلیل حاشیه‌ای نرخ مبادله — بدون هماهنگی
+      روی همین نقطه توافق دارند.
+    </div>
+    <div class="src" id="scen-src"></div>
+  </div>
+
+  <div class="card" style="margin-block-start:16px">
+    <h3>از یک وعده تا یک سال</h3>
+    <p class="card-note">همان عدد، در چهار مقیاس. مبنا در هر چهار پله یکی است.</p>
+    <div id="ladder"></div>
+    <div class="takeaway">
+      معاوضه در نقطه‌ی عملیاتی: <b id="ladder-ratio">—</b> پرس نجات به‌ازای هر یک پرس کمبود.
+    </div>
+    <div class="src" id="ladder-src"></div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────── محدودیت‌ها ── -->
+<section class="sec" id="limits">
+  <div class="sec-head">
+    <div class="eyebrow">۷ · صداقت</div>
+    <h2>چیزهایی که این عدد نمی‌گوید</h2>
+    <p class="claim">
+      برآورد صرفه‌جویی یک <b>شبیه‌سازی روی داده‌ی تاریخی</b> است، نه نتیجه‌ی یک پایلوت
+      میدانی. این فهرست با همان دقتی نوشته شده که نتایج مثبت نوشته شده‌اند.
+    </p>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3>محدودیت داده و تعمیم</h3>
+      <ul class="list warn">
+        <li><span class="ix">۱</span><div><b>پوشش پنج‌ماهه.</b> آذر تا خرداد. تابستان، نوروز و شروع سال تحصیلی دیده نشده‌اند و هیچ سیگنال فصلیِ سالانه‌ای قابل برآورد نبود.</div></li>
+        <li><span class="ix">۲</span><div><b>فرض تداوم الگوی هفتگی.</b> رفتار ۸۰ روز <bdi>fold</bdi> رسمی نماینده‌ی کل سال تحصیلی فرض شده است؛ بدون رشد یا کاهش ثبت‌نام و بدون تورم قیمت.</div></li>
+        <li><span class="ix">۳</span><div><b>قیمت روز، نه قیمت دوره‌ی داده.</b> ۳۷۵ هزار تومان نرخ امروز است، نه نرخ آذر ۱۴۰۲ تا خرداد ۱۴۰۳.</div></li>
+        <li><span class="ix">۴</span><div><b>نبود زمان ثبت رزرو و داده‌ی لغو.</b> پویایی رزرو در طول ۷۲ ساعت پیش از سرو قابل مدل‌سازی نبود.</div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>محدودیت روش و مدل</h3>
+      <ul class="list warn">
+        <li><span class="ix">۵</span><div><b>نقض استقلال افراد.</b> واریانس گروهی ۱۴.۴ برابر دوجمله‌ای است؛ جمع ساده‌ی احتمال‌های فردی عدم‌قطعیت را کم‌برآورد می‌کند و کوانتایل را خوش‌بینانه.</div></li>
+        <li><span class="ix">۶</span><div><b>اندازه‌ی مؤثر کوچک.</b> با احتساب همبستگی درون‌روز، ۱٬۵۲۶ ردیف پنجره‌ی آزمون معادل ۱۰۵ مشاهده‌ی مستقل است.</div></li>
+        <li><span class="ix">۷</span><div><b>حساسیت به تغییر سیاست.</b> اگر رفتار رزرو با اعلام سیاست جدید عوض شود، مدلی که روی رفتار قبلی آموزش دیده دیگر معتبر نیست.</div></li>
+        <li><span class="ix">۸</span><div><b>عدم‌قطعیت نسبت هزینه.</b> <bdi>C<sub>u</sub></bdi> یک برآورد ذی‌نفع است، نه یک عدد اندازه‌گیری‌شده — به همین دلیل اسلایدر سیاست در این گزارش هست.</div></li>
+        <li><span class="ix">۹</span><div><b>سلف تازه‌تأسیس.</b> مدل به هویت سلف شدیداً تکیه دارد؛ برای سلفی بدون تاریخچه عملکردش تضمین‌شده نیست.</div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">doc/report-outline.md بند ۵-۲-۲ · reports/phase10/10.4_annual_savings.md · doc/data_facts_register.md F08</div>
+</section>
+
+<!-- ───────────────────────────────────────────────── گام بعد ── -->
+<section class="sec" id="next">
+  <div class="sec-head">
+    <div class="eyebrow">۸ · گام بعد</div>
+    <h2>راه اثباتش، یک پایلوت است نه یک نمودار دیگر</h2>
+    <p class="claim">
+      تنها چیزی که این برآورد را به عدد واقعی تبدیل می‌کند، اجرای کنترل‌شده در چند سلف
+      و مقایسه با سلف‌های شاهد است.
+    </p>
+  </div>
+  <div class="grid g3">
+    <div class="card">
+      <h3>۱ · پایلوت کنترل‌شده</h3>
+      <p class="card-note">چند سلف آزمون و چند سلف شاهد، تخصیص از پیش تعیین‌شده، و معیار موفقیتِ نوشته‌شده پیش از شروع — تا نتیجه قابل‌ادعا بماند.</p>
+      <div class="src">reports/phase10/10.5_pilot_protocol.md</div>
+    </div>
+    <div class="card">
+      <h3>۲ · پایش با شاخص درست</h3>
+      <p class="card-note">داشبورد عملیاتی باید <b>پرس هدررفت</b> را رصد کند نه درصد نرخ، و نرخ کمبودِ <em>مشاهده‌شده</em> را به مدیریت گزارش کند نه خودِ چندک.</p>
+      <div class="src">doc/data_facts_register.md F80 · doc/decision_log.md ردیف ۳۴</div>
+    </div>
+    <div class="card">
+      <h3>۳ · بازآموزی فصلی</h3>
+      <p class="card-note">مدل پیش از هر نیم‌سال بازآموزی شود، و تا وقتی داده‌ی تابستان جمع نشده، برای تابستان استفاده نشود.</p>
+      <div class="src">reports/models/ — کارت مدل، بند «شرایطی که مدل نباید استفاده شود»</div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────────────────────────────────────── شواهد ── -->
+<section class="sec" id="evidence">
+  <div class="sec-head">
+    <div class="eyebrow">۹ · شواهد</div>
+    <h2>هر عدد این صفحه، یک فایل پشتش دارد</h2>
+    <p class="claim">
+      این داشبورد هیچ عددی را دستی تایپ نمی‌کند: همه از <code>reports/</code> و
+      <code>doc/</code> خوانده می‌شوند. دکمه‌ی <b>شواهد</b> در نوار بالا مسیر فایل هر بخش را
+      زیر خودش نشان می‌دهد.
+    </p>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <h3>منابع داده‌ی این داشبورد</h3>
+      <div class="tbl-wrap" id="sources-tbl"></div>
+    </div>
+    <div class="card">
+      <h3>بازتولید</h3>
+      <p class="card-note">داده‌ی این صفحه با یک دستور از نو ساخته می‌شود:</p>
+      <div class="card flat" style="margin-block-start:10px"><code class="ltr">python dashboard/build_presentation.py</code></div>
+      <p class="card-note" style="margin-block-start:12px">
+        اسکریپت اگر حقیقت یا یافته‌ای که داشبورد به آن ارجاع می‌دهد در دفترها پیدا نشود،
+        <b>با خطا متوقف می‌شود</b> — تا صفحه هرگز عددی بدون شاهد نشان ندهد.
+      </p>
+      <div class="takeaway">
+        قاعده‌ی مبنای واحد: کل صفحه روی <b>۳۲ هفته‌ی آموزشی و ۳۷۵ هزار تومان هر پرس</b>
+        بسته است. هیچ بخشی مبنای دیگری نمی‌آورد.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span id="foot-meta">—</span>
+    <span>ساخته‌شده از روی مخزن پروژه · داده‌ی قفل‌شده‌ی آذر ۱۴۰۲ تا خرداد ۱۴۰۳</span>
+  </div>
+</section>
+
+</main>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
