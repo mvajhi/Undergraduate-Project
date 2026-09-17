@@ -2,7 +2,7 @@
   "data_window": "v4_extended",
   "split_axis": "academic_year",
   "rationale": "F103 — مرز سال تحصیلی همان‌جایی است که جمعیت دانشجویی عوض می‌شود",
-  "n_rows_total": 64236,
+  "n_rows_total": 63931,
   "splits": {
     "in_window": {
       "label": "1402-1403 (۲۰٪ پایانی)",
@@ -20,14 +20,14 @@
     "oos_1403-1404": {
       "label": "1403-1404",
       "n_train": 24866,
-      "n_test": 24173,
+      "n_test": 23868,
       "train_range": [
         "2023-09-25",
         "2024-07-04"
       ],
       "test_range": [
         "2024-09-22",
-        "2025-06-20"
+        "2025-06-12"
       ]
     },
     "oos_1404-1405": {
@@ -44,5 +44,5 @@
       ]
     }
   },
-  "cv_folds_hash": "3aca57d32303756e"
+  "cv_folds_hash": "941c700896055e72"
 }

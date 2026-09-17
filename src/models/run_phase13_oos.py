@@ -52,6 +52,17 @@ TEST_YEARS = ["1403-1404", "1404-1405"]
 #: می‌شود تا پرسش «آیا ۰.۲۰ هنوز درست است؟» با عدد پاسخ بگیرد، نه با فرض.
 TAU_OPERATIONAL = 0.20
 
+#: هایپرپارامتر قهرمان فاز ۷ (`reports/phase7/tau_sensitivity_champion.md`).
+#:
+#: ⚠️ تا پیش از این، اینجا پیش‌فرض کتابخانه‌ای بود نه پیکربندی قهرمان — ناسازگاری
+#: بی‌صدایی که نام «قهرمان فاز ۷» پنهانش می‌کرد. `src/models/tune_phase13.py` هر سه
+#: گزینه را سنجید و نتیجه (F136) این بود که **همین مقادیر** روی هر سه تقسیم بهترین‌اند،
+#: حتی بهتر از تنظیم تازه روی خودِ پنجره‌ی جدید. ردیف ۸۱ `decision_log`.
+CHAMPION_PARAMS = {
+    "num_leaves": 19, "learning_rate": 0.10511867551641824, "min_child_samples": 89,
+    "feature_fraction": 0.922812809422756, "n_estimators": 101,
+}
+
 
 # ---------------------------------------------------------------------------
 # تقسیم‌ها
@@ -140,7 +151,7 @@ def b3_empirical_quantile(train, test, tau):
     return q.reindex(idx).fillna(fallback).to_numpy()
 
 
-def lightgbm_quantile(train, test, tau, seed: int = 42):
+def lightgbm_quantile(train, test, tau, seed: int = 42, feature_set_name: str = "full"):
     """قهرمان فاز ۷ (`lightgbm_quantile`)، بازآموزی‌شده روی پنجره‌ی تازه.
 
     وزن‌های فاز ۷ بارگذاری **نمی‌شوند**: آن‌ها روی فیچرست و شبکه‌ی پنجره‌ی قفل‌شده
@@ -149,13 +160,13 @@ def lightgbm_quantile(train, test, tau, seed: int = 42):
     """
     import lightgbm as lgb
 
-    cols = [c for c in feature_set("full") if c in train.columns]
+    cols = [c for c in feature_set(feature_set_name) if c in train.columns]
     Xtr, Xte = _design(train[cols]), _design(test[cols])
     Xte = Xte.reindex(columns=Xtr.columns, fill_value=np.nan)
 
     model = lgb.LGBMRegressor(
-        objective="quantile", alpha=tau, num_leaves=31, learning_rate=0.05,
-        min_child_samples=20, n_estimators=300, verbosity=-1, random_state=seed,
+        objective="quantile", alpha=tau, verbosity=-1, random_state=seed,
+        **CHAMPION_PARAMS,
     )
     model.fit(Xtr, train["rho"])
     return np.clip(model.predict(Xte), 0.0, 1.0)
@@ -254,10 +265,192 @@ def _log_to_mlflow(results: pd.DataFrame, manifest: dict) -> None:
     logger.info("ثبت در MLflow: experiment=%s، %d run", EXPERIMENT, len(results))
 
 
+# ---------------------------------------------------------------------------
+# نقطه‌ی عملیاتی و سهم فیچر ترکیب
+# ---------------------------------------------------------------------------
+
+#: نسبت‌های هزینه‌ای که حساسیت روی آن‌ها سنجیده می‌شود. ۴ برآورد ذی‌نفع است
+#: ($C_u \approx 4C_o \Rightarrow \tau = C_o/(C_u+C_o) = 0.20$)؛ ۳ و ۵ کران‌های
+#: معقولِ همان برآوردند و کارشان نشان‌دادن این است که تصمیم به عدد دقیق وابسته نباشد.
+COST_RATIOS = (3.0, 4.0, 5.0)
+
+
+def tau_optimality(ratios=COST_RATIOS) -> pd.DataFrame:
+    r"""هزینه‌ی نسبی هر $\tau$: $\frac{C_u}{C_o}\cdot\text{کمبود} + \text{مازاد}$.
+
+    پرسش صریح بند ۱۳-۹: «آیا $\tau=0.20$ با داده‌ی تازه هنوز درست است؟» — که فقط با
+    **منحنی** پاسخ می‌گیرد نه با یک نقطه، چون اگر کمینه تخت باشد، «کمینه بودن» خبر
+    کم‌ارزشی است. هزینه در فضای **پرس** حساب می‌شود نه نرخ (بند ۶.۴).
+    """
+    results = pd.read_csv(OUTPUT_DIR / "oos_results.csv")
+    champ = results[results.model == "lightgbm_quantile"]
+    rows = []
+    for ratio in ratios:
+        for split_name, block in champ.groupby("split"):
+            cost = ratio * block["shortage_portions"] + block["surplus_portions"]
+            best_tau = float(block.loc[cost.idxmin(), "tau"])
+            at_020 = float(cost[block["tau"].round(4) == 0.20].iloc[0])
+            rows.append({
+                "cost_ratio": ratio, "split": split_name,
+                "best_tau": best_tau, "cost_at_best": float(cost.min()),
+                "cost_at_020": at_020,
+                "excess_of_020_%": 100 * (at_020 / cost.min() - 1),
+            })
+    out = pd.DataFrame(rows)
+    out.to_csv(OUTPUT_DIR / "tau_optimality.csv", index=False)
+    return out
+
+
+def composition_ablation(tau: float = TAU_OPERATIONAL, n_boot: int = 500) -> pd.DataFrame:
+    """سهم خانواده‌ی فیچر ترکیب — همان قهرمان، با و بدون آن.
+
+    با CI بلوکی می‌آید چون بهبود کوچک است (~۱-۲٪) و بدون فاصله‌ی اطمینان، تفکیکش از
+    نویز بذر ممکن نیست.
+    """
+    from src.baselines import pinball_loss
+    from src.cv import block_bootstrap_2d
+
+    df = pd.read_parquet(FEATURES_PATH)
+    splits = build_splits(df)
+    rows = []
+    for split_name, split in splits.items():
+        test = split["test"].reset_index(drop=True)
+        y = test["rho"].to_numpy(float)
+        preds = {
+            fs: lightgbm_quantile(split["train"], test, tau, feature_set_name=fs)
+            for fs in ("full", "no_composition")
+        }
+        work = test[["date_gregorian", "restaurant"]].copy()
+        work["_d"] = (pinball_loss(y, preds["full"], tau)
+                      - pinball_loss(y, preds["no_composition"], tau))
+        base = float(pinball_loss(y, preds["no_composition"], tau).mean())
+        delta, lo, hi = block_bootstrap_2d(
+            work, lambda s: s["_d"].mean(), day_col="date_gregorian",
+            unit_col="restaurant", n_boot=n_boot,
+        )
+        rows.append({"split": split_name, "tau": tau,
+                     "pinball_no_composition": base,
+                     "pinball_full": float(pinball_loss(y, preds["full"], tau).mean()),
+                     "delta": delta, "ci_low": lo, "ci_high": hi,
+                     "delta_pct": 100 * delta / base, "significant": bool(hi < 0)})
+        logger.info("ترکیب · %s → Δ=%.6f [%.6f, %.6f]", split_name, delta, lo, hi)
+    out = pd.DataFrame(rows)
+    out.to_csv(OUTPUT_DIR / "composition_ablation.csv", index=False)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# معناداری
+# ---------------------------------------------------------------------------
+
+
+def significance(tau: float = TAU_OPERATIONAL, n_boot: int = 500) -> pd.DataFrame:
+    """برتری قهرمان بر B3، با بوت‌استرپ بلوکیِ **دوبعدی** (روز × سلف).
+
+    ⚠️ نسخه‌ی نخست این گزارش بوت‌استرپ سطر‌به‌سطر زده بود. استاندارد خودِ پروژه آن را
+    رد می‌کند: ICC(روز)=۰.۲۲۵ و ICC(سلف)=۰.۲۰۵ (F10)، پس سطرهای یک روز مستقل نیستند
+    و CI سطری **باریک‌تر از واقعیت** است. `src/cv.py::block_bootstrap_2d` همان ابزاری
+    است که فاز ۶ برای همین ساخته بود؛ اینجا هم همان استفاده می‌شود.
+    """
+    from src.baselines import pinball_loss
+    from src.cv import block_bootstrap_2d
+
+    df = pd.read_parquet(FEATURES_PATH)
+    splits = build_splits(df)
+
+    rows = []
+    for split_name, split in splits.items():
+        test = split["test"].reset_index(drop=True)
+        champ = MODELS["lightgbm_quantile"](split["train"], test, tau)
+        base = MODELS["B3_empirical_quantile"](split["train"], test, tau)
+        y = test["rho"].to_numpy(float)
+        work = test[["date_gregorian", "restaurant"]].copy()
+        work["_d"] = pinball_loss(y, champ, tau) - pinball_loss(y, base, tau)
+        work["_b"] = pinball_loss(y, base, tau)
+
+        delta, lo, hi = block_bootstrap_2d(
+            work, lambda s: s["_d"].mean(), day_col="date_gregorian",
+            unit_col="restaurant", n_boot=n_boot,
+        )
+        rows.append({
+            "split": split_name, "tau": tau, "n_test": len(test),
+            "delta_pinball": delta, "ci_low": lo, "ci_high": hi,
+            "delta_pct": 100 * delta / work["_b"].mean(),
+            "significant": bool(hi < 0),
+        })
+        logger.info("%s → Δ=%.6f [%.6f, %.6f] %s", split_name, delta, lo, hi,
+                    "معنادار" if hi < 0 else "نامعنادار")
+
+    out = pd.DataFrame(rows)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    out.to_csv(OUTPUT_DIR / "oos_significance.csv", index=False)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# حساسیت به پنجره‌ی جنگ
+# ---------------------------------------------------------------------------
+
+#: ماتریسی که پنجره‌ی شوک را **نگه داشته** — فقط برای همین سنجش ساخته می‌شود
+#: (`build_features(exclude_anomalies=False)`).
+ANOMALY_FEATURES_PATH = DATA_PROCESSED / "features_L1_v4_with_anomalies.parquet"
+
+
+def war_window_sensitivity(tau: float = TAU_OPERATIONAL) -> pd.DataFrame:
+    """همان مدل، همان آموزش — فقط با و بدون ۱۳ روز جنگ در مجموعه‌ی **آزمون**.
+
+    **چرا نباید فقط عدد تمیز گزارش شود.** حذف یک بازه از آزمون، عملکرد را بهتر
+    نشان می‌دهد؛ اگر فقط عدد بعد از حذف بیاید، خواننده راهی برای سنجیدن اثر حذف
+    ندارد. پس هر دو در یک جدول می‌آیند. آموزش در هر دو حالت یکسان است — سال
+    ۱۴۰۲-۱۴۰۳ اصلاً جنگ ندارد — پس تفاوت **فقط** ترکیب مجموعه‌ی آزمون است.
+    """
+    from src.features.build_v4 import ANOMALY_WINDOWS
+
+    if not ANOMALY_FEATURES_PATH.exists():
+        logger.warning("ماتریسِ با-شوک ساخته نشده (%s) — سنجش رد شد", ANOMALY_FEATURES_PATH)
+        return pd.DataFrame()
+
+    war_start = pd.Timestamp(ANOMALY_WINDOWS[0][0])
+    df = pd.read_parquet(ANOMALY_FEATURES_PATH)
+    splits = build_splits(df)
+
+    rows = []
+    for split_name, split in splits.items():
+        train, test = split["train"], split["test"]
+        in_war = test["date_gregorian"].between(
+            war_start, pd.Timestamp(ANOMALY_WINDOWS[0][1])
+        ).to_numpy()
+        if not in_war.any():
+            continue
+        for model_name, fn in MODELS.items():
+            if model_name == "B0_cook_all":
+                continue
+            pred = fn(train, test, tau)
+            for variant, mask in (("with_war", np.ones(len(test), bool)),
+                                  ("without_war", ~in_war)):
+                m = operational_metrics(test[mask], pred[mask], tau)
+                rows.append({"split": split_name, "model": model_name, "variant": variant,
+                             "n_test": int(mask.sum()), "tau": tau,
+                             "pinball": m["pinball"], "coverage": m["coverage"],
+                             "shortage_rate": m["shortage_rate"]})
+    out = pd.DataFrame(rows)
+    if len(out):
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        out.to_csv(OUTPUT_DIR / "war_window_sensitivity.csv", index=False)
+    return out
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     set_global_seed()
     results = run()
+
+    sens = war_window_sensitivity()
+    if len(sens):
+        pd.set_option("display.width", 200)
+        print("\n=== حساسیت به ۱۳ روز جنگ (همان آموزش، آزمونِ با/بدون) ===")
+        print(sens.pivot_table(index=["split", "model"], columns="variant", values="pinball")
+              .to_string(float_format=lambda v: f"{v:.5f}"))
 
     pd.set_option("display.width", 220)
     at_tau = results[results.tau == TAU_OPERATIONAL]

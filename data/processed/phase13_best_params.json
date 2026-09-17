@@ -1,0 +1,39 @@
+{
+  "study": {
+    "best_params": {
+      "num_leaves": 10,
+      "learning_rate": 0.02180164671067105,
+      "min_child_samples": 87,
+      "feature_fraction": 0.7498168662908588,
+      "n_estimators": 274
+    },
+    "best_value": 0.013011565850060223,
+    "n_trials": 80,
+    "tau": 0.2,
+    "n_inner_train": 15913,
+    "n_inner_valid": 3979
+  },
+  "param_sets": {
+    "default": {
+      "num_leaves": 31,
+      "learning_rate": 0.05,
+      "min_child_samples": 20,
+      "n_estimators": 300,
+      "feature_fraction": 1.0
+    },
+    "phase7": {
+      "num_leaves": 19,
+      "learning_rate": 0.10511867551641824,
+      "min_child_samples": 89,
+      "feature_fraction": 0.922812809422756,
+      "n_estimators": 101
+    },
+    "retuned": {
+      "num_leaves": 10,
+      "learning_rate": 0.02180164671067105,
+      "min_child_samples": 87,
+      "feature_fraction": 0.7498168662908588,
+      "n_estimators": 274
+    }
+  }
+}

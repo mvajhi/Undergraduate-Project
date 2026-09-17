@@ -110,10 +110,21 @@ COMPOSITION_FEATURES = [
 ]
 
 
-def build(output_path=OUTPUT_PATH) -> pd.DataFrame:
+def build(output_path=OUTPUT_PATH, *, exclude_anomalies: bool = True) -> pd.DataFrame:
+    from src.features.build_v4 import anomaly_mask
+
     person = load_person_level()
     person, _ = apply_domain_filters(person)
     logger.info("سطح فرد پس از فیلتر دامنه: %d ردیف", len(person))
+
+    # پنجره‌ی شوک از **تاریخچه‌ی فرد** هم برداشته می‌شود، به همان دلیل شبکه: نرخ
+    # انبساطی است، پس «نگرفتنِ غذا در روزهای تخلیه» تا آخر پنجره روی نرخ فرد
+    # می‌ماند و او را برای سال بعد پرریسک نشان می‌دهد (ردیف ۸۰ `decision_log`).
+    if exclude_anomalies:
+        drop = anomaly_mask(person)
+        if drop.any():
+            logger.info("پنجره‌ی شوک از سطح فرد حذف شد: %d رزرو", int(drop.sum()))
+            person = person[~drop].reset_index(drop=True)
 
     person = person_history_at_cutoff(person)
     comp = build_composition(person)
@@ -133,6 +144,9 @@ if __name__ == "__main__":
     comp = build()
 
     features = pd.read_parquet(FEATURES_PATH)
+    # ماتریسِ روی دیسک ممکن است از اجرای قبلی ستون ترکیب داشته باشد؛ بدون این حذف،
+    # merge پسوند `_x`/`_y` می‌سازد و برهم‌کنش‌ها روی ستون ناموجود می‌افتند.
+    features = features.drop(columns=[c for c in COMPOSITION_FEATURES if c in features.columns])
     merged = add_composition(features, comp)
 
     pd.set_option("display.width", 200)

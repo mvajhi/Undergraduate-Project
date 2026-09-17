@@ -68,14 +68,25 @@ WEATHER_COLUMNS = [
     "relative_humidity_mean", "aqi_us_max",
 ]
 
-#: شکاف ساختاری خرداد/تیر ۱۴۰۴ (یافته F108، ردیف ۷۰ `decision_log`).
-#: بازه از نخستین روزِ ریزش شروع می‌شود نه از نخستین روز صفر — روزهای ۲۰۲۵-۰۶-۱۶ تا
-#: ۲۰۲۵-۰۶-۲۰ در شبکه **هستند** (با حجم ۳٬۳۵۱ تا ۱۱ پرس) و بدون پرچم، مدل آن‌ها را
-#: روزهای عادیِ کم‌تقاضا می‌بیند.
-#: ⚠️ علت ثبت نشده — پرچم ساختاری است، نه انتساب علّی.
-STRUCTURAL_GAPS: list[tuple[str, str]] = [
-    ("2025-06-16", "2025-07-03"),
+#: پنجره‌ی درگیری خرداد/تیر ۱۴۰۴ (یافته F108 و F135، ردیف ۸۰ `decision_log`).
+#:
+#: **علت دیگر «ثبت‌نشده» نیست.** ردیف ۷۰ این بازه را «شکاف ساختاری با علت ناشناخته»
+#: ثبت کرده بود چون داده خودش علت را نمی‌گفت؛ ذی‌نفع علت را تأیید کرد و هم‌زمانی با
+#: پنجره‌ی ۷۲ ساعته‌ی رزرو، انتساب را از حدس به بازسازی‌پذیر تبدیل می‌کند: رزروِ
+#: روزهای ۱۴ تا ۱۶ ژوئن **پیش از** آغاز درگیری قفل شده بود، پس در داده **هست** ولی
+#: صاحبانش شهر را ترک کرده‌اند — ρ آن روزها ۰.۴۷ تا ۰.۶۷ است در برابر ۰.۰۸ عادی.
+#: از ۱۷ ژوئن به بعد خودِ رزرو هم فرومی‌ریزد (۵۴۰ → ۳۲۸ → ۱۶۰ → ۶ → صفر).
+#:
+#: ⚠️ **مرز آغاز، ۱۳ ژوئن است نه ۱۶ ژوئن.** نسخه‌ی نخست از نخستین روزِ ریزشِ *حجم*
+#: شروع می‌شد و دو روز پرریسک را جا می‌گذاشت — از جمله ۱۵ ژوئن با ρ=۰.۶۷ و سرویس
+#: کامل (۱۳۹ سلول)، که بدون پرچم «یک‌شنبه‌ی عادی» شمرده می‌شد. مرز درست، خودِ رویداد
+#: است؛ نخستین روز سرویسِ پس از آن ۱۴ ژوئن (شنبه) است.
+ANOMALY_WINDOWS: list[tuple[str, str, str]] = [
+    ("2025-06-13", "2025-07-03", "war_1404_03"),
 ]
+
+#: نام تاریخی، برای کدی که هنوز به آن ارجاع می‌دهد.
+STRUCTURAL_GAPS: list[tuple[str, str]] = [(s, e) for s, e, _ in ANOMALY_WINDOWS]
 
 
 def _load_grid(level: str = "L1") -> pd.DataFrame:
@@ -211,18 +222,51 @@ def add_history_features(df: pd.DataFrame) -> pd.DataFrame:
     return out.drop(columns=[c for c in out.columns if c.startswith("_")])
 
 
+def anomaly_mask(df: pd.DataFrame) -> pd.Series:
+    """ردیف‌هایی که داخل یک پنجره‌ی شوک برون‌زا می‌افتند (`ANOMALY_WINDOWS`)."""
+    mask = pd.Series(False, index=df.index)
+    for start, end, _ in ANOMALY_WINDOWS:
+        mask |= df["date_gregorian"].between(pd.Timestamp(start), pd.Timestamp(end))
+    return mask
+
+
 def add_regime_flags(df: pd.DataFrame) -> pd.DataFrame:
-    """پرچم شکاف ساختاری (F108) — بدون انتساب علّی."""
+    """پرچم پنجره‌ی شوک برون‌زا (F108/F135).
+
+    ⚠️ این ستون **فیچر نیست** و عمداً در `FEATURE_SETS` نیامده. پرچم‌کردن یک رویداد
+    یکتا چیزی به مدل یاد نمی‌دهد (یک نمونه، غیرقابل‌تعمیم) و بدتر: در استقرار برای هر
+    شوک آینده مقدارش False است، پس دقیقاً وقتی لازم است کار نمی‌کند. نقش این ستون
+    **فیلتر** است نه فیچر — ردیف ۸۰ `decision_log`. ماند تا ممیزی‌پذیر باشد.
+    """
     out = df.copy()
-    flag = pd.Series(False, index=out.index)
-    for start, end in STRUCTURAL_GAPS:
-        flag |= out["date_gregorian"].between(pd.Timestamp(start), pd.Timestamp(end))
-    out["is_structural_gap"] = flag
+    out["is_war_window"] = anomaly_mask(out)
+    out["is_structural_gap"] = out["is_war_window"]  # نام تاریخی
     return out
 
 
-def build_features(level: str = "L1", output_path=OUTPUT_PATH, *, with_composition: bool = True) -> pd.DataFrame:
+def build_features(
+    level: str = "L1",
+    output_path=OUTPUT_PATH,
+    *,
+    with_composition: bool = True,
+    exclude_anomalies: bool = True,
+) -> pd.DataFrame:
+    """ماتریس ویژگی سطح `level`.
+
+    `exclude_anomalies=True` ردیف‌های پنجره‌ی شوک را **پیش از ساخت فیچرهای تاریخی**
+    برمی‌دارد، نه بعدش. ترتیب مهم است: تاریخچه انبساطی است، پس اگر روزی با ρ=۰.۶۷
+    داخل بماند، برای روزهای بعد «آخرین نرخ شناخته‌شده» می‌شود. نخستین روز سرویس سال
+    ۱۴۰۴-۱۴۰۵ دقیقاً همین را می‌دید (۸.۷٪ سلول‌ها `cell_last_rho` > ۰.۴).
+    """
     df = _load_grid(level)
+    if exclude_anomalies:
+        drop = anomaly_mask(df)
+        if drop.any():
+            logger.info(
+                "پنجره‌ی شوک حذف شد: %d سلول (%.2f٪) · %d پرس",
+                int(drop.sum()), 100 * drop.mean(), int(df.loc[drop, "Res"].sum()),
+            )
+            df = df[~drop].reset_index(drop=True)
     df = add_calendar_features(df)
     df = add_entity_features(df)
     df = add_weather_features(df)
@@ -271,7 +315,9 @@ FEATURE_SETS: dict[str, list[str]] = {
         "res_vs_venue_hist", "res_vs_cell_hist",
     ],
     "weather": WEATHER_COLUMNS,
-    "regime": ["is_structural_gap"],
+    # ⚠️ خانواده‌ی `regime` عمداً **خالی** است. پنجره‌ی شوک با حذف رفتار می‌شود نه با
+    # پرچم — دلیلش در `add_regime_flags` و ردیف ۸۰ `decision_log`.
+    "regime": [],
     # ⚠️ عمداً به شام ماسک **نمی‌شود**. فاز ۵ بر پایه‌ی F63 نسخه‌ی
     # `composition_mean_dinner_only` ساخته بود؛ روی پنجره‌ی v4 آن نامتقارنی
     # بازتولید نشد (F132) و ماسک‌کردن سیگنال ناهار را دور می‌ریخت.
