@@ -10,3 +10,5 @@
 grid_L1_v4.parquet
 grid_L2_v4.parquet
 grid_L3_v4.parquet
+features_L1_v4.parquet
+composition_L2_v4.parquet

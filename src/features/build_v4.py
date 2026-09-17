@@ -221,7 +221,7 @@ def add_regime_flags(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def build_features(level: str = "L1", output_path=OUTPUT_PATH) -> pd.DataFrame:
+def build_features(level: str = "L1", output_path=OUTPUT_PATH, *, with_composition: bool = True) -> pd.DataFrame:
     df = _load_grid(level)
     df = add_calendar_features(df)
     df = add_entity_features(df)
@@ -229,6 +229,17 @@ def build_features(level: str = "L1", output_path=OUTPUT_PATH) -> pd.DataFrame:
     df = add_known_demand_features(df)
     df = add_history_features(df)
     df = add_regime_flags(df)
+
+    # فیچر ترکیب جداگانه ساخته می‌شود چون از سطح فرد (۸.۲ میلیون ردیف) می‌آید و
+    # بازسازی‌اش گران است؛ اینجا فقط الحاق می‌شود اگر از قبل ساخته شده باشد.
+    if with_composition:
+        from src.features.composition_v4 import OUTPUT_PATH as COMP_PATH
+        from src.features.composition_v4 import add_composition
+
+        if COMP_PATH.exists():
+            df = add_composition(df, pd.read_parquet(COMP_PATH))
+        else:
+            logger.warning("فیچر ترکیب ساخته نشده (%s) — بدون آن ادامه داده شد", COMP_PATH)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(output_path, index=False)
@@ -261,6 +272,15 @@ FEATURE_SETS: dict[str, list[str]] = {
     ],
     "weather": WEATHER_COLUMNS,
     "regime": ["is_structural_gap"],
+    # ⚠️ عمداً به شام ماسک **نمی‌شود**. فاز ۵ بر پایه‌ی F63 نسخه‌ی
+    # `composition_mean_dinner_only` ساخته بود؛ روی پنجره‌ی v4 آن نامتقارنی
+    # بازتولید نشد (F132) و ماسک‌کردن سیگنال ناهار را دور می‌ریخت.
+    "composition": [
+        "composition_mean", "composition_std", "composition_p90",
+        "composition_high_risk_share", "composition_coverage", "composition_n",
+        "day_shock_lag1", "composition_mean_x_dayshock",
+        "composition_p90_x_dayshock", "composition_high_risk_share_x_dayshock",
+    ],
 }
 
 
@@ -270,6 +290,8 @@ def feature_set(name: str) -> list[str]:
         return [c for cols in FEATURE_SETS.values() for c in cols]
     if name == "no_weather":
         return [c for key, cols in FEATURE_SETS.items() if key != "weather" for c in cols]
+    if name == "no_composition":
+        return [c for key, cols in FEATURE_SETS.items() if key != "composition" for c in cols]
     return FEATURE_SETS[name]
 
 
