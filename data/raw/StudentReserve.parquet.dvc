@@ -1,0 +1,5 @@
+outs:
+- md5: 9d2aace7d2462056b4bc7dff435bfc1d
+  size: 323174586
+  hash: md5
+  path: StudentReserve.parquet

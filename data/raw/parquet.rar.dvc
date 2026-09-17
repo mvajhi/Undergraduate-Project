@@ -1,0 +1,5 @@
+outs:
+- md5: d5a03dc1a65d039d5f1db5dde4804061
+  size: 232673295
+  hash: md5
+  path: parquet.rar
