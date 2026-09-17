@@ -7,3 +7,6 @@
 /features_A_v1.parquet
 /person_features_v1.parquet
 /person_reservation_fact_v3.csv
+grid_L1_v4.parquet
+grid_L2_v4.parquet
+grid_L3_v4.parquet
