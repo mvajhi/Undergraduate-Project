@@ -67,8 +67,15 @@ def find_decision_log_rows(text: str) -> set[int]:
     return {int(m) for m in re.findall(r"^\|\s*(\d+)\s*\|", text, flags=re.MULTILINE)}
 
 
+#: ⚠️ دو تا سه رقم، نه دقیقاً دو رقم. فضای شناسه‌ی حقایق از F99 گذشته (فاز ۱۳ تا
+#: F130 رسید) و الگوی دورقمیِ قبلی هر شناسه‌ی سه‌رقمی را **بی‌صدا** نادیده می‌گرفت —
+#: یعنی دروازه‌ی پوشش دقیقاً برای یافته‌های تازه، که بیشترین نیاز به ردیابی را دارند،
+#: خاموش بود و «۹۹ حقیقت» گزارش می‌کرد در حالی که ۱۳۰ تا وجود داشت.
+_FACT_ID_RE = re.compile(r"\bF(\d{2,3})\b")
+
+
 def find_fact_ids(text: str) -> set[str]:
-    return set(re.findall(r"\bF(\d{2})\b", text))
+    return set(_FACT_ID_RE.findall(text))
 
 
 def find_referenced_decision_rows(text: str) -> set[int]:
@@ -96,7 +103,7 @@ def find_referenced_decision_rows(text: str) -> set[int]:
 
 
 def find_referenced_fact_ids(text: str) -> set[str]:
-    return set(re.findall(r"\bF(\d{2})\b", text))
+    return set(_FACT_ID_RE.findall(text))
 
 
 def find_finding_refs_in_decision_log(text: str) -> set[str]:
