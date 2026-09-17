@@ -161,3 +161,54 @@ def same_meal_lag(
         gap = (pd.to_datetime(work[date_col]) - grp[date_col].shift(k)).dt.days
         out.loc[gap > k + gap_buffer_days, col] = np.nan
     return out.reindex(df.index)
+
+
+def last_value_at_cutoff(
+    df: pd.DataFrame,
+    group_cols: list[str],
+    value_cols: list[str],
+    seq_col: str = "meal_seq",
+    date_col: str = "date_gregorian",
+    out_prefix: str = "last",
+) -> pd.DataFrame:
+    """آخرین مشاهده‌ی **در دسترس** هر گروه، به‌همراه اینکه چند روز پیش بوده.
+
+    **چرا کنار ``same_meal_lag`` لازم است.** ``same_meal_lag`` وقتی فاصله از آستانه
+    بگذرد ``NaN`` می‌دهد — درست، چون «lag ۱» با ۲۰ روز فاصله دیگر lag ۱ نیست. ولی در
+    سطح سلول $(r,f,m)$ یک غذا معمولاً هر دو تا چهار هفته یک‌بار سرو می‌شود، پس آن
+    فیلتر ۸۵٪ ردیف‌ها را خالی می‌کند و عملاً فیچر را از بین می‌برد.
+
+    این تابع همان اطلاعات را **بدون دورانداختن** نگه می‌دارد: مقدارِ آخرین سرو، و
+    ``days_since`` به‌عنوان یک ستون جدا. فاصله از یک فیلتر به یک فیچر تبدیل می‌شود —
+    مدل خودش یاد می‌گیرد که مشاهده‌ی ۲۵ روز پیش کم‌وزن‌تر از دیروز است. همین ستون
+    «چند روز پیش» خودش معنادار است: مقدار بزرگش یعنی نخستین سرو پس از یک وقفه.
+
+    قاعده‌ی برش عیناً همان است ($\\text{seq}_{obs} \\le \\text{seq}_{target} - 2$)؛
+    فقط به‌جای جمع تجمعی، **آخرین** مقدار قبل از مرز برداشته می‌شود.
+    """
+    work = df[group_cols + value_cols + [seq_col, date_col]].copy()
+    work["_row"] = np.arange(len(work))
+
+    out = {f"{out_prefix}_{col}": np.full(len(work), np.nan) for col in value_cols}
+    days_since = np.full(len(work), np.nan)
+
+    for _, g in work.groupby(group_cols, observed=True, sort=False):
+        g = g.sort_values(seq_col, kind="stable")
+        seqs = g[seq_col].to_numpy()
+        rows = g["_row"].to_numpy()
+        dates = pd.to_datetime(g[date_col]).to_numpy()
+
+        # اندیسِ آخرین مشاهده‌ای که seq آن ≤ seq_target − CUTOFF_LAG است
+        k = np.searchsorted(seqs, seqs - CUTOFF_LAG, side="right") - 1
+        valid = k >= 0
+        if not valid.any():
+            continue
+        src = k[valid]
+        dst = rows[valid]
+        for col in value_cols:
+            out[f"{out_prefix}_{col}"][dst] = g[col].to_numpy(dtype=float)[src]
+        days_since[dst] = (dates[valid] - dates[src]) / np.timedelta64(1, "D")
+
+    res = pd.DataFrame(out, index=df.index)
+    res[f"{out_prefix}_days_since"] = days_since
+    return res
