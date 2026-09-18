@@ -141,16 +141,27 @@ def p9122_prospective() -> tuple[pd.DataFrame, pd.DataFrame]:
             r.update({f"{int(f * 100)}٪": c for f, c in zip(FRACTIONS, cov)})
             rows.append(r)
 
-        # تجزیه‌ی افت: ماندگارها در برابر کل جامعه
-        stay = d[d.res_next > 0]
-        sc_stay = stay.rho_eb.to_numpy() * stay.n_res.to_numpy()
+        # تجزیه‌ی افت با **بودجه‌ی ثابت**: در هر سه سناریو دقیقاً همان تعداد نفر
+        # هدف می‌شوند. نسخه‌ی نخست این بند «فقط ماندگارها» را روی ۱۰٪ جامعه‌ی
+        # کوچک‌ترِ ماندگارها حساب می‌کرد — یعنی بودجه را هم کوچک می‌کرد — و عدد
+        # کمتری می‌داد که به‌اشتباه «هزینه‌ی خطای رتبه» خوانده می‌شد.
+        base_sc = d.rho_eb.to_numpy() * d.n_res.to_numpy()
+        k10 = int(round(0.10 * len(d)))
+        stayed = (d.res_next > 0).to_numpy()
+        # قاعده‌ی «اگر می‌دانستیم چه کسی می‌رود»: همان رتبه‌بندی، ولی خارج‌شده‌ها
+        # رد می‌شوند و جایشان نفر بعدی فهرست می‌آید — بودجه دست‌نخورده می‌ماند.
+        order = np.argsort(-base_sc, kind="stable")
+        pick_plain = order[:k10]
+        pick_noleave = order[stayed[order]][:k10]
         decomp.append({
             "جفت سال": f"{y0} → {y1}",
-            "پوشش ۱۰٪ — کل جامعه": _coverage(
-                d.rho_eb.to_numpy() * d.n_res.to_numpy(), w_next)[3],
-            "پوشش ۱۰٪ — فقط ماندگارها": _coverage(
-                sc_stay, stay.waste_next.to_numpy(dtype="float64"))[3],
-            "پوشش ۱۰٪ — اوراکل سال بعد": _coverage(w_next, w_next)[3],
+            "الف) قاعده‌ی ساده": w_next[pick_plain].sum() / w_next.sum(),
+            "ب) با دانستن خروج": w_next[pick_noleave].sum() / w_next.sum(),
+            "ج) اوراکل سال بعد": _coverage(w_next, w_next)[3],
+            "هزینه‌ی خروج (ب−الف)": (w_next[pick_noleave].sum()
+                                    - w_next[pick_plain].sum()) / w_next.sum(),
+            "هزینه‌ی خطای رتبه (ج−ب)": (_coverage(w_next, w_next)[3]
+                                       - w_next[pick_noleave].sum() / w_next.sum()),
             "نرخ خروج": churn,
         })
 
@@ -173,12 +184,12 @@ def p9122_prospective() -> tuple[pd.DataFrame, pd.DataFrame]:
     ax[0].legend(fontsize=7, loc="lower right")
 
     x = np.arange(len(dc))
-    ax[1].bar(x - 0.27, dc["پوشش ۱۰٪ — اوراکل سال بعد"] * 100, 0.27,
-              color=figs.C_GREY, label="اوراکل سال بعد")
-    ax[1].bar(x, dc["پوشش ۱۰٪ — فقط ماندگارها"] * 100, 0.27,
-              color=figs.C_OK, label="قاعده، فقط ماندگارها")
-    ax[1].bar(x + 0.27, dc["پوشش ۱۰٪ — کل جامعه"] * 100, 0.27,
-              color=figs.C_MAIN, label="قاعده، کل جامعه")
+    ax[1].bar(x - 0.27, dc["ج) اوراکل سال بعد"] * 100, 0.27,
+              color=figs.C_GREY, label="ج) اوراکل سال بعد")
+    ax[1].bar(x, dc["ب) با دانستن خروج"] * 100, 0.27,
+              color=figs.C_OK, label="ب) با دانستن خروج")
+    ax[1].bar(x + 0.27, dc["الف) قاعده‌ی ساده"] * 100, 0.27,
+              color=figs.C_MAIN, label="الف) قاعده‌ی ساده")
     ax[1].set_xticks(x, dc["جفت سال"], fontsize=7)
     ax[1].set_ylabel("پوشش هدررفت سال بعد در ۱۰٪ (٪)")
     ax[1].set_title("تجزیه‌ی افت: خطای رتبه در برابر خروج", fontsize=10)

@@ -205,21 +205,28 @@ def bootstrap_stability(X: np.ndarray, k: int, *, n_boot: int = 100,
 
     rng = np.random.default_rng(seed)
     base = KMeans(n_clusters=k, random_state=seed, n_init=10).fit(X)
-    ref = [set(np.flatnonzero(base.labels_ == c)) for c in range(k)]
+    ref_lab = base.labels_
     jac = np.zeros((n_boot, k))
     n = len(X)
     for b in range(n_boot):
         idx = rng.choice(n, size=n, replace=True)
-        lab = KMeans(n_clusters=k, random_state=int(rng.integers(1e6)),
-                     n_init=3).fit_predict(X[idx])
-        new = [set(idx[lab == c]) for c in range(k)]
+        km = KMeans(n_clusters=k, random_state=int(rng.integers(1e6)),
+                    n_init=3).fit(X[idx])
+        # ⚠️ برچسب برای **همه‌ی** نقاط اصلی پیش‌بینی می‌شود، نه فقط نقاط نمونه.
+        # نسخه‌ی نخست مجموعه‌ها را روی اندیس‌های یکتای نمونه می‌ساخت و هر شش نما
+        # دقیقاً ۰.۶۳۲ دادند — یعنی $1-1/e$، سهم نقاط یکتا در نمونه‌ی بوت‌استرپ.
+        # آن عدد پایداری خوشه را نمی‌سنجید، آرتیفکت بازنمونه‌گیری را می‌سنجید.
+        new_lab = km.predict(X)
         for c in range(k):
-            jac[b, c] = max((len(ref[c] & s) / len(ref[c] | s)) if (ref[c] | s) else 0.0
-                            for s in new)
+            a = ref_lab == c
+            jac[b, c] = max(
+                (np.count_nonzero(a & (new_lab == d))
+                 / max(np.count_nonzero(a | (new_lab == d)), 1))
+                for d in range(k))
     return pd.DataFrame({
         "خوشه": range(k),
-        "اندازه": [len(s) for s in ref],
-        "سهم": [len(s) / n for s in ref],
+        "اندازه": [int(np.count_nonzero(ref_lab == c)) for c in range(k)],
+        "سهم": [float(np.count_nonzero(ref_lab == c) / n) for c in range(k)],
         "ژاکارِ میانه": np.median(jac, axis=0),
         "ژاکارِ صدک ۵": np.quantile(jac, 0.05, axis=0),
         "وضعیت": ["پایدار" if m > 0.75 else ("با احتیاط" if m > 0.60 else "ناپایدار")

@@ -230,11 +230,16 @@ def p986_predictive(n_min: int = N_MIN_MAIN) -> pd.DataFrame:
         lab = pd.Series(KMeans(n_clusters=4, random_state=RANDOM_STATE,
                                n_init=10).fit_predict(X0), index=s0.PersonId.to_numpy())
         nxt = Y[(Y.year_block == y1) & (Y.n_res >= n_min)].set_index("PersonId")
-        both = lab.index.intersection(nxt.index)
+        # ⚠️ `intersection` نام اندیس را می‌اندازد وقتی دو طرف هم‌نام نباشند، و
+        # بعد `.loc[both]` همان نامِ تهی را به قاب تحمیل می‌کند ⇒ `reset_index`
+        # ستون `index` می‌سازد نه `PersonId`. نام‌گذاری صریح جلویش را می‌گیرد.
+        both = lab.index.intersection(nxt.index).rename("PersonId")
         d = pd.DataFrame({"PersonId": both, "cluster": lab[both].to_numpy(),
                           "y": nxt.loc[both, "rho_eb"].to_numpy()})
-        d = d.merge(s0.set_index("PersonId").loc[both, ["n_res", "rho_eb"]]
-                    .rename(columns={"rho_eb": "rho_prev"}).reset_index(), on="PersonId")
+        prev = (s0.set_index("PersonId").loc[both, ["n_res", "rho_eb"]]
+                .rename(columns={"rho_eb": "rho_prev"})
+                .rename_axis("PersonId").reset_index())
+        d = d.merge(prev, on="PersonId")
         d = d.merge(P, on="PersonId", how="left")
         tr, te = train_test_split(d, test_size=0.3, random_state=RANDOM_STATE)
 
