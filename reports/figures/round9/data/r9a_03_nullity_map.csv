@@ -1,0 +1,50 @@
+بلوک,ستون,سهم تهی
+ب۲ هدررفت,rho_dinner,0.5018592954022741
+ب۸ پاسخ به شوک,shock_gap,0.2505212475549728
+ب۸ پاسخ به شوک,rho_on_good_days,0.22823119747221804
+ب۴ توالی,lag1_autocorr,0.13571781699374502
+ب۴ توالی,waste_in_spells_share,0.10100380456978268
+ب۴ توالی,spell_len_max,0.10100380456978268
+ب۴ توالی,spell_len_mean,0.10100380456978268
+ب۸ پاسخ به شوک,rho_on_bad_days,0.0829912086494852
+ب۳ ریتم زمانی,burstiness,0.04118393052898566
+ب۳ ریتم زمانی,gap_cv,0.04118393052898566
+ب۲ هدررفت,rho_slope_seq,0.022698450228919028
+ب۷ چرخه‌ی عمر,max_gap,0.022698450228919028
+ب۳ ریتم زمانی,gap_mean,0.022698450228919028
+ب۸ پاسخ به شوک,shock_slope,0.022698450228919028
+ب۵ سبد مکانی,venue_switch_rate,0.022698450228919028
+ب۲ هدررفت,rho_lunch,0.001590611095587129
+ب۱ حجم و شدت,n_res,0.0
+ب۳ ریتم زمانی,dow_entropy,0.0
+ب۲ هدررفت,lunch_share,0.0
+ب۲ هدررفت,rho_eb,0.0
+ب۲ هدررفت,waste_share,0.0
+ب۲ هدررفت,rho_raw,0.0
+ب۱ حجم و شدت,res_per_active_day,0.0
+ب۱ حجم و شدت,density,0.0
+ب۲ هدررفت,n_waste,0.0
+ب۱ حجم و شدت,span_days,0.0
+ب۱ حجم و شدت,n_active_months,0.0
+ب۱ حجم و شدت,n_active_days,0.0
+ب۱ حجم و شدت,res_per_active_month,0.0
+ب۱ حجم و شدت,n_portions,0.0
+ب۴ توالی,spell_n,0.0
+ب۵ سبد مکانی,venue_top_share,0.0
+ب۵ سبد مکانی,n_venues,0.0
+ب۶ سبد منو,dish_top_share,0.0
+ب۶ سبد منو,dish_hhi,0.0
+ب۶ سبد منو,n_dishes,0.0
+ب۵ سبد مکانی,dorm_venue_share,0.0
+ب۵ سبد مکانی,venue_hhi,0.0
+ب۷ چرخه‌ی عمر,days_since_last,0.0
+ب۶ سبد منو,dish_entropy,0.0
+ب۶ سبد منو,mainstream_index,0.0
+ب۷ چرخه‌ی عمر,volume_trend,0.0
+ب۷ چرخه‌ی عمر,n_gaps_gt14,0.0
+ب۷ چرخه‌ی عمر,tenure_days,0.0
+ب۹ رضایت و فراموشی,vote_rate,0.0
+ب۹ رضایت و فراموشی,vote_good_share,0.0
+ب۹ رضایت و فراموشی,vote_bad_share,0.0
+ب۹ رضایت و فراموشی,vote_abstain_share,0.0
+ب۹ رضایت و فراموشی,forgot_card_rate,0.0

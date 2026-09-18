@@ -26,6 +26,21 @@ from src.config import FIGURES_DIR
 ROUND8_DIR = FIGURES_DIR / "round8"
 ROUND8_DATA = ROUND8_DIR / "data"
 
+#: مقصد جاری شکل‌ها. دور ۸ تنها مصرف‌کننده بود و مسیر ثابت بود؛ دور ۹ همان
+#: زیرساخت را لازم دارد ولی پوشه‌ی خودش را. `use_round()` این را جابه‌جا می‌کند
+#: تا دو نسخه‌ی واگرای `figs` به‌وجود نیاید.
+_DIR = ROUND8_DIR
+_DATA = ROUND8_DATA
+
+
+def use_round(name: str) -> None:
+    """پوشه‌ی مقصد شکل‌ها را روی `reports/figures/{name}/` می‌برد."""
+    global _DIR, _DATA
+    _DIR = FIGURES_DIR / name
+    _DATA = _DIR / "data"
+    _DIR.mkdir(parents=True, exist_ok=True)
+    _DATA.mkdir(parents=True, exist_ok=True)
+
 # پالت امن برای کوررنگی (Okabe–Ito) — ترتیب عمدی: اولی برای «مقدار اصلی»
 PALETTE = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#F0E442", "#666666"]
 C_MAIN, C_ALT, C_OK, C_WARN, C_ACCENT = PALETTE[0], PALETTE[1], PALETTE[2], PALETTE[3], PALETTE[4]
@@ -54,8 +69,8 @@ def setup() -> None:
     """استایل مشترک دور ۸ را اعمال می‌کند. اجراکننده اول این را صدا می‌زند."""
     viz_fa.setup()
     plt.rcParams.update(_STYLE)
-    ROUND8_DIR.mkdir(parents=True, exist_ok=True)
-    ROUND8_DATA.mkdir(parents=True, exist_ok=True)
+    _DIR.mkdir(parents=True, exist_ok=True)
+    _DATA.mkdir(parents=True, exist_ok=True)
 
 
 def new(nrows: int = 1, ncols: int = 1, w: float = 7.2, h: float = 4.3, **kw):
@@ -74,15 +89,14 @@ def save(fig, name: str, data: pd.DataFrame | None = None, *, caption: str | Non
 
     `name` بدون پسوند و بدون پیشوند مسیر — مثلاً `r8a_target_shape`.
     """
-    setup_needed = not ROUND8_DIR.exists()
-    if setup_needed:
-        ROUND8_DIR.mkdir(parents=True, exist_ok=True)
-        ROUND8_DATA.mkdir(parents=True, exist_ok=True)
-    path = ROUND8_DIR / f"{name}.png"
+    if not _DIR.exists():
+        _DIR.mkdir(parents=True, exist_ok=True)
+        _DATA.mkdir(parents=True, exist_ok=True)
+    path = _DIR / f"{name}.png"
     fig.savefig(path)
     plt.close(fig)
     if data is not None:
-        data.to_csv(ROUND8_DATA / f"{name}.csv", index=False)
+        data.to_csv(_DATA / f"{name}.csv", index=False)
     print(f"  ✔ شکل: {path.relative_to(Path.cwd()) if path.is_absolute() else path}"
           + (f"  ({len(data)} ردیف داده)" if data is not None else ""))
     if caption:
