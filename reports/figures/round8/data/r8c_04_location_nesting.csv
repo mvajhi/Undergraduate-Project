@@ -1,0 +1,10 @@
+a,b,n_a,n_b,cramers_v,b_determines_a,level,n_groups,r2
+city,campus,6.0,6.0,1.0,1.0,,,
+campus,city,6.0,6.0,1.0,1.0,,,
+campus,restaurant,6.0,71.0,1.0,1.0,,,
+venue_type,campus,6.0,6.0,0.4525101458517427,0.0,,,
+city,restaurant,6.0,71.0,1.0,1.0,,,
+,,,,,,city,6.0,0.0074945821016941805
+,,,,,,campus,6.0,0.0074945821016941805
+,,,,,,venue_type,6.0,0.05192211664115021
+,,,,,,restaurant,71.0,0.09893174803407401
