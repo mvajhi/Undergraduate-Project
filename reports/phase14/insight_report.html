@@ -1,0 +1,339 @@
+<title>۶۶۲ هزار پرس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&family=Vazirmatn:wght@300;400;500;700&display=swap">
+
+<style>
+:root{
+  --paper:#F3F5F1; --surface:#FFFFFF; --surface-2:#EAEDE6;
+  --ink:#191F1B; --ink-2:#48524B; --ink-3:#77817A;
+  --rule:#D6DBD2; --rule-strong:#B9C0B4;
+  --loss:#A3352A; --loss-soft:#F0DFDB;
+  --save:#2B6659; --save-soft:#D9E8E3;
+  --flag:#8A6212; --flag-soft:#F3E9D2;
+  --shadow:0 1px 2px rgba(25,31,27,.06), 0 8px 24px -16px rgba(25,31,27,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111512; --surface:#191E1A; --surface-2:#222822;
+    --ink:#E7EBE4; --ink-2:#A8B2A9; --ink-3:#7C867E;
+    --rule:#2C332D; --rule-strong:#3D453E;
+    --loss:#E07A68; --loss-soft:#33201C;
+    --save:#63B7A2; --save-soft:#152A25;
+    --flag:#D7AC55; --flag-soft:#2B2312;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 28px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111512; --surface:#191E1A; --surface-2:#222822;
+  --ink:#E7EBE4; --ink-2:#A8B2A9; --ink-3:#7C867E;
+  --rule:#2C332D; --rule-strong:#3D453E;
+  --loss:#E07A68; --loss-soft:#33201C;
+  --save:#63B7A2; --save-soft:#152A25;
+  --flag:#D7AC55; --flag-soft:#2B2312;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 28px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Vazirmatn", system-ui, sans-serif;
+  font-size:16px; line-height:1.85; font-weight:400;
+  direction:rtl; text-align:right;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px; margin:0 auto; padding:0 24px 96px}
+h1,h2,h3{font-family:"Markazi Text","Vazirmatn",serif; font-weight:600; text-wrap:balance; line-height:1.25; margin:0}
+p{margin:0}
+.num{font-family:"Vazirmatn",sans-serif; font-variant-numeric:tabular-nums; font-feature-settings:"ss01"}
+
+/* ---------- masthead ---------- */
+.mast{padding:72px 0 40px; border-bottom:2px solid var(--rule-strong)}
+.eyebrow{
+  font-size:12px; letter-spacing:.14em; color:var(--ink-3);
+  text-transform:uppercase; font-weight:500; margin-bottom:22px;
+}
+.mast h1{font-size:clamp(44px,7vw,76px); letter-spacing:-.01em}
+.mast .sub{
+  margin-top:14px; font-size:19px; color:var(--ink-2); max-width:60ch; line-height:1.75;
+}
+.meta{
+  margin-top:30px; display:flex; flex-wrap:wrap; gap:8px 26px;
+  font-size:13px; color:var(--ink-3);
+}
+.meta b{color:var(--ink-2); font-weight:500}
+
+/* ---------- headline stat ---------- */
+.headline{
+  margin:44px 0 0; padding:34px 32px; border-radius:3px;
+  background:var(--surface); border:1px solid var(--rule);
+  border-right:4px solid var(--loss); box-shadow:var(--shadow);
+}
+.headline .big{
+  font-family:"Markazi Text",serif; font-size:clamp(54px,9vw,88px);
+  line-height:1; color:var(--loss); font-variant-numeric:tabular-nums;
+}
+.headline .cap{margin-top:10px; font-size:17px; color:var(--ink-2)}
+
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1px; margin-top:1px; background:var(--rule)}
+.stat{background:var(--surface); padding:24px 22px}
+.stat .v{font-family:"Markazi Text",serif; font-size:40px; line-height:1.1; font-variant-numeric:tabular-nums}
+.stat .k{font-size:13.5px; color:var(--ink-2); margin-top:6px; line-height:1.6}
+.stat.up .v{color:var(--loss)} .stat.dn .v{color:var(--save)}
+
+/* ---------- sections ---------- */
+section{margin-top:72px}
+.sechead{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--rule-strong); padding-bottom:12px; margin-bottom:34px}
+.sechead h2{font-size:32px}
+.sechead .tag{font-size:12px; letter-spacing:.12em; color:var(--ink-3); margin-inline-start:auto}
+
+/* ---------- recommendations ---------- */
+.rec{
+  background:var(--surface); border:1px solid var(--rule); border-radius:3px;
+  padding:0; margin-bottom:26px; overflow:hidden; box-shadow:var(--shadow);
+}
+.rec > header{display:flex; gap:18px; padding:26px 28px 20px; align-items:flex-start}
+.rec .idx{
+  flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+  display:grid; place-items:center; font-variant-numeric:tabular-nums;
+  background:var(--surface-2); color:var(--ink-2); font-size:16px; font-weight:500;
+  border:1px solid var(--rule-strong);
+}
+.rec h3{font-size:25px; line-height:1.35}
+.rec .body{padding:0 28px 8px}
+.rec .body p{margin-bottom:16px; color:var(--ink-2)}
+.rec .body p strong{color:var(--ink); font-weight:500}
+
+.caveat{
+  margin:4px 28px 26px; padding:16px 18px; border-radius:3px;
+  background:var(--flag-soft); border:1px solid color-mix(in srgb, var(--flag) 30%, transparent);
+  font-size:14.5px; line-height:1.75;
+}
+.caveat b{color:var(--flag); font-weight:700; display:block; margin-bottom:4px; font-size:12px; letter-spacing:.08em}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto; margin:0 28px 24px; border:1px solid var(--rule); border-radius:3px}
+table{width:100%; border-collapse:collapse; font-size:14.5px; font-variant-numeric:tabular-nums}
+th,td{padding:11px 14px; text-align:right; border-bottom:1px solid var(--rule); white-space:nowrap}
+thead th{background:var(--surface-2); font-weight:500; color:var(--ink-2); font-size:13px; letter-spacing:.02em}
+tbody tr:last-child td{border-bottom:none}
+tr.hi td{background:var(--save-soft); font-weight:500}
+tr.now td{background:var(--loss-soft)}
+td.l{color:var(--loss); font-weight:500} td.s{color:var(--save); font-weight:500}
+
+/* ---------- figures ---------- */
+figure{margin:0 0 26px; padding:0 28px}
+figure.wide{padding:0}
+figure img{
+  width:100%; height:auto; display:block; border-radius:2px;
+  background:#fff; border:1px solid var(--rule);
+}
+figcaption{margin-top:10px; font-size:13.5px; color:var(--ink-3); line-height:1.7}
+figcaption b{color:var(--ink-2); font-weight:500}
+
+/* ---------- replication chips ---------- */
+.ledger{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:30px}
+.chip{border:1px solid var(--rule); border-radius:3px; padding:18px 18px; background:var(--surface)}
+.chip .v{font-family:"Markazi Text",serif; font-size:38px; line-height:1; font-variant-numeric:tabular-nums}
+.chip .k{font-size:13px; color:var(--ink-2); margin-top:4px}
+.chip.ok .v{color:var(--save)} .chip.fix .v{color:var(--flag)} .chip.bad .v{color:var(--loss)}
+
+.finding{border-top:1px solid var(--rule); padding:20px 0; display:grid; grid-template-columns:auto 1fr; gap:6px 16px}
+.finding:last-of-type{border-bottom:1px solid var(--rule)}
+.badge{
+  font-size:11.5px; letter-spacing:.06em; padding:4px 10px; border-radius:2px;
+  align-self:start; white-space:nowrap; font-weight:500;
+}
+.badge.bad{background:var(--loss-soft); color:var(--loss)}
+.badge.fix{background:var(--flag-soft); color:var(--flag)}
+.finding .t{font-size:17px; color:var(--ink); font-weight:500}
+.finding .d{grid-column:2; font-size:14.5px; color:var(--ink-2); line-height:1.75}
+.finding .d .was{color:var(--ink-3)}
+
+/* ---------- closing ---------- */
+.limits{background:var(--surface-2); border-radius:3px; padding:30px 32px}
+.limits h2{font-size:26px; margin-bottom:16px}
+.limits ul{margin:0; padding-inline-start:0; list-style:none; display:grid; gap:14px}
+.limits li{padding-inline-start:20px; position:relative; color:var(--ink-2); font-size:15.5px; line-height:1.8}
+.limits li::before{content:""; position:absolute; inset-inline-start:0; top:.75em; width:7px; height:1px; background:var(--rule-strong)}
+.limits li b{color:var(--ink); font-weight:500}
+
+footer{margin-top:60px; padding-top:22px; border-top:1px solid var(--rule); font-size:13px; color:var(--ink-3); line-height:1.9}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.86em; background:var(--surface-2); padding:1px 5px; border-radius:2px; direction:ltr; display:inline-block}
+a{color:var(--save)}
+:focus-visible{outline:2px solid var(--save); outline-offset:3px}
+@media (prefers-reduced-motion:no-preference){.rec,.chip{transition:border-color .2s ease}}
+@media (max-width:620px){
+  .rec > header{padding:22px 20px 16px} .rec .body,.tw,figure{padding-inline:20px}
+  .tw{margin-inline:20px} .caveat{margin-inline:20px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">سلف‌های دانشگاه تهران · مهر ۱۴۰۲ تا اسفند ۱۴۰۴</div>
+  <h1>۶۶۲ هزار پرس</h1>
+  <p class="sub">غذایی که پخته شد و کسی تحویلش نگرفت — و شش کاری که داده می‌گوید می‌شود درباره‌اش کرد.</p>
+  <div class="meta">
+    <span><b>۵۹۳</b> روز سرویس</span>
+    <span><b>۷۱</b> سلف</span>
+    <span><b>۸٬۱۹۶٬۷۷۴</b> رزرو</span>
+    <span><b>۶۳٬۹۳۱</b> موقعیت پخت</span>
+    <span><b>۴۰</b> نمودار پشتیبان</span>
+  </div>
+</header>
+
+<div class="headline">
+  <div class="big num">۶۶۲٬۰۶۳</div>
+  <p class="cap">پرس هدررفته در بازه‌ی بررسی — ۸.۰۸٪ کل رزروها</p>
+</div>
+
+<div class="stats">
+  <div class="stat up"><div class="v num">‎+۱۲.۲٪</div><div class="k">رشد نسبی نرخ هدررفت در سه سال تحصیلی؛ ۹۴٪ آن تغییر رفتار است، نه جابه‌جایی دانشجو بین سلف‌ها</div></div>
+  <div class="stat"><div class="v num">۵۳.۴٪</div><div class="k">سهم ۱۰٪ موقعیت‌های پرهدررفت از کل هدررفت</div></div>
+  <div class="stat dn"><div class="v num">۴۸ : ۱</div><div class="k">به‌ازای هر یک پرس کمبود، این تعداد پرس دورریز صرفه‌جویی می‌شود</div></div>
+</div>
+
+<section>
+  <div class="sechead"><h2>شش توصیه</h2><span class="tag">هر کدام با عدد اثر و شرط ابطال</span></div>
+
+  <article class="rec">
+    <header><div class="idx num">۱</div><h3>قاعده‌ی پخت محافظه‌کارانه، به‌جای «پخت = تعداد رزرو»</h3></header>
+    <div class="body"><p>به‌جای پختن به‌اندازه‌ی تعداد رزرو، به‌اندازه‌ی <strong>رزرو × (۱ − q)</strong> بپزید؛ <strong>q</strong> چندک ۱۰٪ نرخ عدم‌دریافت تاریخی همان سلف در همان وعده است.</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>سیاست</th><th>دورریز کل بازه</th><th>کمبود</th><th>نرخ کمبود</th></tr></thead>
+      <tbody>
+        <tr class="now"><td>فعلی (پخت = رزرو)</td><td class="l">۶۶۲٬۰۶۳</td><td>۰</td><td>۰٪</td></tr>
+        <tr><td>چندک ۵٪</td><td>۴۰۶٬۴۲۴</td><td>۲٬۴۹۹</td><td>۰.۰۳٪</td></tr>
+        <tr class="hi"><td>چندک ۱۰٪</td><td class="s">۳۴۷٬۵۳۳</td><td>۶٬۴۹۵</td><td>۰.۰۹٪</td></tr>
+        <tr><td>چندک ۲۰٪</td><td>۲۷۵٬۱۹۹</td><td>۱۹٬۶۳۰</td><td>۰.۲۶٪</td></tr>
+      </tbody>
+    </table></div>
+    <figure><img src="fig/risk.png" alt="نمودار مبادله‌ی دورریز و کمبود به‌ازای مقادیر مختلف چندک سیاست">
+      <figcaption><b>مبادله‌ی دورریز و کمبود.</b> خط‌چین خاکستری سیاست فعلی است. مرز کارا در قاب راست نشان می‌دهد هر واحد کاهش دورریز، در ابتدا تقریباً رایگان است.</figcaption></figure>
+    <div class="caveat"><b>زیر چه شرطی باطل می‌شود</b>
+      اگر هزینه‌ی یک پرس کمبود بیش از ۴۸ برابر هزینه‌ی یک پرس دورریز باشد — شامل نارضایتی و اعتبار، نه فقط مواد اولیه. و این شبیه‌سازی از تاریخچه‌ی <em>کل بازه</em> استفاده می‌کند که در لحظه‌ی تصمیم موجود نیست؛ عدد واقعی از این کمتر خواهد بود. این رقم یک <b style="display:inline">مرز بالا</b> است، نه وعده.</div>
+  </article>
+
+  <article class="rec">
+    <header><div class="idx num">۲</div><h3>بودجه‌ی توجه را روی ۲۰٪ موقعیت‌ها بگذارید</h3></header>
+    <div class="body"><p>هدررفت بسیار متمرکز است — ضریب جینی <strong>۰.۷۱۶</strong> روی موقعیت‌های پخت. اگر سیستم پیش‌بینی قرار است مرحله‌به‌مرحله مستقر شود، از پرهدررفت‌ترین موقعیت‌ها شروع کنید، نه از همه‌جا هم‌زمان.</p></div>
+    <figure><img src="fig/lorenz.png" alt="منحنی لورنتس تمرکز هدررفت و منحنی پوشش-ارزش">
+      <figcaption><b>پوشش ۲۰٪ موقعیت‌ها، ۷۴.۸٪ ارزش را می‌گیرد.</b> قاب چپ نشان می‌دهد تمرکز روی محور موجودیت شدید است (جینی ۰.۷۲) و روی محور زمان ملایم (۰.۳۶) — یعنی «کدام سلف» بسیار بیشتر از «کدام روز» تعیین می‌کند پول کجا می‌رود.</figcaption></figure>
+    <div class="caveat"><b>زیر چه شرطی باطل می‌شود</b>
+      اگر هزینه‌ی راه‌اندازی مستقل از تعداد موقعیت‌ها باشد — یعنی پوشش‌دادن ۱۰۰٪ هزینه‌ی اضافی نداشته باشد — این اولویت‌بندی بی‌مورد است.</div>
+  </article>
+
+  <article class="rec">
+    <header><div class="idx num">۳</div><h3>چهارشنبه‌ها کمتر بپزید، یکشنبه‌ها نه</h3></header>
+    <div class="body"><p>یک تعدیل ثابت روز-هفته‌ای، بدون نیاز به هیچ مدلی. چهارشنبه نرخ عدم‌دریافتش <strong>۵۲٪ بالاتر</strong> از یکشنبه است، روی محوری که از قبل معلوم است.</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>روز</th><th>نرخ عدم‌دریافت</th><th>سهم از هدررفت</th><th>سهم از حجم</th></tr></thead>
+      <tbody>
+        <tr class="now"><td>چهارشنبه</td><td class="l">۱۰.۳۱٪</td><td>۲۰.۶٪</td><td>۱۶.۲٪</td></tr>
+        <tr><td>سه‌شنبه</td><td>۸.۶۶٪</td><td>۲۰.۹٪</td><td>۱۹.۵٪</td></tr>
+        <tr><td>پنجشنبه</td><td>۸.۱۱٪</td><td>۷.۴٪</td><td>۷.۳٪</td></tr>
+        <tr><td>دوشنبه</td><td>۷.۷۱٪</td><td>۱۸.۸٪</td><td>۱۹.۷٪</td></tr>
+        <tr><td>شنبه</td><td>۷.۲۰٪</td><td>۱۴.۷٪</td><td>۱۶.۵٪</td></tr>
+        <tr class="hi"><td>یکشنبه</td><td class="s">۶.۷۷٪</td><td>۱۶.۵٪</td><td>۱۹.۷٪</td></tr>
+      </tbody>
+    </table></div>
+    <div class="caveat"><b>زیر چه شرطی باطل می‌شود</b>
+      اگر تقویم آموزشی تغییر کند. الگوی روز-هفته بین سال‌های مجاور با همبستگی ۰.۶۹ تکرار می‌شود ولی در دو سال فاصله به ۰.۳۷ می‌افتد — یعنی باید هر سال بازآزمون شود.</div>
+  </article>
+
+  <article class="rec">
+    <header><div class="idx num">۴</div><h3>سلف‌های دانشکده‌ای در وعده‌ی ناهار، نقطه‌ی تمرکزند</h3></header>
+    <div class="body"><p>ناهار <strong>۷۰.۴٪</strong> هدررفت را می‌سازد با ۶۳.۹٪ حجم. سلف دانشکده‌ای <strong>۴۳.۵٪</strong> با ۳۵.۸٪ حجم. سه محور مستقل یک‌جا جمع می‌شوند.</p></div>
+    <figure><img src="fig/money.png" alt="نقشه‌ی پرس هدررفته به تفکیک محورهای تصمیم">
+      <figcaption><b>نقشه‌ی پول.</b> میله‌های قرمز بخش‌هایی‌اند که سهمشان از هدررفت بیشتر از سهمشان از حجم است. خانه‌ی روز×وعده در قاب راست می‌گوید کدام ترکیب بیشترین پرس را می‌برد.</figcaption></figure>
+    <div class="caveat"><b>زیر چه شرطی باطل می‌شود</b>
+      «رستوران آزاد» پرنرخ‌ترین بخش است ولی فقط ۰.۴٪ هدررفت می‌سازد. اگر معیار تصمیم «بالاترین نرخ» باشد به‌جای «بیشترین پرس»، این توصیه غلط می‌شود. معیار درست پرس است.</div>
+  </article>
+
+  <article class="rec">
+    <header><div class="idx num">۵</div><h3>رمضان مسئله‌ی ظرفیت است، نه مسئله‌ی نرخ</h3></header>
+    <div class="body"><p>سرویس ناهار در رمضان عملاً تعطیل است — در کل رمضان‌های بازه فقط <strong>۲ روز</strong> سرویس ناهار وجود دارد. حجم شام از حدود یک برابر روز عادی به <strong>۰.۱۷ برابر</strong> می‌رسد و بعد برمی‌گردد. نرخ عدم‌دریافت شام ۱.۵۸ برابر می‌شود — واقعی، ولی در برابر افت حجم شش برابری، اثر درجه‌دومی است.</p></div>
+    <figure><img src="fig/ramadan.png" alt="پوشش داده‌ی رمضان، فروپاشی حجم، و نرخ شام به تفکیک سال">
+      <figcaption><b>و این ضعیف‌ترین شواهد گزارش است.</b> قاب چپ پوشش واقعی را نشان می‌دهد: دو رمضان موجود فقط در روزهای ۱ تا ۷ هم‌پوشانی دارند، روزهای ۱۷ تا ۲۲ در هیچ سالی داده ندارند. قاب راست نشان می‌دهد در همان هفت روزِ مشترک، دو سال <b>چهار برابر</b> اختلاف می‌دهند.</figcaption></figure>
+    <div class="caveat"><b>زیر چه شرطی باطل می‌شود</b>
+      هر عدد روزبه‌روز رمضان قابل اتکا نیست — بازه فقط ۳۳ روز سرویس رمضانی دارد از ۹۰ روز تقویمی، و هر نقطه‌ی منحنی از یک روز می‌آید. فقط عدد تجمیعی ۱.۵۸ برابر و افت حجم قابل نقل‌اند.</div>
+  </article>
+
+  <article class="rec">
+    <header><div class="idx num">۶</div><h3>نسبت هزینه‌ی دورریز به کمبود را مشخص کنید</h3></header>
+    <div class="body"><p>مهم‌ترین عدد ناشناخته‌ی این پروژه همین است. نقطه‌ی عملیاتی بهینه با آن جابه‌جا می‌شود، و جابه‌جایی‌اش <strong>بزرگ‌تر از هر انتخاب فنی دیگری</strong> است.</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>نسبت هزینه‌ی دورریز به کمبود</th><th>چندک بهینه (کل)</th><th>دامنه بین بخش‌ها</th></tr></thead>
+      <tbody>
+        <tr><td>۱ به ۱</td><td>۰.۴۴</td><td>۰.۴۲ تا ۰.۵۰</td></tr>
+        <tr class="hi"><td>۱ به ۴</td><td>۰.۲۰</td><td>۰.۱۶ تا ۰.۲۶</td></tr>
+      </tbody>
+    </table></div>
+    <figure><img src="fig/tau.png" alt="منحنی هزینه به‌ازای چندک سیاست، به تفکیک بخش و نسبت هزینه">
+      <figcaption><b>یک چندک واحد برای همه‌ی سلف‌ها بهینه نیست</b> — از ۰.۱۶ برای خوابگاه‌ها تا ۰.۲۶ برای خوابگاه‌های سطح شهر، یعنی بازه‌ای ۶۳ درصدی.</figcaption></figure>
+    <div class="caveat"><b>زیر چه شرطی باطل می‌شود</b>
+      اگر هزینه‌ی کمبود آستانه‌ای باشد — تا یک حدی بی‌هزینه و بعد از آن بسیار پرهزینه — نه خطی، این تحلیل باید با تابع هزینه‌ی آستانه‌ای بازاجرا شود.</div>
+  </article>
+</section>
+
+<section>
+  <div class="sechead"><h2>یافته‌ای که تازه است</h2><span class="tag">هدف در حال بزرگ‌شدن است</span></div>
+  <p style="color:var(--ink-2); margin-bottom:26px; max-width:62ch">نرخ هدررفت در سه سال تحصیلی یکنواخت بالا رفته: ۷.۷۱٪ ← ۸.۲۵٪ ← ۸.۶۵٪. سه روش مستقل هم‌جهت‌اند، و تجزیه می‌گوید ۹۴٪ این رشد <strong>تغییر رفتار درون همان سلف‌ها</strong> است. ترکیب موجودیت‌ها نه‌تنها توضیحش نمی‌دهد، کمی در جهت مخالف کار می‌کند.</p>
+  <figure class="wide"><img src="fig/drift.png" alt="سری ماهانه‌ی نرخ با خط روند، و مقایسه‌ی سال‌به‌سال با و بدون کنترل ترکیب سلف">
+    <figcaption><b>کنترل ترکیب، رانش را بزرگ‌تر می‌کند نه کوچک‌تر.</b> ستون سبز فقط ۶۱ سلفی را می‌شمارد که در هر سه سال حضور داشته‌اند؛ رانششان ۱.۰۸ واحد درصد است در برابر ۰.۹۴ واحد کل.</figcaption></figure>
+</section>
+
+<section>
+  <div class="sechead"><h2>بازآزمون یافته‌های قبلی</h2><span class="tag">۳۵ یافته روی داده‌ی کامل بازاجرا شد</span></div>
+  <div class="ledger">
+    <div class="chip ok"><div class="v num">۲۲</div><div class="k">تکرار شد</div></div>
+    <div class="chip fix"><div class="v num">۸</div><div class="k">تصحیح شد</div></div>
+    <div class="chip bad"><div class="v num">۴</div><div class="k">بازتولید نشد</div></div>
+    <div class="chip"><div class="v num">۱</div><div class="k">غیرقابل‌آزمون</div></div>
+  </div>
+  <p style="color:var(--ink-2); margin-bottom:28px; max-width:62ch">یک‌سوم یافته‌های بازآزموده عددشان عوض شد. مهم‌ترین‌هایشان:</p>
+
+  <div class="finding"><span class="badge bad">بازتولید نشد</span><div class="t">«شهر بزرگ‌ترین عامل است»</div>
+    <div class="d">شهر کمتر از یک درصد تفاوت بین موقعیت‌ها را توضیح می‌دهد، و اساساً یک نام دیگر برای «کدام سلف» است: هر نام سلف، شهرش را کامل تعیین می‌کند. <span class="was">عدد قبلی: بزرگ‌ترین عامل · عدد تازه: ۰.۰۰۷۵ سهم از واریانس</span></div></div>
+
+  <div class="finding"><span class="badge bad">بازتولید نشد</span><div class="t">«روند زمانی وجود ندارد»</div>
+    <div class="d">با ۱۴۲ روز داده، آزمون توان کافی نداشت. با ۵۹۳ روز، روند صعودی معنادار است. <span class="was">عدد تازه: ‎+۰.۴۳٪ در سال، p = ۰.۰۳۶</span></div></div>
+
+  <div class="finding"><span class="badge fix">تصحیح شد</span><div class="t">«تمرکز هدررفت متوسط است»</div>
+    <div class="d">«متوسط» فقط در سطح روز درست است. در سطح موقعیت پخت، تمرکز شدید است. <span class="was">عدد تازه: جینی ۰.۷۱۶ · ۱۰٪ موقعیت‌ها ۵۳.۴٪ هدررفت</span></div></div>
+
+  <div class="finding"><span class="badge fix">تصحیح شد</span><div class="t">«بازه سه رمضان کامل دارد»</div>
+    <div class="d">تقویم ۹۰ روز رمضان دارد؛ داده‌ی سرویس ۳۳ روز. رمضان سال آخر کاملاً بیرون از بازه است. <span class="was">هر تحلیل روزبه‌روز رمضان روی این داده قابل اتکا نیست</span></div></div>
+
+  <div class="finding"><span class="badge fix">تصحیح شد</span><div class="t">«شام رمضان نرخ دو برابر دارد»</div>
+    <div class="d">نسبت واقعی ۱.۵۸ برابر است. <span class="was">عدد قبلی: ۲ برابر · عدد تازه: ۱۰.۴۶٪ در برابر ۶.۶۱٪</span></div></div>
+
+  <figure class="wide" style="margin-top:32px"><img src="fig/ledger.png" alt="نمودار وضعیت ۳۵ یافته‌ی بازآزموده">
+    <figcaption><b>چرا این بازآزمون لازم بود.</b> دوازده بسته‌ی تحلیلی پیش‌تر «تأییدشده» اعلام و بازاجرا نشده بودند. هر دو بسته‌ای که واقعاً بازاجرا شد، یافته‌ی تغییریافته داد.</figcaption></figure>
+</section>
+
+<section>
+  <div class="sechead"><h2>سقف آنچه یک مدل می‌تواند بکند</h2><span class="tag">چرا شناخت بهتر سلف‌ها کافی نیست</span></div>
+  <p style="color:var(--ink-2); margin-bottom:26px; max-width:62ch">هر چیزی که از <strong>هویت</strong> می‌آید — کدام سلف، کدام وعده، کدام غذا — سقفی حدود ۰.۱۹ دارد. اگر کسی وضعیت واقعی همان روز در همان سلف را می‌دانست، به ۰.۷۶ می‌رسید. فاصله‌ی این دو، دقیقاً همان چیزی است که پیش‌بینی باید بسازد.</p>
+  <figure class="wide"><img src="fig/oracle.png" alt="نردبان اطلاعات و حساسیت سهم اثر روز به آستانه‌ی اندازه‌ی سلول">
+    <figcaption><b>نارنجی‌ها دانشِ غیرقابل‌دسترس‌اند.</b> نکته‌ی ظریف: دانستن میانگین کل روز به‌تنهایی از شناخت کامل هویت سلول کمتر می‌ارزد. آنچه ۰.۷۶ می‌سازد، برهم‌کنش روز و سلف است. قاب راست نشان می‌دهد چرا همین عدد در گزارش‌های مختلف پروژه متفاوت بود: با تغییر آستانه‌ی اندازه‌ی موقعیت، ۲.۵ برابر جابه‌جا می‌شود.</figcaption></figure>
+</section>
+
+<section>
+  <div class="limits">
+    <h2>آنچه این گزارش نمی‌گوید</h2>
+    <ul>
+      <li><b>علت رانش صعودی را نمی‌داند.</b> می‌داند که رفتاری است، نه ترکیبی. اینکه چرا رفتار عوض شده — قیمت، کیفیت غذا، تغییر جمعیت دانشجویی، عادتِ پس از دوره‌ی اختلال — از این داده درنمی‌آید.</li>
+      <li><b>درباره‌ی رفتار افراد چیزی نمی‌گوید.</b> تحلیل سطح فرد — ۸.۳۷ میلیون رزرو و ۴۶٬۶۵۹ نفر — در این دور اجرا نشد. یافته‌های قبلیِ سطح فرد بازآزمون نشده‌اند و وضعیتشان نامعلوم است، نه تأییدشده.</li>
+      <li><b>هیچ مدل پیش‌بینی نهایی معرفی نمی‌کند.</b> مدل‌های استفاده‌شده فقط برای تعیین سقف و منحنی یادگیری بودند.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  هر عدد این صفحه از یک ماژول بازتولیدپذیر در <code>src/eda_lib/runners/r8*.py</code> می‌آید و داده‌ی پشت هر نمودار کنارش در <code>reports/figures/round8/data/</code> ذخیره شده. اسناد فنی: <code>doc/eda/round8/</code>.
+</footer>
+
+</div>
