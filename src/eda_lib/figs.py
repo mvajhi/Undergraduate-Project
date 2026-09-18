@@ -127,6 +127,37 @@ def block_bootstrap_ci(df: pd.DataFrame, value: str, stat, *,
     return tuple(np.nanquantile(out, [alpha / 2, 1 - alpha / 2]))
 
 
+def block_bootstrap_rate_ci(df: pd.DataFrame, *, num: str = "NoRecv", den: str = "Res",
+                            day_col: str = "date_gregorian", venue_col: str = "restaurant",
+                            n_boot: int = 400, alpha: float = 0.05, seed: int = 42):
+    """همان بوت‌استرپ بلوکی، ولی برای آماره‌ی **نرخ وزنی** و صدها برابر سریع‌تر.
+
+    نسخه‌ی عمومی در هر تکرار قاب‌ها را به‌هم می‌چسباند؛ برای نرخ لازم نیست — نرخ
+    فقط به دو جمع نیاز دارد، پس داده یک‌بار به ماتریس روز×سلف تبدیل می‌شود و بقیه
+    جبر خطی روی numpy است.
+    """
+    rng = np.random.default_rng(seed)
+    g = df.groupby([day_col, venue_col], observed=True)[[num, den]].sum()
+    days = g.index.get_level_values(0).unique()
+    venues = g.index.get_level_values(1).unique()
+    di = {d: i for i, d in enumerate(days)}
+    vi = {v: i for i, v in enumerate(venues)}
+    N = np.zeros((len(days), len(venues)))
+    D = np.zeros_like(N)
+    ii = [di[d] for d in g.index.get_level_values(0)]
+    jj = [vi[v] for v in g.index.get_level_values(1)]
+    N[ii, jj] = g[num].to_numpy()
+    D[ii, jj] = g[den].to_numpy()
+    out = np.empty(n_boot)
+    for b in range(n_boot):
+        ds = rng.integers(0, len(days), len(days))
+        vs = rng.integers(0, len(venues), len(venues))
+        sub_n = N[np.ix_(ds, vs)].sum()
+        sub_d = D[np.ix_(ds, vs)].sum()
+        out[b] = sub_n / sub_d if sub_d else np.nan
+    return tuple(np.nanquantile(out, [alpha / 2, 1 - alpha / 2]))
+
+
 def weighted_rate(df: pd.DataFrame, num: str = "NoRecv", den: str = "Res") -> float:
     """نرخ وزنی — تنها تعریف معتبر «نرخ یک گروه» در این پروژه.
 
