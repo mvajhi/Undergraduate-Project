@@ -15,8 +15,8 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
-import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.config import DATA_RAW
@@ -66,6 +66,12 @@ _TEXT_COLUMNS = [
     "PersonType", "Comment", "Reception",
 ]
 
+#: ستون‌هایی که **فقط** dictionary-encode می‌شوند و نرمال‌سازی متنی **نمی‌گیرند**.
+#: `DateReserve` ~۸۸۰ مقدار یکتا روی ۸.۴ میلیون ردیف دارد و به‌صورت رشته‌ی آزاد
+#: ۴۸۵ مگابایت می‌گیرد؛ ولی `normalize_persian_text` روی آن **ممنوع** است چون
+#: می‌تواند ارقام را دستکاری کند.
+_DICT_ONLY_COLUMNS = ["DateReserve"]
+
 
 def verify_snapshot(path: Path | str = RAW_V4_PATH, *, strict: bool = True) -> str:
     """هش فایل خام را با مقدار ثبت‌شده در manifest مقایسه می‌کند.
@@ -108,18 +114,18 @@ def load_raw_v4(
         columns.append("mealid")
 
     filters = [("mealid", "in", list(meals))] if meals is not None else None
-    table = pq.read_table(path, columns=columns, filters=filters)
-
-    dict_cols = [c for c in _TEXT_COLUMNS if c in table.column_names]
-    if dict_cols:
-        table = table.cast(
-            pa.schema([
-                f.with_type(pa.dictionary(pa.int32(), pa.large_string()))
-                if f.name in dict_cols else f
-                for f in table.schema
-            ])
-        )
-    return table.to_pandas()
+    dict_cols = [c for c in (*_TEXT_COLUMNS, *_DICT_ONLY_COLUMNS) if c in columns]
+    # ⚠️ `read_dictionary` ستون‌ها را **حین خواندن** dictionary می‌کند، نه با
+    # `table.cast()` پس از آن. تفاوتش حافظه است نه سلیقه: `cast` جدول تازه‌ای
+    # می‌سازد در حالی که جدول رشته‌ی آزاد هنوز زنده است ⇒ اوج مصرف دو برابر.
+    # روی ۱۴ ستون، ۵٬۳۶۰ مگابایت در برابر **۲٬۰۰۱**.
+    table = pq.read_table(path, columns=columns, filters=filters,
+                          read_dictionary=dict_cols or None)
+    # ⚠️ `self_destruct` بافرهای Arrow را حین تبدیل آزاد می‌کند. بدون آن، در لحظه‌ی
+    # `to_pandas` هم جدول Arrow و هم قاب pandas هم‌زمان در حافظه‌اند و اوج مصرف
+    # تقریباً **دو برابر** می‌شود. ⚠️ پیامدش این است که `table` پس از فراخوانی
+    # دیگر قابل‌استفاده نیست — به همین دلیل بلافاصله برگردانده می‌شود.
+    return table.to_pandas(self_destruct=True, split_blocks=True)
 
 
 def _normalize_categories(s: pd.Series) -> pd.Series:
@@ -156,13 +162,45 @@ def normalization_collisions(df: pd.DataFrame, column: str) -> pd.DataFrame:
     return merged.reset_index().rename(columns={"raw": "raw_variants"})
 
 
+def _codes_and_categories(s: pd.Series) -> tuple[np.ndarray, np.ndarray]:
+    """کدها و دسته‌های یک ستون — چه categorical باشد چه نباشد."""
+    cat = s if isinstance(s.dtype, pd.CategoricalDtype) else s.astype("category")
+    return cat.cat.codes.to_numpy(), np.asarray(cat.cat.categories, dtype=object)
+
+
+def _from_category_map(codes: np.ndarray, values: np.ndarray) -> pd.Categorical:
+    """ستون مشتق را از روی **دسته‌ها** می‌سازد، نه از روی ردیف‌ها.
+
+    همان ترفند `_normalize_categories`: به‌جای ۸.۴ میلیون فراخوانی، ~۸۸۰ تا. و چون
+    نگاشت می‌تواند دو دسته را به یکی برساند (`1402/9/1` و `1402/09/01` هر دو
+    `1402-09-01`)، ادغام باید از راه کدها انجام شود.
+    """
+    uniq, inverse = np.unique(values, return_inverse=True)
+    new_codes = np.where(codes >= 0, inverse[np.maximum(codes, 0)], -1)
+    return pd.Categorical.from_codes(new_codes, categories=uniq)
+
+
 def clean_v4(df: pd.DataFrame, *, normalize_text: bool = True) -> pd.DataFrame:
     """پاکسازی پایه: نرمال‌سازی متن، ستون‌های مشتق تاریخ/وعده، و هدف `dont_receive`.
 
     چیزی حذف نمی‌کند — تصمیم‌های دامنه (سلف موقت، رستوران مکمل، وعده‌های فرعی) عمداً
     اینجا نیستند و در بندهای ۱۳-۵ و ۱۳-۷ جداگانه گرفته و مستند می‌شوند.
+
+    ## ⚠️ قرارداد حافظه — چرا این تابع این‌قدر محتاط نوشته شده
+
+    نسخه‌ی نخست این تابع روی ماشین ۱۶ گیگابایتی پروژه با **OOM کشته می‌شد**. سه علت
+    داشت و هر سه اینجا رفع شده‌اند:
+
+    - `df.copy()` عمیق، کل قاب را دوباره می‌ساخت ⇒ حالا کپی **کم‌عمق** است.
+    - `DateReserve.str.split(expand=True)` سه ستون رشته‌ی ۸.۴ میلیونی می‌ساخت
+      (~۱.۵ گیگابایت) ⇒ حالا تجزیه روی **دسته‌ها** انجام می‌شود (~۸۸۰ تا).
+    - `date_jalali` و `meal` به‌صورت رشته‌ی آزاد ساخته می‌شدند (۴۹۴ و ۴۵۵ مگابایت
+      برای ستون‌هایی با ۸۸۰ و **۲** مقدار یکتا) ⇒ حالا `category`اند.
+
+    اوج حافظه از **۵.۵ گیگابایت** به زیر **۰.۷ گیگابایت** رسید. مقادیر ستون‌ها
+    دقیقاً همان‌اند؛ فقط `dtype` سه ستون از `object` به `category` رفته.
     """
-    out = df.copy()
+    out = df.copy(deep=False)
 
     if normalize_text:
         for col in _TEXT_COLUMNS:
@@ -171,22 +209,37 @@ def clean_v4(df: pd.DataFrame, *, normalize_text: bool = True) -> pd.DataFrame:
             if isinstance(out[col].dtype, pd.CategoricalDtype):
                 out[col] = _normalize_categories(out[col])
             else:
-                out[col] = out[col].map(normalize_persian_text)
+                out[col] = _normalize_categories(out[col].astype("category"))
 
     if "miladi" in out.columns:
         out["date_gregorian"] = pd.to_datetime(out["miladi"]).dt.normalize()
 
     if "DateReserve" in out.columns:
         # «1402/9/8» → «1402-09-08» تا با قرارداد فایل تجمیعی یکی شود (بند ۳-۵ WBS).
-        parts = out["DateReserve"].str.split("/", expand=True)
-        out["date_jalali"] = (
-            parts[0] + "-" + parts[1].str.zfill(2) + "-" + parts[2].str.zfill(2)
-        )
-        out["jyear"] = parts[0].astype("int16")
-        out["jmonth"] = parts[1].astype("int8")
+        codes, cats = _codes_and_categories(out["DateReserve"])
+        parts = [str(c).split("/") for c in cats]
+        jalali = np.array([f"{p[0]}-{int(p[1]):02d}-{int(p[2]):02d}" for p in parts],
+                          dtype=object)
+        out["date_jalali"] = _from_category_map(codes, jalali)
+        jy = np.array([int(p[0]) for p in parts], dtype="int16")
+        jm = np.array([int(p[1]) for p in parts], dtype="int8")
+        safe = np.maximum(codes, 0)
+        out["jyear"] = pd.Series(np.where(codes >= 0, jy[safe], -1), index=out.index,
+                                 dtype="int16")
+        out["jmonth"] = pd.Series(np.where(codes >= 0, jm[safe], -1), index=out.index,
+                                  dtype="int8")
 
     if "mealid" in out.columns:
-        out["meal"] = out["mealid"].map(MEAL_BY_ID)
+        ids = out["mealid"].to_numpy()
+        uniq_ids, inverse = np.unique(ids, return_inverse=True)
+        labels = np.array([MEAL_BY_ID.get(int(i)) for i in uniq_ids], dtype=object)
+        known = np.array([lbl is not None for lbl in labels])
+        # وعده‌ی ناشناخته ⇒ کد ‎-۱ (NaN)، نه یک دسته‌ی ساختگی
+        lut = np.full(len(uniq_ids), -1, dtype="int64")
+        kept = np.asarray(labels[known], dtype=object)
+        uniq_lbl, lbl_inv = np.unique(kept, return_inverse=True)
+        lut[known] = lbl_inv
+        out["meal"] = pd.Categorical.from_codes(lut[inverse], categories=uniq_lbl)
 
     if "ReserveStatus" in out.columns:
         unexpected = set(out["ReserveStatus"].dropna().unique()) - DONT_RECEIVE_STATUSES - _RECEIVE_STATUSES

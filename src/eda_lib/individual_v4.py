@@ -33,10 +33,16 @@ _KEEP = ["PersonId", "miladi", "DateReserve", "mealid", "ReserveStatus", "Count"
          "GroupName", "PersonType", "FieldName"]
 
 
-def build_person_level_v4(force: bool = False) -> pd.DataFrame:
-    """ساخت (یا خواندن کشِ) جدول سطح فرد v4، محدود به رده‌ی `core` و ناهار/شام."""
+def build_person_level_v4(force: bool = False,
+                          columns: list[str] | None = None) -> pd.DataFrame:
+    """ساخت (یا خواندن کشِ) جدول سطح فرد v4، محدود به رده‌ی `core` و ناهار/شام.
+
+    `columns` فقط همان ستون‌ها را از کش می‌خواند. تحلیل دوره‌ی غیبت به سه ستون
+    نیاز دارد (`PersonId`, `meal_seq`, `dont_receive`) و خواندن هر ۱۵ ستون برای آن،
+    حافظه را بی‌دلیل چند برابر می‌کند.
+    """
     if PERSON_V4.exists() and not force:
-        return pd.read_parquet(PERSON_V4)
+        return pd.read_parquet(PERSON_V4, columns=columns)
 
     from src.data.load_v4 import load_clean_v4
     from src.eda_lib.restaurant_taxonomy import CORE_CLASS, add_restaurant_class
@@ -59,7 +65,7 @@ def build_person_level_v4(force: bool = False) -> pd.DataFrame:
     out["dont_receive"] = out.dont_receive.astype(bool)
     PERSON_V4.parent.mkdir(parents=True, exist_ok=True)
     out.to_parquet(PERSON_V4, index=False)
-    return out
+    return out[columns] if columns else out
 
 
 # ---------------------------------------------------------------------------

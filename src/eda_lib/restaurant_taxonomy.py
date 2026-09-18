@@ -41,17 +41,34 @@ NON_TARGET_CLASSES = ("test", "guest", "howzeh", "mokammel")
 
 
 def classify_restaurants(names: pd.Series) -> pd.Series:
-    """برچسب رده برای هر مقدار `RestaurantName`."""
-    s = names.astype("string")
-    conds = [s.str.contains(pat, regex=True, na=False) for _, pat in CLASS_PATTERNS]
+    """برچسب رده برای هر مقدار `RestaurantName`.
+
+    ⚠️ رده‌بندی روی **مقادیر یکتا** انجام می‌شود، نه روی ردیف‌ها. رده تابعی محض از
+    نام است، پس نتیجه یکسان است — ولی روی snapshot v4 تفاوتش ۱۲۴ اجرای regex در
+    برابر ۸٬۳۷۱٬۴۸۹ تا، و ۴۴۴ مگابایت ستون رشته‌ی آزاد در برابر ۸ مگابایت
+    `category`. همان ترفند `_normalize_categories` در `src/data/load_v4.py`.
+
+    خروجی `category` است؛ هر مقایسه‌ی برابری، `groupby` و `isin` مثل قبل کار می‌کند.
+    """
+    codes, uniq = pd.factorize(names, use_na_sentinel=True)
+    u = pd.Series(uniq, dtype="string")
+    conds = [u.str.contains(pat, regex=True, na=False) for _, pat in CLASS_PATTERNS]
     labels = [cls for cls, _ in CLASS_PATTERNS]
-    return pd.Series(
-        np.select(conds, labels, default=CORE_CLASS), index=names.index, dtype="object"
-    )
+    per_unique = np.asarray(np.select(conds, labels, default=CORE_CLASS), dtype=object)
+
+    cats, inverse = np.unique(per_unique, return_inverse=True)
+    new_codes = np.where(codes >= 0, inverse[np.maximum(codes, 0)], -1)
+    return pd.Series(pd.Categorical.from_codes(new_codes, categories=cats),
+                     index=names.index, name="restaurant_class")
 
 
 def add_restaurant_class(df: pd.DataFrame, column: str = "RestaurantName") -> pd.DataFrame:
-    out = df.copy()
+    """ستون `restaurant_class` را می‌چسباند، با کپی **کم‌عمق**.
+
+    کپی عمیق روی قابِ ۸.۴ میلیون ردیفی چند گیگابایت می‌گیرد و هیچ لازم نیست —
+    این تابع فقط یک ستون **اضافه** می‌کند و هیچ ستون موجودی را تغییر نمی‌دهد.
+    """
+    out = df.copy(deep=False)
     out["restaurant_class"] = classify_restaurants(out[column])
     return out
 

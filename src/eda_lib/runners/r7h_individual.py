@@ -19,7 +19,9 @@ MIN_RES = 20
 
 def main() -> None:
     set_global_seed()
-    d = build_person_level_v4()
+    # فقط سه ستونِ لازم — بند ۱۴-۶-۲ به بقیه نیاز ندارد (قرارداد حافظه)
+    d = build_person_level_v4(columns=["PersonId", "meal_seq", "dont_receive",
+                                       "jyear", "jmonth"])
     print(f"{len(d):,} رزرو · {d.PersonId.nunique():,} فرد · {d.meal_seq.max()+1} فرصت سرویس · "
           f"نرخ کل {d.dont_receive.mean():.4f}\n")
 

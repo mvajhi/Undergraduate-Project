@@ -9,19 +9,35 @@
 قرارداد همان `src/models/tests.py` است: هر تست `(bool, str)` برمی‌گرداند.
 
 اجرا: `python -m src.data.tests_v4`
+
+## ⚠️ چرا این تست‌ها دیگر داده را در حافظه بار نمی‌کنند
+
+نسخه‌ی نخست با `load_clean_v4()` کار می‌کرد و روی ماشین ۱۶ گیگابایتی پروژه
+**با OOM کشته می‌شد** (اوج ~۴ گیگابایت، هم‌زمان با هر کار دیگری = SIGKILL).
+یک تستی که اجرا نمی‌شود، تست نیست.
+
+ولی **هیچ‌یک از این نُه تست به ردیف‌ها نیاز ندارد** — همه `GROUP BY` یا `DISTINCT`
+هستند. حالا از `src/data/query_v4.py` (DuckDB) می‌آیند: **~۲۳۵ مگابایت** به‌جای
+~۴٬۰۰۰، و اعداد **بیت‌به‌بیت** همان‌اند (اعتبارسنجی‌شده در برابر مسیر pandas).
+
+⚠️ دو قرارداد که هنگام انتقال عمداً حفظ شدند، چون تغییر بی‌صدایشان یعنی تست
+چیز دیگری را می‌سنجد:
+
+- **وزن سطری، نه پرسی.** این تست‌ها تاریخاً هر رکورد رزرو را یک واحد می‌شمارند
+  (`weight="rows"`)، نه `SUM(Count)`. از F94 به بعد این دو یکی نیستند.
+- **دوره‌بندی میلادی** در تست بی‌ثباتی تک‌کدها (`by="greg_month"`)، چون
+  `status_stability_table` تاریخاً با ماه میلادی کار می‌کند.
 """
 
 from __future__ import annotations
 
 import pandas as pd
 
+import src.data.query_v4 as q
 from src.data.food_dim_v4 import OUTPUT_PATH as FOOD_DIM_PATH
-from src.data.load_v4 import (
-    DONT_RECEIVE_STATUSES,
-    load_clean_v4,
-    status_stability_table,
-)
+from src.data.load_v4 import DONT_RECEIVE_STATUSES
 from src.data.restaurant_dim_v4 import OUTPUT_PATH as RESTAURANT_DIM_PATH
+from src.data.text_normalize import normalize_persian_text
 
 #: بیشینه‌ی نوسان مجاز نرخ اجتماع بین سال‌های شمسی، بر حسب واحد درصد. F102 کل جابه‌جایی
 #: را «زیر یک واحد درصد» ثبت کرده (۷.۷۰/۸.۵۴/۸.۶۱)؛ آستانه‌ی ۲ فضای تنفس می‌دهد بدون
@@ -31,14 +47,25 @@ MAX_UNION_DRIFT_PP = 2.0
 #: نرخ اجتماع باید در این بازه بماند. بیرون‌زدن یعنی تعریف هدف عوض شده است.
 UNION_RATE_BOUNDS = (0.05, 0.12)
 
-_CACHE: dict[str, pd.DataFrame] = {}
+#: یک اتصال DuckDB برای کل اجرا — هر تست view مشترک `reserve` را می‌بیند.
+_CON = None
 
 
-def _data() -> pd.DataFrame:
-    if "df" not in _CACHE:
-        _CACHE["df"] = load_clean_v4(["miladi", "DateReserve", "mealid", "ReserveStatus",
-                                      "Count", "RestaurantName", "FoodName"])
-    return _CACHE["df"]
+def _con():
+    global _CON
+    if _CON is None:
+        _CON = q.connect()
+        q.assert_known_statuses(_CON)   # همان دروازه‌ی رانشِ `clean_v4`
+    return _CON
+
+
+def _normalized_distinct(column: str) -> set[str]:
+    """مقادیر یکتای یک ستون، **پس از** نرمال‌سازی فارسی.
+
+    نرمال‌سازی روی ~۱٬۷۶۲ مقدار یکتا انجام می‌شود، نه روی ۸.۴ میلیون ردیف — همان
+    ترفندی که `_normalize_categories` در `load_v4` استفاده می‌کند.
+    """
+    return {normalize_persian_text(v) for v in q.distinct_values(column, _con()).value}
 
 
 # ---------------------------------------------------------------------------
@@ -79,9 +106,7 @@ def test_union_rate_stable_across_years() -> tuple[bool, str]:
     عدد ثبت‌شده در F102 (۷.۷۰/۸.۵۴/۸.۶۱) به سطر آخر نزدیک است. هر نقل‌قولی از این
     اعداد باید بگوید از کدام مسیر آمده — اختلافشان کوچک است ولی صفر نیست.
     """
-    df = _data()
-    ay = academic_year(df["jyear"], df["jmonth"])
-    by_year = df.groupby(ay)["dont_receive"].mean() * 100
+    by_year = q.union_rate(_con(), by="academic_year", weight="rows")["rate"] * 100
     drift = float(by_year.max() - by_year.min())
     ok = drift <= MAX_UNION_DRIFT_PP
     return ok, f"نوسان نرخ اجتماع {drift:.2f} واحد درصد (حد {MAX_UNION_DRIFT_PP}) · " + \
@@ -90,7 +115,7 @@ def test_union_rate_stable_across_years() -> tuple[bool, str]:
 
 def test_union_rate_within_bounds() -> tuple[bool, str]:
     """نرخ کل باید در بازه‌ی مورد انتظار بماند — پرچم تغییر تعریف هدف."""
-    rate = float(_data()["dont_receive"].mean())
+    rate = float(q.union_rate(_con(), weight="rows"))
     lo, hi = UNION_RATE_BOUNDS
     return lo <= rate <= hi, f"نرخ اجتماع {rate:.4f} (بازه‌ی مجاز {lo}–{hi})"
 
@@ -102,7 +127,7 @@ def test_single_codes_are_unstable_as_documented() -> tuple[bool, str]:
     شوند، آن هم یک **تغییر** است و باید دیده شود: یعنی یا سامانه رفتارش را عوض کرده یا
     داده فیلتر شده. در هر دو حالت فرضِ زیربنای قاعده‌ی پایداری هدف باید بازبینی شود.
     """
-    table = status_stability_table(_data())
+    table = q.status_shares(_con(), by="greg_month", weight="rows")
     singles = [c for c in DONT_RECEIVE_STATUSES if c in table.columns]
     if not singles:
         return False, "هیچ‌کدام از سه کد عدم‌دریافت در داده نیست — پرچم قرمز"
@@ -121,7 +146,7 @@ def test_all_expected_status_codes_present() -> tuple[bool, str]:
     (مثلاً `منقضی شده`) از داده **غایب** شود، همه‌چیز بی‌خطا کار می‌کند و هدف بی‌صدا
     کوچک می‌شود. این تست همان حالت را می‌گیرد.
     """
-    present = set(_data()["ReserveStatus"].dropna().unique())
+    present = set(q.distinct_values("ReserveStatus", _con()).value)
     missing = DONT_RECEIVE_STATUSES - present
     return not missing, ("هر سه کد عدم‌دریافت حاضرند" if not missing
                          else f"⚠️ کد غایب: {sorted(missing)}")
@@ -132,10 +157,12 @@ def test_no_status_code_dominates_alone() -> tuple[bool, str]:
 
     اگر بسازد، یعنی عملاً هدف به یک تک‌کد فروکاسته شده و F90 دیگر محافظت نمی‌کند.
     """
-    df = _data()
-    dont = df[df["dont_receive"]]
-    shares = dont["ReserveStatus"].value_counts(normalize=True)
-    top, share = shares.index[0], float(shares.iloc[0])
+    codes = q._quoted(DONT_RECEIVE_STATUSES)
+    d = _con().execute(
+        f"SELECT ReserveStatus AS code, count(*) AS n FROM reserve "
+        f"WHERE ReserveStatus IN ({codes}) GROUP BY 1 ORDER BY 2 DESC"
+    ).fetch_df()
+    top, share = d["code"].iloc[0], float(d["n"].iloc[0] / d["n"].sum())
     return share <= 0.90, f"بیشترین سهم تک‌کد: «{top}» = {share:.1%} از اجتماع"
 
 
@@ -146,7 +173,7 @@ def test_no_status_code_dominates_alone() -> tuple[bool, str]:
 
 def test_every_restaurant_has_dim_row() -> tuple[bool, str]:
     """هیچ نام سلفی نباید بی‌ویژگی بماند — «نام بدون نگاشت نباید بی‌صدا حذف شود»."""
-    names = set(_data()["RestaurantName"].astype(str).unique())
+    names = _normalized_distinct("RestaurantName")
     known = set(pd.read_csv(RESTAURANT_DIM_PATH)["raw_name"].astype(str))
     missing = names - known
     return not missing, (f"هر {len(names)} نام سلف پوشش دارد" if not missing
@@ -154,7 +181,7 @@ def test_every_restaurant_has_dim_row() -> tuple[bool, str]:
 
 
 def test_every_food_has_dim_row() -> tuple[bool, str]:
-    names = set(_data()["FoodName"].astype(str).unique())
+    names = _normalized_distinct("FoodName")
     known = set(pd.read_csv(FOOD_DIM_PATH)["raw_food_name"].astype(str))
     missing = names - known
     return not missing, (f"هر {len(names)} نام غذا پوشش دارد" if not missing
@@ -180,8 +207,8 @@ def test_count_is_not_binary() -> tuple[bool, str]:
     """⚠️ تأیید F94 به‌عنوان تست: اگر روزی `Count` دوباره باینری شود، فرضِ «جمع بزن،
     ردیف نشمار» بی‌خطر می‌شود ولی **کدی که ردیف می‌شمارد هم بی‌صدا درست می‌شود** —
     و آن وقت باگ بعدی دیرتر پیدا می‌شود."""
-    counts = _data()["Count"]
-    n_multi = int((counts > 1).sum())
+    dist = q.count_distribution(_con())
+    n_multi = int(dist.loc[dist["value"] > 1, "rows"].sum())
     return n_multi > 0, f"{n_multi:,} ردیف با Count>1 (F94) — جمع‌زدن الزامی است"
 
 
@@ -199,11 +226,17 @@ _ALL_TESTS = [
 
 
 def run_all() -> bool:
+    global _CON
     all_ok = True
-    for fn in _ALL_TESTS:
-        ok, msg = fn()
-        print(f"  {'✅' if ok else '❌'} {fn.__name__:<46s} {msg}")
-        all_ok &= ok
+    try:
+        for fn in _ALL_TESTS:
+            ok, msg = fn()
+            print(f"  {'✅' if ok else '❌'} {fn.__name__:<46s} {msg}")
+            all_ok &= ok
+    finally:
+        if _CON is not None:
+            _CON.close()
+            _CON = None
     return all_ok
 
 
