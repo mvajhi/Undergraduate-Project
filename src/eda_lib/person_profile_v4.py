@@ -526,3 +526,52 @@ def build_person_profile_v4(force: bool = False) -> pd.DataFrame:
     (DATA_INTERIM / "person_profile_v4_meta.json").write_text(
         json.dumps({k: float(v) for k, v in meta.items()}, indent=2), encoding="utf-8")
     return P
+
+
+# ---------------------------------------------------------------------------
+# پنل فرد × سال — پایه‌ی بندهای ۹-۵-۳، ۹-۸-۴ و ۹-۱۲-۲
+# ---------------------------------------------------------------------------
+
+PERSON_YEAR_V4 = DATA_INTERIM / "person_year_v4.parquet"
+
+
+def build_person_year_v4(force: bool = False) -> pd.DataFrame:
+    """یک ردیف به‌ازای هر (فرد، سال تحصیلی) — با انقباض **داخل همان سال**.
+
+    ⚠️ چرا پیشین هر سال جداگانه برآورد می‌شود: نرخ پایه بین سه سال رانش صعودی
+    دارد (F221: ۷.۷۱٪ → ۸.۲۵٪ → ۸.۶۵٪). انقباض همه‌ی سال‌ها به سمت یک پیشین
+    مشترک، بخشی از همان رانش را به‌عنوان «تغییر فرد» ثبت می‌کند و ماتریس گذار
+    دهک را به‌طور مصنوعی ناپایدار نشان می‌دهد.
+
+    `year_block` تقویم بدون شکاف است (`add_year_block`)، نه `academic_year` رسمی —
+    دلیلش در همان تابع نوشته شده.
+    """
+    if PERSON_YEAR_V4.exists() and not force:
+        return pd.read_parquet(PERSON_YEAR_V4)
+
+    d = add_year_block(build_person_rows_v4(columns=[KEY, "date_gregorian",
+                                                     "dont_receive", "Count"]))
+    g = d.groupby([KEY, "year_block"], observed=True)
+    Y = pd.DataFrame({"n_res": g.size(),
+                      "n_waste": g["dont_receive"].sum(),
+                      "n_active_days": g["date_gregorian"].nunique(),
+                      "first_seen": g["date_gregorian"].min(),
+                      "last_seen": g["date_gregorian"].max()}).reset_index()
+    Y["rho_raw"] = Y.n_waste / Y.n_res
+
+    Y["rho_eb"] = np.nan
+    priors = {}
+    for yb, idx in Y.groupby("year_block", observed=True).groups.items():
+        sub = Y.loc[idx]
+        a, b = fit_beta_binomial(sub.n_waste.to_numpy(), sub.n_res.to_numpy())
+        Y.loc[idx, "rho_eb"] = eb_shrink(sub.n_waste.to_numpy(), sub.n_res.to_numpy(), a, b)
+        priors[str(yb)] = {"alpha": a, "beta": b, "strength": a + b,
+                           "n_person": len(sub), "rho": float(sub.n_waste.sum() / sub.n_res.sum())}
+    Y.attrs["priors"] = priors
+
+    PERSON_YEAR_V4.parent.mkdir(parents=True, exist_ok=True)
+    Y.to_parquet(PERSON_YEAR_V4, index=False)
+    import json
+    (DATA_INTERIM / "person_year_v4_priors.json").write_text(
+        json.dumps(priors, indent=2, ensure_ascii=False), encoding="utf-8")
+    return Y
