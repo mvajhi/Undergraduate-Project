@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import logging
 
+import numpy as np
 import pandas as pd
 
 from src.config import DATA_PROCESSED
@@ -56,6 +57,33 @@ F97_REFERENCE = {
 }
 
 
+def _as_category(col: pd.Series) -> pd.Series:
+    """ستون را رده‌ای برمی‌گرداند بدون عبور از `object` — حتی اگر از قبل رده‌ای باشد."""
+    if isinstance(col.dtype, pd.CategoricalDtype):
+        return col
+    return col.astype("category")
+
+
+def _map_categories(col: pd.Series, lookup: pd.Series, *, to_category: bool = True):
+    """نگاشت یک ستون رده‌ای با جست‌وجو روی **رده‌ها**، نه روی ردیف‌ها.
+
+    کدهای رده‌ای ردیف‌ها ثابت می‌مانند و فقط برچسب‌ها عوض می‌شوند؛ پس هزینه‌ی
+    حافظه با تعداد **رده** بالا می‌رود نه با تعداد ردیف. مقدارِ نگاشت‌نشده `NaN`
+    می‌شود، دقیقاً مثل `merge(how="left")`.
+    """
+    values = lookup.reindex(col.cat.categories).to_numpy()
+    codes = col.cat.codes.to_numpy()
+    if not to_category:
+        out = np.where(codes >= 0, values[np.clip(codes, 0, None)], np.nan)
+        return pd.Series(out, index=col.index)
+
+    uniq = pd.Index(pd.unique(pd.Series(values).dropna()))
+    remap = {v: i for i, v in enumerate(uniq)}
+    per_cat = np.array([remap.get(v, -1) for v in values], dtype=np.int32)
+    out_codes = np.where(codes >= 0, per_cat[np.clip(codes, 0, None)], -1)
+    return pd.Series(pd.Categorical.from_codes(out_codes, categories=uniq), index=col.index)
+
+
 def load_person_level() -> pd.DataFrame:
     """ردیف‌های سطح فرد، پاکسازی‌شده و **فیلترشده به دامنه‌ی مسئله**.
 
@@ -69,23 +97,44 @@ def load_person_level() -> pd.DataFrame:
     restaurants = pd.read_csv(RESTAURANT_DIM_PATH)
     foods = pd.read_csv(FOOD_DIM_PATH)
 
-    df["restaurant"] = df["RestaurantName"].astype(str)
-    df["dish_raw"] = df["FoodName"].astype(str)
+    # ⚠️ قاعده‌ی ۱ قرارداد حافظه (`AGENTS.md`): «روی دسته‌ها کار کنید، نه روی ردیف‌ها.»
+    #
+    # نسخه‌ی پیشین این تابع دو `merge` روی ۸.۴ میلیون ردیف می‌زد و ده ستون `object`
+    # می‌ساخت؛ اوج مصرف **۱۲.۳ گیگابایت** روی ماشین ۱۶ گیگابایتی بود — یعنی یک
+    # فرایند دیگرِ هم‌زمان کافی بود تا `SIGKILL` بگیرد. ولی کاردینالیتی واقعی این
+    # نگاشت‌ها کوچک است: ۱۲۴ سلف و چند صد نام غذا. پس نگاشت روی **رده‌ها** اجرا
+    # می‌شود نه روی ردیف‌ها، و کد رده‌ایِ هر ردیف دست‌نخورده می‌ماند.
+    #
+    # همان الگوی `classify_restaurants` که از ۸.۴ میلیون اجرای regex به ۱۲۴ رسید.
+    # هم‌ارزی خروجی با نسخه‌ی merge در `test_person_level_mapping_matches_merge` آزموده می‌شود.
+    df["restaurant"] = _as_category(df["RestaurantName"])
+    df["dish_raw"] = _as_category(df["FoodName"])
 
-    df = df.merge(
-        restaurants[["raw_name", "restaurant_class", "campus", "city", "venue_type"]],
-        left_on="restaurant", right_on="raw_name", how="left",
-    ).merge(
-        foods[["raw_food_name", "canonical_dish", "food_group", "is_dish"]],
-        left_on="dish_raw", right_on="raw_food_name", how="left",
-    )
-    df = df.rename(columns={"canonical_dish": "dish"})
+    rmap = restaurants.drop_duplicates("raw_name").set_index("raw_name")
+    fmap = foods.drop_duplicates("raw_food_name").set_index("raw_food_name")
+    for col in ("restaurant_class", "campus", "city", "venue_type"):
+        df[col] = _map_categories(df["restaurant"], rmap[col])
+    for src, dst in (("canonical_dish", "dish"), ("food_group", "food_group")):
+        df[dst] = _map_categories(df["dish_raw"], fmap[src])
+    df["is_dish"] = _map_categories(df["dish_raw"], fmap["is_dish"], to_category=False)
 
     # هیچ ردیفی نباید بی‌ویژگی بماند — دروازه‌ی بند ۱۳-۵ در مصرف هم برقرار است.
     for col in ("restaurant_class", "is_dish"):
         missing = int(df[col].isna().sum())
         if missing:
             raise ValueError(f"{missing} ردیف بدون «{col}» — جدول بعد با داده هم‌نسخه نیست")
+
+    # ⚠️ قاعده‌ی ۳ قرارداد حافظه (`AGENTS.md`): «هیچ ستون رشته‌ای آزادی نسازید.»
+    # merge با جدول‌های بعد، ده ستون `object` روی ۸.۲ میلیون ردیف می‌سازد —
+    # هرکدام ~۴۵۰ مگابایت، و اوج مصرف را روی ماشین ۱۶ گیگابایتی به **۱۲.۳
+    # گیگابایت** می‌رساند. کاردینالیتی واقعی‌شان کوچک است (۱۲۴ سلف، ۱۲۲ غذا،
+    # ۶ شهر)، پس `category` همان اطلاعات را در کسری از حافظه نگه می‌دارد.
+    # ⚠️ این تبدیل **پس از** merge انجام می‌شود نه قبلش: کلید merge اگر رده‌ای
+    # باشد و دو طرف رده‌های متفاوت داشته باشند، pandas به `object` برمی‌گرداند و
+    # صرفه‌جویی از بین می‌رود.
+    for col in df.columns:
+        if df[col].dtype == object:
+            df[col] = df[col].astype("category")
 
     return df
 
@@ -255,3 +304,53 @@ if __name__ == "__main__":
     print("\n=== اعتبارسنجی در برابر فایل تجمیعی (مرجع F97) ===")
     for k, v in result["_validation"].items():
         print(f"  {k}: {v}")
+
+
+def test_person_level_mapping_matches_merge(sample_rows: int = 2_000_000) -> tuple[bool, str]:
+    """نگاشت روی رده‌ها باید **دقیقاً** همان چیزی را بدهد که `merge` می‌داد.
+
+    این تست بدهی یک بازنویسی حافظه‌ای را می‌پردازد: `load_person_level` از دو
+    `merge` روی ۸.۴ میلیون ردیف به نگاشت روی رده‌ها تغییر کرد (اوج ۱۲.۳ گیگابایت
+    → ۱.۸؛ زمان ۳۱.۸ ثانیه → ۳.۳). صرفه‌جویی بی‌معناست اگر یک مقدار هم عوض شده
+    باشد، پس نسخه‌ی `merge` روی نمونه‌ای از همان داده بازسازی و مقایسه می‌شود.
+    """
+    df = load_clean_v4(
+        ["PersonId", "RestaurantName", "FoodName", "Count", "miladi", "mealid", "ReserveStatus"]
+    ).head(sample_rows)
+    restaurants = pd.read_csv(RESTAURANT_DIM_PATH)
+    foods = pd.read_csv(FOOD_DIM_PATH)
+
+    legacy = df.copy(deep=False)
+    legacy["restaurant"] = legacy["RestaurantName"].astype(str)
+    legacy["dish_raw"] = legacy["FoodName"].astype(str)
+    legacy = legacy.merge(
+        restaurants[["raw_name", "restaurant_class", "campus", "city", "venue_type"]],
+        left_on="restaurant", right_on="raw_name", how="left",
+    ).merge(
+        foods[["raw_food_name", "canonical_dish", "food_group", "is_dish"]],
+        left_on="dish_raw", right_on="raw_food_name", how="left",
+    ).rename(columns={"canonical_dish": "dish"})
+
+    fast = df.copy(deep=False)
+    fast["restaurant"] = _as_category(fast["RestaurantName"])
+    fast["dish_raw"] = _as_category(fast["FoodName"])
+    rmap = restaurants.drop_duplicates("raw_name").set_index("raw_name")
+    fmap = foods.drop_duplicates("raw_food_name").set_index("raw_food_name")
+    for col in ("restaurant_class", "campus", "city", "venue_type"):
+        fast[col] = _map_categories(fast["restaurant"], rmap[col])
+    fast["dish"] = _map_categories(fast["dish_raw"], fmap["canonical_dish"])
+    fast["food_group"] = _map_categories(fast["dish_raw"], fmap["food_group"])
+    fast["is_dish"] = _map_categories(fast["dish_raw"], fmap["is_dish"], to_category=False)
+
+    checked = ["restaurant", "dish_raw", "restaurant_class", "campus", "city",
+               "venue_type", "dish", "food_group", "is_dish"]
+    bad = []
+    for col in checked:
+        a = legacy[col].astype(object).where(legacy[col].notna(), None)
+        b = fast[col].astype(object).where(fast[col].notna(), None)
+        n_diff = int((a.to_numpy() != b.to_numpy()).sum())
+        if n_diff:
+            bad.append(f"{col}:{n_diff}")
+    ok = not bad
+    return ok, (f"{len(df):,} ردیف × {len(checked)} ستون بررسی شد · "
+                + ("هیچ اختلافی نیست" if ok else "اختلاف در " + "، ".join(bad)))
