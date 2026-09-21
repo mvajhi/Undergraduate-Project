@@ -355,3 +355,66 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def block_bootstrap_2d_mean(
+    df: pd.DataFrame, value_col: str, day_col: str = DATE_COL,
+    unit_col: str = "RestaurantName", n_boot: int = 1000, alpha: float = 0.05,
+    seed: int = 42,
+) -> tuple[float, float, float]:
+    """همان بوت‌استرپ بلوکی دوبعدی، وقتی آماره **میانگین یک ستون** است.
+
+    `block_bootstrap_2d` عمومی است و به‌ازای هر تکرار یک `DataFrame` می‌سازد؛ روی
+    تقسیمی با ۲۰۹ روز × ۶۷ سلف این یعنی ~۱.۳ ثانیه برای هر ۲۵ تکرار، و جریان ب ده‌ها
+    بار به آن نیاز دارد. وقتی آماره میانگین است، همان نمونه‌ی بوت‌استرپ را می‌شود از
+    جمع و شمارِ از پیش محاسبه‌شده‌ی هر بلوک ساخت: میانگینِ اجتماع بلوک‌ها = مجموع
+    جمع‌ها ÷ مجموع شمارها.
+
+    **همان روش است، نه تقریبش.** دنباله‌ی `rng` و ترتیب قرعه عیناً یکسان نگه داشته
+    شده‌اند تا با همان `seed` همان نمونه‌ها کشیده شوند؛
+    `test_block_bootstrap_mean_matches_generic` هم‌ارزی عددی را می‌آزماید. تفاوت فقط
+    ترتیب جمع‌زدن ممیز شناور است.
+    """
+    rng = np.random.default_rng(seed)
+    days = df[day_col].unique()
+    units = df[unit_col].unique()
+
+    block = df.groupby([day_col, unit_col], observed=True)[value_col].agg(["sum", "count"])
+    day_pos = {d: i for i, d in enumerate(days)}
+    unit_pos = {u: j for j, u in enumerate(units)}
+    sums = np.zeros((len(days), len(units)), dtype=float)
+    counts = np.zeros((len(days), len(units)), dtype=float)
+    for (d, u), row in block.iterrows():
+        sums[day_pos[d], unit_pos[u]] = row["sum"]
+        counts[day_pos[d], unit_pos[u]] = row["count"]
+
+    stats = np.empty(n_boot, dtype=float)
+    n_kept = 0
+    for _ in range(n_boot):
+        bd = np.array([day_pos[d] for d in rng.choice(days, size=len(days), replace=True)])
+        bu = np.array([unit_pos[u] for u in rng.choice(units, size=len(units), replace=True)])
+        den = counts[np.ix_(bd, bu)].sum()
+        if den == 0:
+            continue
+        value = sums[np.ix_(bd, bu)].sum() / den
+        if np.isfinite(value):
+            stats[n_kept] = value
+            n_kept += 1
+
+    stats = stats[:n_kept]
+    lo, hi = np.percentile(stats, [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    return float(df[value_col].mean()), float(lo), float(hi)
+
+
+def test_block_bootstrap_mean_matches_generic(
+    df: pd.DataFrame, value_col: str, day_col: str = DATE_COL,
+    unit_col: str = "RestaurantName", n_boot: int = 40, seed: int = 42,
+) -> tuple[bool, str]:
+    """نسخه‌ی سریع باید با نسخه‌ی عمومی، در همان seed، همان CI را بدهد."""
+    generic = block_bootstrap_2d(df, lambda s: s[value_col].mean(), day_col=day_col,
+                                 unit_col=unit_col, n_boot=n_boot, seed=seed)
+    fast = block_bootstrap_2d_mean(df, value_col, day_col=day_col, unit_col=unit_col,
+                                   n_boot=n_boot, seed=seed)
+    worst = max(abs(a - b) / max(abs(a), 1e-12) for a, b in zip(generic, fast))
+    ok = worst < 1e-6
+    return ok, f"بیشینه‌ی اختلاف نسبی {worst:.2e} روی (نقطه، کران پایین، کران بالا)"

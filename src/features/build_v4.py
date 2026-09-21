@@ -330,14 +330,33 @@ FEATURE_SETS: dict[str, list[str]] = {
 }
 
 
+#: مجموعه‌ی مرجع جریان ب (ردیف ۱۱۴ `decision_log`) — سه خانواده‌ای که سهمشان
+#: اثبات شد، ۳۸ ستون در برابر ۶۶.
+#:
+#: **این یک «فیچرست سبک‌تر برای سرعت» نیست، نتیجه‌ی اندازه‌گیری است.** ablation هر
+#: هفت خانواده (بند ۱۴-۹-۱) نشان داد `entity`، `weather` و `composition` روی هیچ‌کدام
+#: از سه تقسیم Δ معنادار ندارند و حذف **هم‌زمانشان** هم بی‌هزینه است (F277). `full`
+#: حذف نمی‌شود و ستون مقایسه می‌ماند — اگر نسل دوم هیچ‌کدامشان را احیا نکرد، خودِ آن
+#: هم یک نتیجه است.
+LEAN_FAMILIES = ["known_demand", "history", "calendar"]
+
+
 def feature_set(name: str) -> list[str]:
-    """`full` = همه · `no_weather` = همه جز هواشناسی."""
+    """`full` = همه · `lean` = سه خانواده‌ی اثبات‌شده · `no_<خانواده>` = همه جز آن · `<خانواده>` = فقط خودش.
+
+    قالب `no_*` **عمومی** است، نه فهرستی از چند حالت دستی: بند ۱۴-۹-۱ سهم هر هفت
+    خانواده را با leave-one-family-out می‌سنجد، و هر خانواده‌ای که اینجا حالت ویژه‌ی
+    خودش را لازم داشته باشد، یعنی یکی از هفت‌تا بی‌صدا از ablation جا می‌ماند.
+    """
     if name == "full":
         return [c for cols in FEATURE_SETS.values() for c in cols]
-    if name == "no_weather":
-        return [c for key, cols in FEATURE_SETS.items() if key != "weather" for c in cols]
-    if name == "no_composition":
-        return [c for key, cols in FEATURE_SETS.items() if key != "composition" for c in cols]
+    if name == "lean":
+        return [c for fam in LEAN_FAMILIES for c in FEATURE_SETS[fam]]
+    if name.startswith("no_"):
+        dropped = name[3:]
+        if dropped not in FEATURE_SETS:
+            raise KeyError(f"خانواده‌ی ناشناخته برای حذف: {dropped}")
+        return [c for key, cols in FEATURE_SETS.items() if key != dropped for c in cols]
     return FEATURE_SETS[name]
 
 
