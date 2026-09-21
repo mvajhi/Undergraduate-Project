@@ -22,6 +22,8 @@ $$\boxed{\text{مشاهده مجاز است} \iff \text{meal\_seq}_{\text{obs}} 
 روز $d-1$ هنوز سرو نشده. اندازه‌ی این خوش‌بینی در `doc/leakage_audit.md` کمّی شده است.
 """
 
+import logging
+
 import numpy as np
 import pandas as pd
 
@@ -29,6 +31,8 @@ MEAL_ORDER = {"lunch": 0, "dinner": 1}
 N_MEALS = 2
 #: فاصله‌ی مجاز بین وعده‌ی هدف و آخرین وعده‌ی قابل‌استفاده (بر حسب شماره‌ی سراسری وعده)
 CUTOFF_LAG = 2
+
+logger = logging.getLogger(__name__)
 
 
 def meal_seq(dates: pd.Series, meals: pd.Series, origin: pd.Timestamp | None = None) -> pd.Series:
@@ -80,6 +84,19 @@ def expanding_stat_at_cutoff(
     work["_row"] = np.arange(len(work))
     out_sum = np.full(len(work), np.nan)
     out_cnt = np.zeros(len(work), dtype="int64")
+
+    # ⚠️ تله‌ی خاموش: `np.cumsum` با یک `NaN`، **تمام** مقادیر پس از آن را در همان
+    # گروه `NaN` می‌کند. ستونی که فقط در ردیف اولِ هر گروه `NaN` است (مثل هر فیچر
+    # مبتنی بر `shift`) خروجی را کاملاً تهی می‌کند — و چون خطا نمی‌دهد، به‌صورت
+    # «فیچر با پوشش ۳٪» در جدول ظاهر می‌شود نه به‌صورت باگ. یک‌بار همین اتفاق در
+    # بند ۱۴-۱۱ افتاد. رفتار تابع عوض نمی‌شود (هیچ فراخوان فعلی `NaN` نمی‌دهد)،
+    # فقط دیگر بی‌صدا نیست.
+    if work[value_col].isna().any():
+        logger.warning(
+            "%s شامل %d مقدار NaN است — جمع تجمعی از نخستین NaN به بعد در همان گروه "
+            "NaN می‌شود. پیش از فراخوانی پرش کنید.",
+            value_col, int(work[value_col].isna().sum()),
+        )
 
     for _, g in work.groupby(group_cols, observed=True, sort=False):
         g = g.sort_values(seq_col, kind="stable")
