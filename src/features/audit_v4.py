@@ -165,7 +165,11 @@ def _encode(X: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     set_global_seed()
     df = pd.read_parquet(FEATURES_PATH)
-    features = feature_set("full")
+    # ⚠️ ممیزی روی `FS_core` اجرا می‌شود، نه `full`: پس از بند ۱۴-۱۲ فیچرست مرجع
+    # همان است و ممیزیِ ستون‌هایی که وارد هیچ مدلی نمی‌شوند، دروازه را رقیق می‌کند.
+    from src.features.selection_v4 import core_columns
+
+    features = core_columns()
 
     pd.set_option("display.width", 200)
 
@@ -180,10 +184,71 @@ def main() -> None:
     ok_r2, r2 = test_r2_ceiling(df, features)
     print(f"\n=== ۳. سقف R² (تقسیم زمانی ۸۰/۲۰) ===\n  R² = {r2}  (سقف {R2_CEILING})")
 
-    all_ok = ok_struct and ok_corr and ok_r2
+    ok_refit, refit_report = test_refit_invariance()
+    print("\n=== ۴. ناوردایی نسبت به بازساخت روی زیرمجموعه (بند ۱۴-۱۲-۳) ===")
+    print(refit_report.to_string(index=False))
+
+    all_ok = ok_struct and ok_corr and ok_r2 and ok_refit
     print(f"\n{'✅ ممیزی نشت: قبول' if all_ok else '❌ ممیزی نشت: رد'}")
     if not all_ok:
         raise SystemExit(1)
+
+
+
+
+# ---------------------------------------------------------------------------
+# لایه‌ی چهارم — بند ۱۴-۱۲-۳
+# ---------------------------------------------------------------------------
+
+def test_refit_invariance(n_days_fraction: float = 0.8) -> tuple[bool, pd.DataFrame]:
+    r"""مقدار یک فیچر نباید به **حضور ردیف‌های آینده** بستگی داشته باشد.
+
+    **چرا سه لایه‌ی قبلی کافی نبودند.** بند ۱۴-۱۰ یک ستون عمداً نشتی ساخت
+    (`seas_weekly_leaky`: مؤلفه‌ی فصلی برازش‌شده روی **کل** سری) و اندازه‌ی نشتش را
+    سنجید — برون‌نمونه ۲.۴ برابر اثر واقعی (F292). وقتی همان ستون به ممیزی سه‌لایه
+    داده شد، **از هر سه لایه رد شد**: همبستگی خامش با هدف کوچک است، $R^2$ را به
+    ۰.۹ نمی‌رساند، و لایه‌ی ساختاری فقط فیچرهای تاریخیِ شناخته‌شده را بازسازی می‌کند.
+    یعنی ممیزی، این **رده** از نشت را اصلاً نمی‌دید.
+
+    **آزمون درست، تعریف خودِ نشت است.** فیچری که فقط تا لحظه‌ی برش ساخته شده، اگر
+    روی زیرمجموعه‌ی ابتدایی داده دوباره ساخته شود باید برای همان ردیف‌ها **همان
+    مقدار** را بدهد. فیچری که از آینده خبر دارد، مقدارش عوض می‌شود. این همان
+    منطق `cv.test_expanding_features_independent_of_fold` است، تعمیم‌یافته به هر
+    فیچری که یک تابع سازنده دارد.
+
+    ستون `seas_weekly_leaky` اینجا **شاهد مثبت** است: اگر این آزمون آن را نگیرد،
+    خودِ آزمون بی‌ارزش است.
+    """
+    from src.features.seasonal_v4 import add_seasonal_features
+
+    df = pd.read_parquet(FEATURES_PATH)
+    full = add_seasonal_features(df)
+
+    dates = pd.Index(sorted(pd.to_datetime(df["date_gregorian"]).unique()))
+    cut = dates[int(n_days_fraction * len(dates))]
+    truncated = add_seasonal_features(df[pd.to_datetime(df["date_gregorian"]) < cut].copy())
+
+    key = ["date_gregorian", "meal", "restaurant", "dish"]
+    checked = ["seas_weekly_safe", "seas_weekly_leaky", "seas_dow_sin1", "seas_holiday_signed"]
+    merged = full[key + checked].merge(
+        truncated[key + checked], on=key, suffixes=("_full", "_trunc"))
+
+    rows = []
+    for col in checked:
+        a = merged[f"{col}_full"].to_numpy(float)
+        b = merged[f"{col}_trunc"].to_numpy(float)
+        both = np.isfinite(a) & np.isfinite(b)
+        max_diff = float(np.max(np.abs(a[both] - b[both]))) if both.any() else 0.0
+        rows.append({"feature": col, "n_compared": int(both.sum()),
+                     "max_abs_diff": max_diff, "invariant": max_diff < 1e-9})
+
+    report = pd.DataFrame(rows)
+    control = report[report.feature == "seas_weekly_leaky"]
+    control_caught = bool(len(control) and not control["invariant"].iloc[0])
+    candidates_ok = bool(report[report.feature != "seas_weekly_leaky"]["invariant"].all())
+    report["role"] = np.where(report.feature == "seas_weekly_leaky",
+                              "⛔ شاهد مثبت (باید گرفته شود)", "نامزد (باید ناوردا باشد)")
+    return bool(control_caught and candidates_ok), report
 
 
 if __name__ == "__main__":
