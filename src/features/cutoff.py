@@ -212,3 +212,60 @@ def last_value_at_cutoff(
     res = pd.DataFrame(out, index=df.index)
     res[f"{out_prefix}_days_since"] = days_since
     return res
+
+
+def rolling_stat_at_cutoff(
+    df: pd.DataFrame,
+    group_cols: list[str],
+    value_col: str,
+    window_days: int,
+    seq_col: str = "meal_seq",
+    out_prefix: str = "roll",
+) -> pd.DataFrame:
+    """مثل ``expanding_stat_at_cutoff``، ولی فقط روی **پنجره‌ی متحرک** آخر.
+
+    **چرا تا فاز ۱۳ وجود نداشت.** پنجره‌ی قفل‌شده ۱۴۲ روز بود و پنجره‌ی متحرک ۱۸۰
+    روزه رویش بی‌معنا. با ۶۰۰ روز سرویس، این انتخاب برای نخستین بار واقعی است و بند
+    ۱۴-۹-۳ باید بین دو گزینه عدد بگذارد: تاریخچه‌ی **بلند و کامل** (انبساطی) در برابر
+    تاریخچه‌ی **کوتاه و تازه** (متحرک).
+
+    مرز بالا همان قاعده‌ی برش است ($\\text{seq} \\le \\text{seq}_{target} - 2$)؛ مرز
+    پایین ``seq_target - 2*window_days`` است، چون هر روز دو وعده دارد. حاصل از تفاضل
+    دو ``searchsorted`` روی همان جمع تجمعی می‌آید، پس هزینه‌اش با نسخه‌ی انبساطی یکی است.
+    """
+    work = df[group_cols + [value_col, seq_col]].copy()
+    work["_row"] = np.arange(len(work))
+    out_sum = np.full(len(work), np.nan)
+    out_cnt = np.zeros(len(work), dtype="int64")
+    span = int(window_days) * N_MEALS
+
+    for _, g in work.groupby(group_cols, observed=True, sort=False):
+        g = g.sort_values(seq_col, kind="stable")
+        seqs = g[seq_col].to_numpy()
+        vals = g[value_col].to_numpy(dtype=float)
+        csum = np.concatenate([[0.0], np.cumsum(vals)])
+        hi = np.searchsorted(seqs, seqs - CUTOFF_LAG, side="right")
+        lo = np.searchsorted(seqs, seqs - CUTOFF_LAG - span, side="right")
+        rows = g["_row"].to_numpy()
+        out_sum[rows] = csum[hi] - csum[lo]
+        out_cnt[rows] = hi - lo
+
+    res = pd.DataFrame(index=df.index)
+    res[f"{out_prefix}_sum"] = out_sum
+    res[f"{out_prefix}_count"] = out_cnt
+    with np.errstate(invalid="ignore", divide="ignore"):
+        res[f"{out_prefix}_mean"] = np.where(out_cnt > 0, out_sum / out_cnt, np.nan)
+    return res
+
+
+def test_rolling_matches_expanding_at_infinite_window(
+    df: pd.DataFrame, group_cols: list[str], value_col: str
+) -> tuple[bool, str]:
+    """پنجره‌ی به‌قدر کافی بزرگ باید عیناً همان انبساطی را بدهد."""
+    span = int(df["meal_seq"].max() - df["meal_seq"].min()) + 10
+    roll = rolling_stat_at_cutoff(df, group_cols, value_col, span, out_prefix="_r")
+    exp = expanding_stat_at_cutoff(df, group_cols, value_col, out_prefix="_e")
+    diff = (roll["_r_sum"].fillna(0) - exp["_e_sum"].fillna(0)).abs().max()
+    n_diff = int((roll["_r_count"] != exp["_e_count"]).sum())
+    ok = bool(diff < 1e-9 and n_diff == 0)
+    return ok, f"بیشینه‌ی اختلاف جمع {diff:.2e} · {n_diff} اختلاف در شمارش"
